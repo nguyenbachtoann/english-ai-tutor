@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <!-- interactive-widget=resizes-content: Báo hiệu cho trình duyệt biết web app này muốn tự xử lý resize -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
-    <title>AI Tutor: v3.5 (Native Resize)</title>
+    <title>AI Tutor: v3.6 (Fixed Layout)</title>
     
     <!-- PWA Setup -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -22,19 +22,22 @@
     <style>
         :root { --sat: env(safe-area-inset-top); --sab: env(safe-area-inset-bottom); }
         
-        /* 1. KHÓA CHẶT BODY: Ngăn chặn hành vi "đẩy" trang của trình duyệt */
+        /* FIX 1: KHÓA CHẶT BODY TUYỆT ĐỐI */
+        /* position: fixed giúp ngăn browser tự động đẩy toàn bộ trang lên */
         html, body {
-            height: 100%; width: 100%; overflow: hidden; position: fixed; inset: 0;
+            height: 100%; width: 100%; 
+            position: fixed; inset: 0; overflow: hidden;
             overscroll-behavior: none; font-family: 'Quicksand', sans-serif; background-color: #FFFBEB; 
             -webkit-tap-highlight-color: transparent;
         }
         
-        /* 2. APP CONTAINER: Chiều cao sẽ được JS điều khiển chính xác bằng (Screen - Keyboard) */
+        /* APP CONTAINER: Flex Column chiếm toàn bộ không gian được JS cấp phát */
         #app-container { 
             width: 100%; 
-            /* Chiều cao mặc định là 100%, JS sẽ ghi đè giá trị này khi resize */
-            height: 100%; 
-            display: flex; flex-direction: column; background-color: #FFFBEB; overflow: hidden; position: relative; 
+            height: 100%; /* JS sẽ override giá trị này */
+            display: flex; flex-direction: column; 
+            background-color: #FFFBEB; 
+            position: absolute; top: 0; left: 0; /* Anchor chặt vào body */
         }
         
         #app { background-color: #FFFBEB; height: 100%; width: 100%; display: flex; flex-direction: column; overflow: hidden; }
@@ -42,6 +45,7 @@
         @media (min-width: 768px) {
             #app { max-width: 28rem; margin: 0 auto; border-left: 1px solid #FDE68A; border-right: 1px solid #FDE68A; position: static; height: 100dvh; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
             html, body { position: static; overflow: auto; background-color: #f3f4f6; }
+            #app-container { position: static; }
         }
 
         /* --- ANIMATIONS & UTILS --- */
@@ -64,30 +68,28 @@
         .screen-fade { animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Bottom Sheet Modal Animation */
+        /* Modal Animation */
         .modal-enter { transform: translateY(100%); opacity: 0; }
-        .modal-enter-active { transform: translateY(0); opacity: 1; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .modal-exit { transform: translateY(100%); opacity: 0; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
         
         /* Layout Helpers */
         .no-shrink { flex-shrink: 0; }
-        .scrollable-content { flex-grow: 1; flex-shrink: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; }
+        .scrollable-content { flex-grow: 1; flex-shrink: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; scroll-behavior: smooth; }
         
-        #gameDisplayWrapper { display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; flex-grow: 1; }
+        #gameDisplayWrapper { display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; flex-grow: 1; min-height: 150px; }
         
-        /* Khi ở chế độ bàn phím, ta căn content lên trên một chút để dễ nhìn hơn thay vì giữa */
-        body.keyboard-active #gameDisplayWrapper { justify-content: flex-start; padding-top: 1rem; }
+        /* Khi bàn phím hiện, nén phần hiển thị lại một chút nhưng vẫn giữ center */
+        body.keyboard-active #gameDisplayWrapper { justify-content: center; }
         
         /* Input Focus Ring Custom */
         .input-focus:focus-within { border-color: #FBBF24; box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.2); }
     </style>
 </head>
 <body>
-    <!-- App Container này sẽ được JS thay đổi height liên tục -->
     <div id="app-container">
         <div id="app">
-            <!-- HEADER (Glassmorphism) -->
-            <div id="mainHeader" class="no-shrink px-4 pb-3 pt-[calc(env(safe-area-inset-top)+0.75rem)] bg-[#FFFBEB]/80 backdrop-blur-md flex justify-between items-center z-30 sticky top-0 border-b border-yellow-100/50">
+            <!-- FIX 2: HEADER KHÔNG CÒN STICKY -->
+            <!-- Loại bỏ 'sticky top-0'. Vì đây là flex column, nó sẽ tự động ở trên cùng và KHÔNG BAO GIỜ bị đẩy. -->
+            <div id="mainHeader" class="no-shrink px-4 pb-3 pt-[calc(env(safe-area-inset-top)+0.75rem)] bg-[#FFFBEB] flex justify-between items-center z-30 border-b border-yellow-100/50">
                 <div class="flex items-center gap-3">
                     <button onclick="resetGame()" class="w-10 h-10 flex items-center justify-center text-yellow-800 bg-white rounded-full shadow-sm active:scale-90 transition-transform"><i class="fas fa-home"></i></button>
                     <h1 class="text-xl font-extrabold text-yellow-900 tracking-tight flex items-center gap-2 cursor-pointer" onclick="resetGame()"><span class="text-2xl filter drop-shadow-sm">🥑</span> AI Tutor</h1>
@@ -99,8 +101,8 @@
                 </div>
             </div>
             
-            <!-- MAIN CONTENT -->
-            <div id="mainContent" class="flex-1 flex flex-col relative overflow-hidden w-full">
+            <!-- MAIN CONTENT (Scrollable Area) -->
+            <div id="mainContent" class="flex-1 flex flex-col relative overflow-hidden w-full bg-[#FFFBEB]">
                 
                 <!-- START SCREEN -->
                 <div id="startScreen" class="flex-1 flex flex-col h-full scrollable-content p-5 w-full screen-fade">
@@ -111,7 +113,7 @@
                         <button onclick="setMode('forms')" id="tabForms" class="tab-btn flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition tab-inactive">Biến Thể</button>
                     </div>
 
-                    <div id="startScreenContent" class="w-full max-w-md mx-auto flex-1 flex flex-col justify-center">
+                    <div id="startScreenContent" class="w-full max-w-md mx-auto flex-1 flex flex-col justify-center pb-20">
                         <div class="mb-6 text-center">
                             <!-- View Vocab -->
                             <div id="viewVocab" class="flex flex-col items-center w-full animate-fadeIn">
@@ -176,12 +178,6 @@
                             <i class="fas fa-play text-yellow-400"></i> Bắt Đầu
                         </button>
                     </div>
-                    
-                    <div class="mt-auto pt-6 text-center pb-8 safe-pb">
-                        <span id="dataSourceText" class="text-[10px] text-gray-400 font-bold bg-white/50 px-3 py-1.5 rounded-full border border-gray-100 backdrop-blur-sm">
-                            <i class="fas fa-database mr-1"></i> Source: Offline
-                        </span>
-                    </div>
                 </div>
 
                 <!-- GAME SCREEN -->
@@ -242,7 +238,7 @@
                 </div>
             </div>
 
-            <!-- MODALS (Bottom Sheet Style) -->
+            <!-- MODALS -->
             <div id="settingsPanel" class="hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center pointer-events-none">
                 <div class="absolute inset-0 bg-black/40 backdrop-blur-sm pointer-events-auto transition-opacity duration-300 opacity-0" id="settingsBackdrop" onclick="toggleSettings()"></div>
                 <div class="bg-white w-full sm:w-[28rem] rounded-t-3xl sm:rounded-3xl p-6 pointer-events-auto transform transition-transform duration-300 translate-y-full safe-pb" id="settingsContent">
@@ -343,6 +339,14 @@
                 // Thêm class để CSS có thể điều chỉnh layout (ví dụ: đẩy content lên cao hơn khi có phím)
                 if (height < window.innerHeight * 0.8) {
                     document.body.classList.add('keyboard-active');
+                    // Scroll active input into view logic
+                    setTimeout(() => {
+                        const activeEl = document.activeElement;
+                        if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA')) {
+                           activeEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    }, 100);
+
                 } else {
                     document.body.classList.remove('keyboard-active');
                 }
@@ -386,7 +390,7 @@
             theory: {
                 "Present Simple": { title: "Thì Hiện Tại Đơn (Present Simple)", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Công thức</h3><div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm font-mono"><div class="mb-1"><span class="text-green-600 font-bold">(+)</span> S + V(s/es)</div><div class="mb-1"><span class="text-red-500 font-bold">(-)</span> S + do/does + not + V</div><div><span class="text-blue-500 font-bold">(?)</span> Do/Does + S + V?</div></div><h3 class="font-bold text-indigo-700 mb-2">2. Cách dùng</h3><ul class="list-disc list-inside space-y-1 mb-4 text-gray-700"><li>Diễn tả thói quen, hành động lặp đi lặp lại.</li><li>Diễn tả sự thật hiển nhiên.</li><li>Lịch trình cố định.</li></ul><h3 class="font-bold text-indigo-700 mb-2">3. Dấu hiệu</h3><p class="text-gray-700 italic">Always, usually, often, every day...</p>` },
                 "Present Continuous": { title: "Thì Hiện Tại Tiếp Diễn", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Công thức</h3><div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm font-mono"><div class="mb-1"><span class="text-green-600 font-bold">(+)</span> S + am/is/are + V-ing</div></div><h3 class="font-bold text-indigo-700 mb-2">2. Cách dùng</h3><ul class="list-disc list-inside space-y-1 mb-4 text-gray-700"><li>Hành động đang xảy ra lúc nói.</li><li>Hành động đang diễn ra xung quanh thời điểm nói.</li></ul><h3 class="font-bold text-indigo-700 mb-2">3. Dấu hiệu</h3><p class="text-gray-700 italic">Now, at the moment, Look!...</p>` },
-                "Present Perfect": { title: "Thì Hiện Tại Hoàn Thành", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Công thức</h3><div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm font-mono"><div class="mb-1"><span class="text-green-600 font-bold">(+)</span> S + have/has + V3/ed</div></div><h3 class="font-bold text-indigo-700 mb-2">2. Cách dùng</h3><ul class="list-disc list-inside space-y-1 mb-4 text-gray-700"><li>Hành động bắt đầu trong QK kéo dài đến HT.</li><li>Vừa mới xảy ra.</li><li>Kinh nghiệm.</li></ul><h3 class="font-bold text-indigo-700 mb-2">3. Dấu hiệu</h3><p class="text-gray-700 italic">Just, recently, since, for, already, yet, just, never, ever, so far, up to now, recently, this is the first time.</p>` },
+                "Present Perfect": { title: "Thì Hiện Tại Hoàn Thành", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Công thức</h3><div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm font-mono"><div class="mb-1"><span class="text-green-600 font-bold">(+)</span> S + have/has + V3/ed</div></div><h3 class="font-bold text-indigo-700 mb-2">2. Cách dùng</h3><ul class="list-disc list-inside space-y-1 mb-4 text-gray-700"><li>Hành động bắt đầu trong QK kéo dài đến HT.</li><li>Vừa mới xảy ra.</li><li>Kinh nghiệm.</li></ul><h3 class="font-bold text-indigo-700 mb-2">3. Dấu hiệu</h3><p class="text-gray-700 italic">Just, recently, since, for, already...</p>` },
                 "Present Perfect Continuous": { title: "HT Hoàn Thành Tiếp Diễn", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Công thức</h3><div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm font-mono">S + have/has + been + V-ing</div><p class="text-gray-700">Nhấn mạnh tính liên tục của hành động từ QK đến HT.</p>` },
                 "Past Simple": { title: "Thì Quá Khứ Đơn", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Công thức</h3><div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm font-mono">S + V2/ed</div><p class="text-gray-700">Hành động đã kết thúc trong quá khứ. <br>DH: Yesterday, last week, ago.</p>` },
                 "Past Continuous": { title: "Thì Quá Khứ Tiếp Diễn", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Công thức</h3><div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm font-mono">S + was/were + V-ing</div><p class="text-gray-700">Hành động đang xảy ra tại 1 thời điểm trong QK.</p>` },
