@@ -2,9 +2,9 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <!-- interactive-widget=resizes-content: Báo hiệu cho trình duyệt biết web app này muốn tự xử lý resize -->
+    <!-- interactive-widget=resizes-content: Hỗ trợ Android resize mượt mà -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
-    <title>AI Tutor: v3.6 (Fixed Layout)</title>
+    <title>AI Tutor: v3.7 (Zero Jitter)</title>
     
     <!-- PWA Setup -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -22,22 +22,29 @@
     <style>
         :root { --sat: env(safe-area-inset-top); --sab: env(safe-area-inset-bottom); }
         
-        /* FIX 1: KHÓA CHẶT BODY TUYỆT ĐỐI */
-        /* position: fixed giúp ngăn browser tự động đẩy toàn bộ trang lên */
-        html, body {
+        /* FIX 3.7: ZERO-SCROLL LAYOUT */
+        /* Khóa cứng HTML và BODY. position: fixed khiến trình duyệt KHÔNG THỂ cuộn trang gốc */
+        html { 
+            height: 100%; width: 100%; overflow: hidden; 
+            overscroll-behavior: none; 
+        }
+        body {
             height: 100%; width: 100%; 
-            position: fixed; inset: 0; overflow: hidden;
-            overscroll-behavior: none; font-family: 'Quicksand', sans-serif; background-color: #FFFBEB; 
+            position: fixed; /* QUAN TRỌNG: Ngăn chặn hành vi "đẩy layout" của trình duyệt */
+            top: 0; left: 0; right: 0; bottom: 0;
+            overflow: hidden; 
+            font-family: 'Quicksand', sans-serif; background-color: #FFFBEB; 
             -webkit-tap-highlight-color: transparent;
         }
         
-        /* APP CONTAINER: Flex Column chiếm toàn bộ không gian được JS cấp phát */
+        /* App Container: Đây là "cửa sổ" duy nhất thay đổi kích thước */
         #app-container { 
-            width: 100%; 
-            height: 100%; /* JS sẽ override giá trị này */
+            position: absolute; top: 0; left: 0; width: 100%; 
+            /* Height sẽ được JS cập nhật theo VisualViewport */
+            height: 100%; 
             display: flex; flex-direction: column; 
-            background-color: #FFFBEB; 
-            position: absolute; top: 0; left: 0; /* Anchor chặt vào body */
+            background-color: #FFFBEB;
+            transition: height 0.1s ease-out; /* Thêm transition nhẹ để mượt hơn nếu có độ trễ */
         }
         
         #app { background-color: #FFFBEB; height: 100%; width: 100%; display: flex; flex-direction: column; overflow: hidden; }
@@ -45,7 +52,7 @@
         @media (min-width: 768px) {
             #app { max-width: 28rem; margin: 0 auto; border-left: 1px solid #FDE68A; border-right: 1px solid #FDE68A; position: static; height: 100dvh; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
             html, body { position: static; overflow: auto; background-color: #f3f4f6; }
-            #app-container { position: static; }
+            #app-container { position: static; height: 100dvh; }
         }
 
         /* --- ANIMATIONS & UTILS --- */
@@ -87,8 +94,7 @@
 <body>
     <div id="app-container">
         <div id="app">
-            <!-- FIX 2: HEADER KHÔNG CÒN STICKY -->
-            <!-- Loại bỏ 'sticky top-0'. Vì đây là flex column, nó sẽ tự động ở trên cùng và KHÔNG BAO GIỜ bị đẩy. -->
+            <!-- HEADER: Nằm trong Flex container, không dùng sticky/fixed -->
             <div id="mainHeader" class="no-shrink px-4 pb-3 pt-[calc(env(safe-area-inset-top)+0.75rem)] bg-[#FFFBEB] flex justify-between items-center z-30 border-b border-yellow-100/50">
                 <div class="flex items-center gap-3">
                     <button onclick="resetGame()" class="w-10 h-10 flex items-center justify-center text-yellow-800 bg-white rounded-full shadow-sm active:scale-90 transition-transform"><i class="fas fa-home"></i></button>
@@ -209,7 +215,6 @@
                                 <i class="fas fa-pen"></i>
                             </div>
                         </div>
-                        <!-- Nút kiểm tra: Gọi checkAnswer, trong đó sẽ có lệnh ẩn bàn phím -->
                         <button id="checkBtn" onclick="checkAnswer()" class="w-full bg-gray-900 text-white font-bold text-lg py-4 rounded-3xl shadow-xl shadow-gray-400/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
                             <span>Kiểm tra</span> <i class="fas fa-arrow-up transform rotate-45"></i>
                         </button>
@@ -325,35 +330,32 @@
         })();
         
         // --- 2. NATIVE RESIZE LOGIC (CRITICAL FOR SMOOTH UI) ---
-        // Hàm này đảm bảo khung app luôn vừa khít với không gian nhìn thấy được (Visual Viewport)
-        // Trình duyệt sẽ không cần "scroll" body, do đó loại bỏ hiện tượng giật/đẩy trang.
+        // FIX 3.7: XÓA BỎ LỆNH SCROLL VÀ CHỈ DÙNG VISUAL VIEWPORT ĐỂ RESIZE CONTAINER
         if (window.visualViewport) {
             function handleResize() {
                 const appContainer = document.getElementById('app-container');
-                const height = window.visualViewport.height;
-                appContainer.style.height = `${height}px`;
+                // Chỉ lấy chiều cao, không scroll gì cả
+                appContainer.style.height = `${window.visualViewport.height}px`;
                 
-                // Khóa chặt vị trí scroll để tránh trình duyệt tự ý đẩy nội dung
-                window.scrollTo(0, 0);
-
-                // Thêm class để CSS có thể điều chỉnh layout (ví dụ: đẩy content lên cao hơn khi có phím)
-                if (height < window.innerHeight * 0.8) {
+                // Logic phụ: Thêm class để CSS biết có keyboard hay không
+                if (window.visualViewport.height < window.innerHeight * 0.8) {
                     document.body.classList.add('keyboard-active');
-                    // Scroll active input into view logic
+                    // Tùy chọn: Đảm bảo ô input không bị che (scroll nội bộ #mainContent nếu cần)
                     setTimeout(() => {
-                        const activeEl = document.activeElement;
-                        if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA')) {
-                           activeEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        }
+                         const activeEl = document.activeElement;
+                         if(activeEl && activeEl.id === 'answerInput') {
+                             // Scroll nhẹ nội dung bên trong #mainContent để thấy input nếu nó bị khuất
+                             // Nhưng không được scroll cả body
+                             activeEl.scrollIntoView({block: "nearest", behavior: "smooth"});
+                         }
                     }, 100);
-
                 } else {
                     document.body.classList.remove('keyboard-active');
                 }
             }
 
             window.visualViewport.addEventListener('resize', handleResize);
-            window.visualViewport.addEventListener('scroll', () => window.scrollTo(0, 0)); // Double lock
+            // Không lắng nghe sự kiện scroll nữa vì body đã fixed
             handleResize(); // Gọi ngay lần đầu
         }
 
