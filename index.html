@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <!-- Sử dụng dvh và fit=cover để tính toán chiều cao chính xác. interactive-widget=resizes-content -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
-    <title>AI Tutor: v1.9 (Header Always Visible)</title>
+    <title>AI Tutor: v2.0 (Fixed Keyboard UI)</title>
     
     <!-- PWA Setup -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -54,19 +54,22 @@
         .safe-pb-footer { padding-bottom: calc(var(--sab) + 2rem); }
         .safe-pt { padding-top: calc(var(--sat) + 0.5rem); }
 
-        /* --- SMART KEYBOARD MODE STYLES (v1.9 - Minimal Changes) --- */
-        /* Giữ lại body.keyboard-mode chỉ để đánh dấu trạng thái */
+        /* --- SMART KEYBOARD MODE STYLES (v2.0 FIXED) --- */
         
-        /* Tối ưu màn hình Game/Start: Giữ Header, chỉ thu nhỏ nội dung */
+        /* 1. Ẩn các thành phần không cần thiết trên màn hình Start */
         body.keyboard-mode #logo-container { display: none !important; } 
         body.keyboard-mode #configSection { display: none !important; } 
+        body.keyboard-mode #startScreenContent { 
+            justify-content: flex-start; /* Đẩy nội dung lên trên */
+            padding-top: 1rem;
+        }
 
-        /* Tối ưu khu vực hiển thị câu hỏi và căn chỉnh lại vị trí khi không gian hẹp */
+        /* 2. Điều chỉnh khu vực hiển thị câu hỏi trên màn hình Game */
         body.keyboard-mode #gameDisplayWrapper {
-            flex-grow: 0; 
-            min-height: auto;
-            /* Cần thu nhỏ chiều cao tối đa của khu vực câu hỏi để nhường chỗ cho input */
-            max-height: 40dvh; /* Giới hạn chiều cao động */
+            flex-grow: 1; /* Cho phép nó co lại trong không gian hẹp */
+            min-height: 0; /* Quan trọng để flex-grow hoạt động */
+            max-height: 45vh; /* Giới hạn chiều cao tối đa của vùng câu hỏi */
+            overflow-y: auto; /* Cho phép cuộn nếu câu hỏi quá dài */
             justify-content: center;
             align-items: center;
             padding-top: 0.5rem;
@@ -75,19 +78,22 @@
 
         body.keyboard-mode #mainDisplay { 
             font-size: 1.5rem; 
-            margin-bottom: 0.1rem; 
-            margin-top: 0.1rem; 
             line-height: 1.2;
         }
-        body.keyboard-mode #subDisplay { font-size: 0.75rem; padding: 0.1rem 0.4rem; }
+        body.keyboard-mode #subDisplay { font-size: 0.875rem; padding: 0.1rem 0.4rem; }
         
-        /* Đảm bảo input container luôn nằm ở dưới cùng của viewport đã resize */
+        /* 3. Tối ưu Input Container */
         body.keyboard-mode #inputContainer { 
             padding-bottom: 0.5rem; 
             margin-top: 0.5rem; 
         }
         body.keyboard-mode #inputContainer #checkBtn {
             margin-bottom: 0 !important;
+        }
+
+        /* Đảm bảo #gameHeader và #mainHeader không bị co */
+        #mainHeader, #gameHeader, #progressBarContainer {
+            flex-shrink: 0;
         }
         
     </style>
@@ -110,9 +116,6 @@
                 </div>
             </div>
             
-            <!-- REMOVED: minimalGameHeader (v1.9) -->
-
-
             <!-- SETTINGS MODAL -->
             <div id="settingsPanel" class="hidden absolute inset-0 bg-white z-50 flex flex-col animate-fade-in pt-[calc(env(safe-area-inset-top))]">
                 <div class="p-4 border-b flex justify-between items-center bg-gray-50">
@@ -177,10 +180,11 @@
             </div>
 
             <!-- MAIN CONTENT -->
-            <div id="mainContent" class="flex-1 flex flex-col p-4 overflow-y-auto custom-scroll relative">
+            <!-- Loại bỏ overflow-y:auto ở đây và chuyển xuống gameScreen/startScreen -->
+            <div id="mainContent" class="flex-1 flex flex-col p-4 relative">
                 
                 <!-- START SCREEN -->
-                <div id="startScreen" class="flex-1 flex flex-col h-full">
+                <div id="startScreen" class="flex-1 flex flex-col h-full overflow-y-auto custom-scroll">
                     <!-- Tabs -->
                     <div class="flex bg-gray-100 p-1.5 rounded-2xl mb-4 shrink-0 shadow-inner">
                         <button onclick="setMode('vocab')" id="tabVocab" class="flex-1 py-2 rounded-xl text-xs sm:text-sm font-bold transition tab-active">Từ Vựng</button>
@@ -266,15 +270,18 @@
                     
                     <!-- Game Display Wrapper (Tối ưu cho Keyboard) -->
                     <div id="gameDisplayWrapper" class="flex-1 flex flex-col justify-center items-center mb-4 min-h-0 transition-all duration-300">
-                        <span id="instructionText" class="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4 bg-gray-50 px-3 py-1 rounded-full">Instruction</span>
-                        <div class="w-full flex flex-col items-center justify-center py-4">
+                        <!-- Instruction -->
+                        <span id="instructionText" class="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4 bg-gray-50 px-3 py-1 rounded-full shrink-0">Instruction</span>
+                        
+                        <!-- Content -->
+                        <div class="w-full flex flex-col items-center justify-center py-4 flex-1 min-h-0 overflow-y-hidden">
                             <h2 id="mainDisplay" class="text-3xl sm:text-4xl font-black text-center text-gray-800 mb-2 px-2 leading-tight break-words max-w-full transition-all duration-300">Loading...</h2>
-                            <p id="subDisplay" class="text-indigo-500 font-medium text-base hidden bg-indigo-50 px-3 py-1 rounded-lg mt-2 transition-all duration-300">(hint)</p>
+                            <p id="subDisplay" class="text-indigo-500 font-medium text-base hidden bg-indigo-50 px-3 py-1 rounded-lg mt-2 transition-all duration-300 shrink-0">(hint)</p>
                         </div>
                     </div>
                     
                     <!-- Input Area -->
-                    <div id="inputContainer" class="mt-auto w-full pb-2 flex flex-col transition-all duration-300">
+                    <div id="inputContainer" class="mt-auto w-full pb-2 flex flex-col transition-all duration-300 shrink-0">
                         <input type="text" id="answerInput" class="w-full bg-white border-2 border-gray-200 text-center text-xl p-4 rounded-2xl focus:outline-none focus:border-yellow-400 mb-3 transition-all duration-300" placeholder="Nhập đáp án..." autocomplete="off">
                         <button id="checkBtn" onclick="checkAnswer()" class="w-full bg-gray-800 text-white font-bold py-4 rounded-2xl shadow-lg active:scale-95 flex items-center justify-center gap-2"><i class="fas fa-check-circle text-xl mr-2"></i><span>Kiểm tra</span></button>
                         <div class="h-safe-keyboard hidden"></div>
@@ -627,7 +634,7 @@
             // Nếu chuyển sang màn hình Game, đảm bảo các phần tử game chiếm đúng không gian
             if (s === 'game') {
                 // Đặt lại display wrapper về chế độ mặc định (flex-grow: 1)
-                els.gameDisplayWrapper.classList.remove('flex-grow-0', 'max-h-[40dvh]', 'justify-center', 'items-center', 'padding-top-0_5', 'padding-bottom-0_5');
+                els.gameDisplayWrapper.classList.remove('flex-grow-0', 'max-h-[40dvh]', 'justify-center', 'items-center', 'padding-top-0_5', 'padding-bottom-0_5', 'overflow-y-auto');
                 els.gameDisplayWrapper.classList.add('flex-1', 'justify-center', 'items-center', 'mb-4');
             } else {
                  // Đảm bảo không ở keyboard mode khi không phải màn hình input
@@ -640,19 +647,19 @@
         els.inputs.answer.addEventListener('keypress', (e) => { if(e.key === 'Enter') checkAnswer(); });
         els.config.qtyInput.addEventListener('input', (e) => { els.config.qtyDisplay.textContent = `${e.target.value} câu`; });
 
-        // --- KEYBOARD HANDLING V1.9 (FIXED) ---
+        // --- KEYBOARD HANDLING V2.0 FIXED ---
         let isKeyboardVisible = false;
         
         const enterKeyboardMode = (event) => {
-            if (event && event.target.tagName !== 'INPUT' && event.target.tagName !== 'TEXTAREA' && event.target.id !== 'vocabTopicInput') return;
+            if (event && event.target.tagName !== 'INPUT' && event.target.tagName !== 'TEXTAREA' && event.target.id !== 'vocabTopicInput' && event.target.id !== 'dictInput') return;
             isKeyboardVisible = true;
             document.body.classList.add('keyboard-mode');
             
             // Áp dụng tối ưu UI khi keyboard hiện
             if (!els.screens.game.classList.contains('hidden')) {
-                // Chế độ tối giản cho Game Display Wrapper (như bạn yêu cầu)
+                // Chế độ tối giản cho Game Display Wrapper: co lại và cho phép cuộn
                 els.gameDisplayWrapper.classList.remove('flex-1', 'justify-center', 'items-center', 'mb-4');
-                els.gameDisplayWrapper.classList.add('flex-grow-0', 'max-h-[40dvh]', 'justify-center', 'items-center', 'padding-top-0_5', 'padding-bottom-0_5');
+                els.gameDisplayWrapper.classList.add('flex-grow-0', 'max-h-[40dvh]', 'justify-start', 'items-center', 'overflow-y-auto');
             } else if (!els.screens.start.classList.contains('hidden')) {
                 // Tối ưu màn hình Start
                  document.getElementById('startScreenContent').classList.add('justify-content-flex-start');
@@ -665,7 +672,7 @@
             
             // Khôi phục UI về trạng thái bình thường
             if (!els.screens.game.classList.contains('hidden')) {
-                els.gameDisplayWrapper.classList.remove('flex-grow-0', 'max-h-[40dvh]', 'justify-center', 'items-center', 'padding-top-0_5', 'padding-bottom-0_5');
+                els.gameDisplayWrapper.classList.remove('flex-grow-0', 'max-h-[40dvh]', 'justify-start', 'items-center', 'overflow-y-auto');
                 els.gameDisplayWrapper.classList.add('flex-1', 'justify-center', 'items-center', 'mb-4');
             } else if (!els.screens.start.classList.contains('hidden')) {
                 document.getElementById('startScreenContent').classList.remove('justify-content-flex-start');
