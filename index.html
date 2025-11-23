@@ -2,9 +2,9 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <!-- interactive-widget=resizes-content: Quan trọng để keyboard đẩy nội dung lên mượt mà -->
+    <!-- interactive-widget=resizes-content: Báo hiệu cho trình duyệt biết web app này muốn tự xử lý resize -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
-    <title>AI Tutor: v3.4 (Smoothest)</title>
+    <title>AI Tutor: v3.5 (Native Resize)</title>
     
     <!-- PWA Setup -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -22,15 +22,21 @@
     <style>
         :root { --sat: env(safe-area-inset-top); --sab: env(safe-area-inset-bottom); }
         
-        /* CẤU TRÚC LAYOUT CỐ ĐỊNH (FIXED) ĐỂ TRÁNH GIẬT */
-        html { height: 100%; width: 100%; overflow: hidden; overscroll-behavior: none; }
-        body {
+        /* 1. KHÓA CHẶT BODY: Ngăn chặn hành vi "đẩy" trang của trình duyệt */
+        html, body {
             height: 100%; width: 100%; overflow: hidden; position: fixed; inset: 0;
-            font-family: 'Quicksand', sans-serif; background-color: #FFFBEB; 
+            overscroll-behavior: none; font-family: 'Quicksand', sans-serif; background-color: #FFFBEB; 
             -webkit-tap-highlight-color: transparent;
         }
         
-        #app-container { width: 100%; height: 100%; display: flex; flex-direction: column; background-color: #FFFBEB; overflow: hidden; position: relative; }
+        /* 2. APP CONTAINER: Chiều cao sẽ được JS điều khiển chính xác bằng (Screen - Keyboard) */
+        #app-container { 
+            width: 100%; 
+            /* Chiều cao mặc định là 100%, JS sẽ ghi đè giá trị này khi resize */
+            height: 100%; 
+            display: flex; flex-direction: column; background-color: #FFFBEB; overflow: hidden; position: relative; 
+        }
+        
         #app { background-color: #FFFBEB; height: 100%; width: 100%; display: flex; flex-direction: column; overflow: hidden; }
         
         @media (min-width: 768px) {
@@ -67,14 +73,17 @@
         .no-shrink { flex-shrink: 0; }
         .scrollable-content { flex-grow: 1; flex-shrink: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; }
         
-        /* NO TRANSITION on layout wrapper to prevent resize jitter */
-        #gameDisplayWrapper { display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; flex-grow: 1; } 
+        #gameDisplayWrapper { display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; flex-grow: 1; }
+        
+        /* Khi ở chế độ bàn phím, ta căn content lên trên một chút để dễ nhìn hơn thay vì giữa */
+        body.keyboard-active #gameDisplayWrapper { justify-content: flex-start; padding-top: 1rem; }
         
         /* Input Focus Ring Custom */
         .input-focus:focus-within { border-color: #FBBF24; box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.2); }
     </style>
 </head>
 <body>
+    <!-- App Container này sẽ được JS thay đổi height liên tục -->
     <div id="app-container">
         <div id="app">
             <!-- HEADER (Glassmorphism) -->
@@ -204,7 +213,7 @@
                                 <i class="fas fa-pen"></i>
                             </div>
                         </div>
-                        <!-- Updated Check Button: No preventDefault, pure onclick to allow blur -->
+                        <!-- Nút kiểm tra: Gọi checkAnswer, trong đó sẽ có lệnh ẩn bàn phím -->
                         <button id="checkBtn" onclick="checkAnswer()" class="w-full bg-gray-900 text-white font-bold text-lg py-4 rounded-3xl shadow-xl shadow-gray-400/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
                             <span>Kiểm tra</span> <i class="fas fa-arrow-up transform rotate-45"></i>
                         </button>
@@ -319,9 +328,32 @@
             document.getElementById('apple-icon').href = url; document.getElementById('fav-icon').href = url;
         })();
         
-        // REMOVED manual visualViewport resizing to prevent conflict with browser native behavior
+        // --- 2. NATIVE RESIZE LOGIC (CRITICAL FOR SMOOTH UI) ---
+        // Hàm này đảm bảo khung app luôn vừa khít với không gian nhìn thấy được (Visual Viewport)
+        // Trình duyệt sẽ không cần "scroll" body, do đó loại bỏ hiện tượng giật/đẩy trang.
+        if (window.visualViewport) {
+            function handleResize() {
+                const appContainer = document.getElementById('app-container');
+                const height = window.visualViewport.height;
+                appContainer.style.height = `${height}px`;
+                
+                // Khóa chặt vị trí scroll để tránh trình duyệt tự ý đẩy nội dung
+                window.scrollTo(0, 0);
 
-        /* --- 2. FULL DATA --- */
+                // Thêm class để CSS có thể điều chỉnh layout (ví dụ: đẩy content lên cao hơn khi có phím)
+                if (height < window.innerHeight * 0.8) {
+                    document.body.classList.add('keyboard-active');
+                } else {
+                    document.body.classList.remove('keyboard-active');
+                }
+            }
+
+            window.visualViewport.addEventListener('resize', handleResize);
+            window.visualViewport.addEventListener('scroll', () => window.scrollTo(0, 0)); // Double lock
+            handleResize(); // Gọi ngay lần đầu
+        }
+
+        /* --- 3. FULL DATA --- */
         const offlineData = {
             vocab: { "Daily Life": [{vi: "Cà phê", en: "coffee"}, {vi: "Máy tính", en: "computer"}, {vi: "Sách", en: "book"}, {vi: "Bút", en: "pen"}, {vi: "Trường học", en: "school"}, {vi: "Bạn bè", en: "friend"}, {vi: "Gia đình", en: "family"}, {vi: "Nước", en: "water"}, {vi: "Thức ăn", en: "food"}, {vi: "Tiền", en: "money"}, {vi: "Cửa", en: "door"}, {vi: "Ghế", en: "chair"}, {vi: "Bàn", en: "table"}, {vi: "Thành phố", en: "city"}, {vi: "Công việc", en: "job"}, {vi: "Giường ngủ", en: "bed"}, {vi: "Bếp", en: "kitchen"}, {vi: "Điện thoại", en: "phone"}, {vi: "Xe buýt", en: "bus"}, {vi: "Bữa sáng", en: "breakfast"}], "Work & Business": [{vi: "Phát triển", en: "develop"}, {vi: "Thành tựu", en: "achievement"}, {vi: "Thử thách", en: "challenge"}, {vi: "Môi trường", en: "environment"}, {vi: "Xã hội", en: "society"}, {vi: "Kinh tế", en: "economy"}, {vi: "Văn hóa", en: "culture"}, {vi: "Giải pháp", en: "solution"}, {vi: "Cơ hội", en: "opportunity"}, {vi: "Kiến thức", en: "knowledge"}, {vi: "Kinh nghiệm", en: "experience"}, {vi: "Quyết định", en: "decision"}, {vi: "Ảnh hưởng", en: "influence"}, {vi: "Công nghệ", en: "technology"}, {vi: "Sáng tạo", en: "creative"}, {vi: "Thị trường", en: "market"}, {vi: "Khách hàng", en: "customer"}, {vi: "Đầu tư", en: "investment"}, {vi: "Lợi nhuận", en: "profit"}, {vi: "Quản lý", en: "management"}], "Academic & IELTS": [{vi: "Toàn diện", en: "comprehensive"}, {vi: "Đáng kể", en: "significant"}, {vi: "Sâu sắc", en: "profound"}, {vi: "Mơ hồ", en: "ambiguous"}, {vi: "Tỉ mỉ", en: "meticulous"}, {vi: "Bền vững", en: "sustainable"}, {vi: "Thiết yếu", en: "indispensable"}, {vi: "Lỗi thời", en: "obsolete"}, {vi: "Thịnh vượng", en: "prosperous"}, {vi: "Bất lợi", en: "detrimental"}, {vi: "Thuyết phục", en: "persuasive"}, {vi: "Nhất quán", en: "consistent"}, {vi: "Khó nắm bắt", en: "elusive"}, {vi: "Tinh tế", en: "exquisite"}, {vi: "Kiên cường", en: "resilient"}, {vi: "Giảm nhẹ", en: "mitigate"}, {vi: "Làm trầm trọng", en: "exacerbate"}, {vi: "Phổ biến", en: "prevalent"}, {vi: "Bất bình đẳng", en: "inequality"}, {vi: "Đô thị hóa", en: "urbanization"}], "Travel & Food": [{vi: "Hành lý", en: "luggage"}, {vi: "Hộ chiếu", en: "passport"}, {vi: "Đặt phòng", en: "reservation"}, {vi: "Thực đơn", en: "menu"}, {vi: "Ngon", en: "delicious"}, {vi: "Sân bay", en: "airport"}, {vi: "Khách sạn", en: "hotel"}, {vi: "Bản đồ", en: "map"}, {vi: "Du khách", en: "tourist"}, {vi: "Chuyến bay", en: "flight"}, {vi: "Đặc sản", en: "specialty"}, {vi: "Cay", en: "spicy"}, {vi: "Mặn", en: "salty"}, {vi: "Ngọt", en: "sweet"}, {vi: "Chua", en: "sour"}] },
             grammar: {
@@ -354,7 +386,7 @@
             theory: {
                 "Present Simple": { title: "Thì Hiện Tại Đơn (Present Simple)", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Công thức</h3><div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm font-mono"><div class="mb-1"><span class="text-green-600 font-bold">(+)</span> S + V(s/es)</div><div class="mb-1"><span class="text-red-500 font-bold">(-)</span> S + do/does + not + V</div><div><span class="text-blue-500 font-bold">(?)</span> Do/Does + S + V?</div></div><h3 class="font-bold text-indigo-700 mb-2">2. Cách dùng</h3><ul class="list-disc list-inside space-y-1 mb-4 text-gray-700"><li>Diễn tả thói quen, hành động lặp đi lặp lại.</li><li>Diễn tả sự thật hiển nhiên.</li><li>Lịch trình cố định.</li></ul><h3 class="font-bold text-indigo-700 mb-2">3. Dấu hiệu</h3><p class="text-gray-700 italic">Always, usually, often, every day...</p>` },
                 "Present Continuous": { title: "Thì Hiện Tại Tiếp Diễn", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Công thức</h3><div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm font-mono"><div class="mb-1"><span class="text-green-600 font-bold">(+)</span> S + am/is/are + V-ing</div></div><h3 class="font-bold text-indigo-700 mb-2">2. Cách dùng</h3><ul class="list-disc list-inside space-y-1 mb-4 text-gray-700"><li>Hành động đang xảy ra lúc nói.</li><li>Hành động đang diễn ra xung quanh thời điểm nói.</li></ul><h3 class="font-bold text-indigo-700 mb-2">3. Dấu hiệu</h3><p class="text-gray-700 italic">Now, at the moment, Look!...</p>` },
-                "Present Perfect": { title: "Thì Hiện Tại Hoàn Thành", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Công thức</h3><div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm font-mono"><div class="mb-1"><span class="text-green-600 font-bold">(+)</span> S + have/has + V3/ed</div></div><h3 class="font-bold text-indigo-700 mb-2">2. Cách dùng</h3><ul class="list-disc list-inside space-y-1 mb-4 text-gray-700"><li>Hành động bắt đầu trong QK kéo dài đến HT.</li><li>Vừa mới xảy ra.</li><li>Kinh nghiệm.</li></ul><h3 class="font-bold text-indigo-700 mb-2">3. Dấu hiệu</h3><p class="text-gray-700 italic">Just, recently, since, for, already...</p>` },
+                "Present Perfect": { title: "Thì Hiện Tại Hoàn Thành", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Công thức</h3><div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm font-mono"><div class="mb-1"><span class="text-green-600 font-bold">(+)</span> S + have/has + V3/ed</div></div><h3 class="font-bold text-indigo-700 mb-2">2. Cách dùng</h3><ul class="list-disc list-inside space-y-1 mb-4 text-gray-700"><li>Hành động bắt đầu trong QK kéo dài đến HT.</li><li>Vừa mới xảy ra.</li><li>Kinh nghiệm.</li></ul><h3 class="font-bold text-indigo-700 mb-2">3. Dấu hiệu</h3><p class="text-gray-700 italic">Just, recently, since, for, already, yet, just, never, ever, so far, up to now, recently, this is the first time.</p>` },
                 "Present Perfect Continuous": { title: "HT Hoàn Thành Tiếp Diễn", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Công thức</h3><div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm font-mono">S + have/has + been + V-ing</div><p class="text-gray-700">Nhấn mạnh tính liên tục của hành động từ QK đến HT.</p>` },
                 "Past Simple": { title: "Thì Quá Khứ Đơn", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Công thức</h3><div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm font-mono">S + V2/ed</div><p class="text-gray-700">Hành động đã kết thúc trong quá khứ. <br>DH: Yesterday, last week, ago.</p>` },
                 "Past Continuous": { title: "Thì Quá Khứ Tiếp Diễn", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Công thức</h3><div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm font-mono">S + was/were + V-ing</div><p class="text-gray-700">Hành động đang xảy ra tại 1 thời điểm trong QK.</p>` },
@@ -529,7 +561,7 @@
             Object.values(els.screens).forEach(e => e.classList.add('hidden')); 
             els.screens[s].classList.remove('hidden'); 
         };
-        const resetGame = () => { document.body.classList.remove('keyboard-mode'); switchScreen('start'); };
+        const resetGame = () => { document.body.classList.remove('keyboard-active'); switchScreen('start'); };
         
         const updateUI = () => {
             const item = gameState.data[gameState.currentIdx]; 
