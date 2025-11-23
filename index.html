@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
-    <title>AI Tutor: v3.7.8 (Settings Page)</title>
+    <title>AI Tutor: v3.8.5 (CSS Lockout - Final)</title>
 
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -29,16 +29,18 @@
             background-color: #FFFBEB; touch-action: none;
         }
 
+        /* App Viewport sẽ được JS tính toán và đặt chiều cao chính xác theo VisualViewport */
         #app-viewport {
-            position: fixed; left: 0; right: 0; top: 0; /* Height set by JS */
+            position: fixed; left: 0; right: 0; top: 0;
             display: flex; flex-direction: column;
             background-color: #FFFBEB; overflow: hidden; z-index: 10;
         }
 
-        #mainHeader { flex: none; transition: opacity 0.2s; }
+        /* FIX Header Stability: Đảm bảo Header luôn ở vị trí cố định */
+        #mainHeader { flex: none; transition: all 0.2s ease-in-out; }
         #mainContent { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
 
-        /* --- GAME SCREEN LAYOUT FIX (QUAN TRỌNG) --- */
+        /* --- GAME SCREEN LAYOUT --- */
         #gameScreen:not(.hidden) {
             flex: 1;
             display: flex;
@@ -46,22 +48,30 @@
             overflow: hidden;
         }
 
-        #gameHeaderWrapper { flex: none; }
+        #gameHeaderWrapper { flex: none; transition: all 0.2s ease-in-out; }
 
         #gameDisplayWrapper {
             flex: 1;
             display: flex;
             flex-direction: column;
+
+            /* Logic: LUÔN BÁM TRÊN (Flex-start) */
+            align-items: center;
+            justify-content: flex-start;
+
             overflow-y: auto;
             overflow-x: hidden;
             width: 100%;
             -webkit-overflow-scrolling: touch;
             padding: 0 1.25rem;
+            transition: padding 0.15s ease-in-out;
         }
 
         .game-content-box {
+            /* Mặc định căn giữa bằng margin-top: auto */
             margin-top: auto;
             margin-bottom: auto;
+
             width: 100%;
             display: flex;
             flex-direction: column;
@@ -69,6 +79,7 @@
             justify-content: center;
             padding-top: 1.5rem; padding-bottom: 1.5rem;
             min-height: 150px;
+            transition: all 0.15s ease-in-out;
         }
 
         #inputContainer {
@@ -78,30 +89,54 @@
             padding: 1.25rem;
             padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
             box-shadow: 0 -5px 20px rgba(0,0,0,0.02);
+            transition: all 0.15s ease-in-out;
         }
 
-        /* --- KEYBOARD MODE --- */
-        body.keyboard-active #mainHeader { display: none !important; }
-        body.keyboard-active #gameHeaderWrapper { display: none !important; }
+        /* Cải thiện khả năng phản hồi của input trên mobile */
+        #answerInput { touch-action: manipulation; }
+        #mainDisplay, #instructionText { transition: all 0.15s ease-in-out; }
 
-        body.keyboard-active #gameDisplayWrapper { padding-bottom: 0.5rem; }
+        /* --- KEYBOARD MODE (QUAN TRỌNG: Tắt transition và chuyển Margin) --- */
+
+        body.keyboard-active #gameDisplayWrapper {
+            padding-bottom: 0.5rem !important;
+            overflow-y: hidden !important;
+            transition: none !important; /* Fix: Tắt transition */
+            padding-top: 0.5rem !important;
+        }
 
         body.keyboard-active .game-content-box {
+            /* Fix: Loại bỏ margin auto để bám trên và tránh giật */
+            margin-top: 0.5rem !important;
+            margin-bottom: 0 !important;
+
             padding-top: 0.5rem !important;
             padding-bottom: 0.5rem !important;
             min-height: 0 !important;
-            margin-bottom: 0;
+
+            transition: none !important;
         }
 
-        body.keyboard-active #mainDisplay { font-size: 1.4rem !important; margin-bottom: 0.25rem !important; }
-        body.keyboard-active #instructionText { font-size: 0.65rem !important; margin-bottom: 0.25rem !important; }
+        body.keyboard-active #mainDisplay {
+            font-size: 1.4rem !important;
+            margin-bottom: 0.25rem !important;
+            transition: none !important;
+        }
+        body.keyboard-active #instructionText {
+            font-size: 0.65rem !important;
+            margin-bottom: 0.25rem !important;
+            transition: none !important;
+        }
 
         body.keyboard-active #inputContainer {
             padding: 0.75rem !important;
             border-top: 1px solid rgba(0,0,0,0.05);
+            transition: none !important;
         }
-        body.keyboard-active #answerInput { padding: 0.75rem !important; font-size: 1.1rem !important; border-radius: 1rem !important; }
-        body.keyboard-active #checkBtn { padding: 0.75rem !important; border-radius: 1rem !important; margin-top: 0.5rem !important; font-size: 1rem !important; }
+        body.keyboard-active #answerInput,
+        body.keyboard-active #checkBtn {
+            transition: none !important;
+        }
 
         /* --- UTILS --- */
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid #F59E0B; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
@@ -231,7 +266,7 @@
 
                 <div id="inputContainer" class="w-full shadow-[0_-5px_20px_rgba(0,0,0,0.02)]">
                     <div class="relative w-full mb-3 group">
-                        <input type="text" id="answerInput" class="w-full bg-gray-50 border-2 border-transparent text-center text-xl font-bold p-4 rounded-3xl focus:outline-none focus:bg-white focus:border-yellow-400 transition-all shadow-inner placeholder-gray-300" placeholder="Nhập đáp án..." autocomplete="off">
+                        <input type="text" id="answerInput" class="w-full bg-gray-50 border-2 border-transparent text-center text-xl font-bold p-4 rounded-3xl focus:outline-none focus:bg-white focus:border-yellow-400 transition-all shadow-inner placeholder-gray-300" placeholder="Nhập đáp án..." autocomplete="off" touch-action="manipulation">
                         <div class="absolute inset-y-0 right-4 flex items-center pointer-events-none text-gray-300 group-focus-within:text-yellow-400 transition-colors"><i class="fas fa-pen"></i></div>
                     </div>
                     <button id="checkBtn" onclick="checkAnswer()" class="w-full bg-gray-900 text-white font-bold text-lg py-4 rounded-3xl shadow-xl shadow-gray-400/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2"><span>Kiểm tra</span> <i class="fas fa-arrow-up transform rotate-45"></i></button>
@@ -333,25 +368,35 @@
         };
 
         // --- 2. VIEWPORT FIX ---
+        // Đây là phần cốt lõi để đảm bảo sự ổn định tuyệt đối trên Mobile khi bàn phím hiện.
+        // Chiến lược: Loại bỏ hoàn toàn các transition gây trễ trong chế độ keyboard-active
+        // và đảm bảo container chính (app-viewport) luôn khớp VisualViewport.
+
         if (window.visualViewport) {
             function handleVisualResize() {
                 const appViewport = document.getElementById('app-viewport');
                 const height = window.visualViewport.height;
                 if (!height) return;
 
+                // Set chiều cao và vị trí của toàn bộ ứng dụng bằng Visual Viewport
                 appViewport.style.height = `${height}px`;
                 appViewport.style.top = `${window.visualViewport.offsetTop}px`;
 
-                if (height < window.innerHeight * 0.75) {
+                // Detection Logic: Phát hiện bàn phím
+                const isKeyboardActive = height < window.innerHeight * 0.70;
+
+                if (isKeyboardActive) {
                     document.body.classList.add('keyboard-active');
                 } else {
                     document.body.classList.remove('keyboard-active');
                 }
+
+                // Vô hiệu hóa cuộn gốc của trình duyệt
                 window.scrollTo(0, 0);
             }
+            // Chỉ lắng nghe sự kiện resize (thường xảy ra khi keyboard hiện/ẩn)
             window.visualViewport.addEventListener('resize', handleVisualResize);
-            window.visualViewport.addEventListener('scroll', handleVisualResize);
-            window.addEventListener('scroll', () => window.scrollTo(0, 0));
+            window.addEventListener('scroll', () => window.scrollTo(0, 0)); // Chặn cuộn trên body/window
             handleVisualResize();
         }
 
@@ -383,7 +428,7 @@
                 "adj_adv": [{question: "quick (Adv)", answer: "quickly", explanation: "+ ly."}, {question: "happy (Adv)", "answer": "happily", explanation: "y -> i + ly."}],
                 "ing": [{question: "run", answer: "running", explanation: "Gấp đôi phụ âm."}, {question: "swim", answer: "swimming", explanation: "Gấp đôi phụ âm."}],
                 "ed": [{question: "stop", answer: "stopped", explanation: "Gấp đôi phụ âm."}, {question: "plan", answer: "planned", explanation: "Gấp đôi phụ âm."}],
-                "classify": [{question: "She runs [fast]. (Type?)", answer: "adverb", explanation: "Bổ nghĩa cho động từ runs."}, {question: "It is a [fast] car. (Type?)", answer: "adjective", explanation: "Bổ nghĩa cho danh từ car."}]
+                "classify": [{question: "She runs [fast]. (Type?)", answer: "adverb", explanation: "Bổ nghĩa cho động từ runs."}, {question: "It is a [fast] car. (Type?)", "answer": "adjective", explanation: "Bổ nghĩa cho danh từ car."}]
             },
             theory: {
                 "Present Simple": { title: "Thì Hiện Tại Đơn (Present Simple)", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Công thức</h3><div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm font-mono"><div class="mb-1"><span class="text-green-600 font-bold">(+)</span> S + V(s/es)</div><div class="mb-1"><span class="text-red-500 font-bold">(-)</span> S + do/does + not + V</div><div><span class="text-blue-500 font-bold">(?)</span> Do/Does + S + V?</div></div><h3 class="font-bold text-indigo-700 mb-2">2. Cách dùng</h3><ul class="list-disc list-inside space-y-1 mb-4 text-gray-700"><li>Diễn tả thói quen, hành động lặp đi lặp lại.</li><li>Diễn tả sự thật hiển nhiên.</li><li>Lịch trình cố định.</li></ul><h3 class="font-bold text-indigo-700 mb-2">3. Dấu hiệu</h3><p class="text-gray-700 italic">Always, usually, often, every day...</p>` },
@@ -402,11 +447,11 @@
                 "irregular_v3": { title: "Quá khứ phân từ (V3)", content: `<p class="mb-2 text-gray-600">Dùng trong các thì Hoàn thành (Perfect tenses) và Câu bị động.</p><table class="w-full text-sm text-left border rounded-lg overflow-hidden"><thead><tr class="bg-gray-100"><th class="p-2 border">V1</th><th class="p-2 border">V2</th><th class="p-2 border text-red-600 font-bold">V3</th></tr></thead><tbody><tr><td class="p-2 border">Go</td><td class="p-2 border">Went</td><td class="p-2 border text-red-600">Gone</td></tr><tr><td class="p-2 border">Eat</td><td class="p-2 border">Ate</td><td class="p-2 border text-red-600">Eaten</td></tr><tr><td class="p-2 border">Write</td><td class="p-2 border">Wrote</td><td class="p-2 border text-red-600">Written</td></tr><tr><td class="p-2 border">Take</td><td class="p-2 border">Took</td><td class="p-2 border text-red-600">Taken</td></tr></tbody></table>` },
                 "noun_suffix": { title: "Hậu tố Danh từ", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Chỉ người</h3><ul class="list-disc ml-5 mb-2 text-sm"><li><b>-er/or:</b> teacher, actor, worker</li><li><b>-ist:</b> artist, scientist</li><li><b>-ee:</b> employee, trainee</li></ul><h3 class="font-bold text-indigo-700 mb-2">2. Chỉ vật/trừu tượng</h3><ul class="list-disc ml-5 text-sm"><li><b>-tion/sion:</b> information, decision</li><li><b>-ment:</b> development, government</li><li><b>-ness:</b> happiness, sadness</li><li><b>-ity:</b> ability, activity</li></ul>` },
                 "adj_suffix": { title: "Hậu tố Tính từ", content: `<ul class="list-disc ml-5 text-sm space-y-1"><li><b>-ful (đầy):</b> helpful, beautiful</li><li><b>-less (không):</b> careless, homeless</li><li><b>-able/ible (có thể):</b> comfortable, visible</li><li><b>-ive:</b> active, creative</li><li><b>-ous:</b> dangerous, famous</li><li><b>-y:</b> sunny, rainy, windy</li><li><b>-al:</b> national, traditional</li></ul>` },
-                "prefixes": { title: "Tiền tố phổ biến", content: `<p class="mb-2 text-sm">Thêm vào trước từ gốc để đổi nghĩa (thường là nghĩa phủ định).</p><ul class="list-disc ml-5 text-sm space-y-1"><li><b>un-:</b> unhappy, unsafe</li><li><b>-im (trước p, m):</b> impossible, impolite</li><li><b>in-:</b> incorrect, informal</li><li><b>dis-:</b> disagree, dislike</li><li><b>re- (làm lại):</b> rewrite, replay</li><li><b>pre- (trước):</b> preview, pretest</li></ul>` },
+                "prefixes": { title: "Tiền tố phổ biến", content: `<p class="mb-2 text-gray-600">Thêm vào trước từ gốc để đổi nghĩa (thường là nghĩa phủ định).</p><ul class="list-disc ml-5 text-sm space-y-1"><li><b>un-:</b> unhappy, unsafe</li><li><b>-im (trước p, m):</b> impossible, impolite</li><li><b>in-:</b> incorrect, informal</li><li><b>dis-:</b> disagree, dislike</li><li><b>re- (làm lại):</b> rewrite, replay</li><li><b>pre- (trước):</b> preview, pretest</li></ul>` },
                 "verb_noun": { title: "Chuyển Động từ thành Danh từ", content: `<div class="bg-green-50 p-3 rounded mb-2 border border-green-200"><span class="font-bold">Quy tắc chung:</span> Thêm hậu tố danh từ vào động từ.</div><ul class="text-sm space-y-2"><li><b>Decide</b> (v) -> <b>Decision</b> (n)</li><li><b>Solve</b> (v) -> <b>Solution</b> (n)</li><li><b>Arrive</b> (v) -> <b>Arrival</b> (n)</li><li><b>Perform</b> (v) -> <b>Performance</b> (n)</li></ul>` },
                 "noun_adj": { title: "Chuyển Danh từ thành Tính từ", content: `<div class="bg-blue-50 p-3 rounded mb-2 border border-blue-200"><span class="font-bold">Quy tắc:</span> Thêm hậu tố tính từ.</div><ul class="text-sm space-y-2"><li><b>Danger</b> (n) -> <b>Dangerous</b> (adj)</li><li><b>Care</b> (n) -> <b>Careful/Careless</b> (adj)</li><li><b>Nature</b> (n) -> <b>Natural</b> (adj)</li><li><b>Sun</b> (n) -> <b>Sunny</b> (adj)</li></ul>` },
                 "adj_adv": { title: "Tính từ & Trạng từ", content: `<div class="bg-yellow-50 p-3 rounded mb-2 border border-yellow-200"><span class="font-bold">Công thức:</span> Adj + ly = Adv</div><ul class="text-sm space-y-1 mb-2"><li>Quick -> Quickly</li><li>Bad -> Badly</li><li>Happy -> Happily (y -> i + ly)</li></ul><p class="font-bold text-red-500 text-sm">Ngoại lệ:</p><ul class="text-sm"><li>Good -> Well</li><li>Fast -> Fast (giữ nguyên)</li><li>Hard -> Hard</li></ul>` },
-                "ing": { title: "Quy tắc thêm đuôi -ING", content: `<ol class="list-decimal ml-5 text-sm space-y-2"><li><b>Thông thường:</b> Thêm -ing (walk -> walking)</li><li><b>Tận cùng là e:</b> Bỏ e thêm ing (write -> writing)</li><li><b>Tận cùng là ie:</b> Đổi ie thành y (lie -> lying)</li><li><b>1 âm tiết, tận cùng 1 phụ âm, trước là 1 nguyên âm:</b> Gấp đôi phụ âm (run -> running, sit -> sitting)</li></ol>` },
+                "ing": { title: "Quy tắc thêm đuôi -ING", content: `<ol class="list-decimal ml-5 text-sm space-y-2"><li><b>Thông thường:</b> Thêm -ing (walk -> walking)</li><li><b>Tận cùng là e:</b> Bỏ e thêm ing (write -> writing)</li><li><b>Tận cùng là ie:</b> Đổi ie thành y (lie -> lying)</li><li><b>1 âm tiết, tận cùng 1 phụ âm, trước là 1 nguyên âm:</b> Gấp đôi phụ âm (run -> running, sit -> sitting)</li><li><b>1 âm tiết, tận cùng 1 phụ âm, trước là 1 nguyên âm:</b> Gấp đôi phụ âm (run -> running, sit -> sitting)</li></ol>` },
                 "ed": { title: "Quy tắc thêm đuôi -ED", content: `<ol class="list-decimal ml-5 text-sm space-y-2"><li><b>Thông thường:</b> Thêm -ed (watch -> watched)</li><li><b>Tận cùng là e:</b> Thêm d (live -> lived)</li><li><b>Tận cùng là y (trước là phụ âm):</b> Đổi y thành i + ed (study -> studied)</li><li><b>Gấp đôi phụ âm cuối:</b> stop -> stopped, plan -> planned</li></ol>` },
                 "classify": { title: "Phân loại từ", content: `<div class="space-y-3 text-sm"><div><span class="font-bold text-blue-600">Noun (Danh từ):</span> Chỉ người, vật, nơi chốn.<br>Vị trí: Đầu câu (Chủ ngữ), sau động từ (Tân ngữ).</div><div><span class="font-bold text-red-600">Verb (Động từ):</span> Chỉ hành động, trạng thái.<br>Vị trí: Sau chủ ngữ.</div><div><span class="font-bold text-green-600">Adjective (Tính từ):</span> Chỉ tính chất.<br>Vị trí: Trước danh từ, sau tobe.</div><div><span class="font-bold text-purple-600">Adverb (Trạng từ):</span> Bổ nghĩa cho động từ/tính từ.<br>Vị trí: Sau động từ thường, cuối câu.</div></div>` }
             }
@@ -561,7 +606,10 @@
             // Show specific
             els.screens[s].classList.remove('hidden');
         };
-        const resetGame = () => { document.body.classList.remove('keyboard-active'); switchScreen('start'); };
+        const resetGame = () => {
+            document.body.classList.remove('keyboard-active');
+            switchScreen('start');
+        };
 
         const updateUI = () => {
             const item = gameState.data[gameState.currentIdx];
@@ -613,7 +661,9 @@
         };
 
         const nextQuestion = () => { els.feedback.overlay.classList.add('hidden'); gameState.currentIdx++; if(gameState.currentIdx >= gameState.data.length) finishGame(); else updateUI(); };
-        const startGame = () => { gameState.currentIdx = 0; gameState.score = 0; gameState.history = []; els.game.totalQ.textContent = gameState.data.length; switchScreen('game'); updateUI(); };
+        const startGame = () => {
+            gameState.currentIdx = 0; gameState.score = 0; gameState.history = []; els.game.totalQ.textContent = gameState.data.length; switchScreen('game'); updateUI();
+        };
 
         const generateContent = async (type) => {
             const key = getApiKey(); const qty = parseInt(els.config.qtyInput.value); const level = els.config.level.value;
