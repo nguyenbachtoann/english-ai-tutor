@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
-    <title>AI Tutor: v3.7.7 (Final UI Fix)</title>
+    <title>AI Tutor: v3.7.8 (Settings Page)</title>
 
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -39,7 +39,6 @@
         #mainContent { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
 
         /* --- GAME SCREEN LAYOUT FIX (QUAN TRỌNG) --- */
-        /* Sử dụng :not(.hidden) để đảm bảo khi có class hidden thì nó ẩn thật sự */
         #gameScreen:not(.hidden) {
             flex: 1;
             display: flex;
@@ -129,7 +128,7 @@
             <div class="flex gap-2">
                 <button onclick="openDictModal()" class="w-10 h-10 flex items-center justify-center text-yellow-700 bg-white rounded-full shadow-sm active:scale-90 transition-transform"><i class="fas fa-search"></i></button>
                 <button onclick="openTheoryModal()" class="w-10 h-10 flex items-center justify-center text-indigo-600 bg-white rounded-full shadow-sm active:scale-90 transition-transform"><i class="fas fa-book-open"></i></button>
-                <button onclick="toggleSettings()" class="w-10 h-10 flex items-center justify-center text-gray-600 bg-white rounded-full shadow-sm active:scale-90 transition-transform"><i class="fas fa-cog"></i></button>
+                <button onclick="openSettingsScreen()" class="w-10 h-10 flex items-center justify-center text-gray-600 bg-white rounded-full shadow-sm active:scale-90 transition-transform"><i class="fas fa-cog"></i></button>
             </div>
         </div>
 
@@ -187,7 +186,30 @@
                 </div>
             </div>
 
-            <!-- GAME SCREEN (Hidden by default via JS & CSS fix) -->
+            <!-- SETTINGS SCREEN (Màn hình mới) -->
+            <div id="settingsScreen" class="hidden flex-1 flex-col w-full h-full overflow-y-auto screen-fade p-5">
+                <button onclick="backFromSettings()" class="mb-6 flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-gray-700 bg-gray-100 px-4 py-2 rounded-xl active:scale-95 transition-all w-fit">
+                    <i class="fas fa-arrow-left"></i> Quay lại
+                </button>
+                <div class="w-full max-w-lg mx-auto">
+                    <h2 class="text-2xl font-bold mb-6 text-gray-800 flex items-center gap-3"><i class="fas fa-cog text-gray-400"></i> Cài đặt Ứng dụng</h2>
+                    <div class="mb-6 p-6 bg-indigo-50 rounded-3xl border border-indigo-100 shadow-lg">
+                        <label class="block text-sm font-bold text-indigo-900 mb-2 uppercase tracking-wider">🔑 Google Gemini API Key</label>
+                        <input type="password" id="userApiKeyInput" placeholder="Dán API Key vào đây..."
+                               class="w-full p-4 border border-indigo-200 bg-white rounded-xl mb-3 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition text-gray-700 font-mono text-sm">
+                        <button onclick="saveApiKey()" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-200 active:scale-[0.99]">Lưu Key</button>
+                        <p id="keyStatus" class="text-xs mt-3 text-center text-gray-400 font-medium">Chưa kết nối</p>
+                    </div>
+
+                    <div class="mb-6 p-6 bg-white rounded-3xl border border-gray-100 shadow-lg">
+                        <h3 class="text-lg font-bold text-gray-800 mb-2">Thông tin Phiên bản</h3>
+                        <p class="text-sm text-gray-600">Phiên bản hiện tại: <span class="font-mono font-bold text-yellow-700">v3.7.8</span></p>
+                        <p class="text-sm text-gray-600">Mô hình AI: Gemini 2.5 Flash</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GAME SCREEN -->
             <div id="gameScreen" class="hidden w-full h-full bg-white relative">
                 <div class="shrink-0 px-5 pt-4 pb-2 bg-white z-10 transition-all" id="gameHeaderWrapper">
                     <div id="gameHeader" class="flex justify-between items-center mb-3 transition-all">
@@ -238,22 +260,7 @@
             </div>
         </div>
 
-        <!-- MODALS (Settings, Dict, Theory, Feedback) -->
-        <div id="settingsPanel" class="hidden fixed inset-0 z-[100] flex items-end sm:items-center justify-center pointer-events-none">
-            <div class="absolute inset-0 bg-black/40 backdrop-blur-sm pointer-events-auto transition-opacity duration-300 opacity-0" id="settingsBackdrop" onclick="toggleSettings()"></div>
-            <div class="bg-white w-full sm:w-[28rem] rounded-t-3xl sm:rounded-3xl p-6 pointer-events-auto transform transition-transform duration-300 translate-y-full safe-pb" id="settingsContent">
-                <div class="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-6"></div>
-                <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2"><i class="fas fa-cog text-gray-400"></i> Cài đặt</h2>
-                <label class="block text-xs font-bold text-indigo-900 uppercase tracking-wider mb-2">Google Gemini API Key</label>
-                <div class="relative mb-4">
-                    <input type="password" id="userApiKeyInput" class="w-full p-4 bg-gray-50 border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-2xl text-sm font-medium transition-all outline-none" placeholder="Paste key here...">
-                </div>
-                <button onclick="saveApiKey()" class="w-full bg-indigo-600 text-white font-bold py-4 rounded-2xl hover:bg-indigo-700 shadow-lg shadow-indigo-200">Lưu Key</button>
-                <p id="keyStatus" class="text-xs mt-4 text-center text-gray-400 font-medium">Chưa kết nối</p>
-            </div>
-        </div>
-
-        <!-- Other Modals: Dict, Theory, Feedback, Loading -->
+        <!-- MODALS (Dict, Theory, Feedback, Loading) - Settings Modal đã bị loại bỏ -->
         <div id="dictModal" class="hidden fixed inset-0 z-[100] flex items-end sm:items-center justify-center pointer-events-none">
             <div class="absolute inset-0 bg-black/40 backdrop-blur-sm pointer-events-auto transition-opacity duration-300 opacity-0" id="dictBackdrop" onclick="closeDictModal()"></div>
             <div class="bg-white w-full sm:w-[28rem] h-[85vh] sm:h-[80vh] rounded-t-3xl sm:rounded-3xl flex flex-col pointer-events-auto transform transition-transform duration-300 translate-y-full" id="dictContent">
@@ -412,7 +419,7 @@
         // --- ELEMENTS ---
         const els = {
             app: document.getElementById('app'),
-            screens: { start: document.getElementById('startScreen'), game: document.getElementById('gameScreen'), result: document.getElementById('resultScreen') },
+            screens: { start: document.getElementById('startScreen'), game: document.getElementById('gameScreen'), result: document.getElementById('resultScreen'), settings: document.getElementById('settingsScreen') },
             tabs: { vocab: document.getElementById('tabVocab'), grammar: document.getElementById('tabGrammar'), forms: document.getElementById('tabForms') },
             views: { vocab: document.getElementById('viewVocab'), grammar: document.getElementById('viewGrammar'), forms: document.getElementById('viewForms') },
             inputs: { vocabTopic: document.getElementById('vocabTopicInput'), vocabSelect: document.getElementById('vocabTopicSelect'), grammarTense: document.getElementById('grammarTenseSelect'), formsType: document.getElementById('formsTypeSelect'), answer: document.getElementById('answerInput'), apiKey: document.getElementById('userApiKeyInput'), dict: document.getElementById('dictInput') },
@@ -454,19 +461,21 @@
         const checkKeyStatus = () => {
             const key = getApiKey();
             if(key) {
-                els.settings.keyStatus.textContent = "✅ Đã kết nối AI"; els.settings.keyStatus.className = "text-xs mt-4 text-center font-bold text-green-600"; els.inputs.apiKey.value = key;
+                els.settings.keyStatus.textContent = "✅ Đã kết nối AI"; els.settings.keyStatus.className = "text-xs mt-3 text-center font-bold text-green-600"; els.inputs.apiKey.value = key;
                 if(els.wrappers.onlineVocab) els.wrappers.onlineVocab.classList.remove('hidden');
                 if(els.wrappers.offlineVocab) els.wrappers.offlineVocab.classList.add('hidden');
             } else {
-                els.settings.keyStatus.textContent = "⚠️ Chế độ Offline"; els.settings.keyStatus.className = "text-xs mt-4 text-center font-medium text-gray-400";
+                els.settings.keyStatus.textContent = "⚠️ Chế độ Offline"; els.settings.keyStatus.className = "text-xs mt-3 text-center font-medium text-gray-400";
                 if(els.wrappers.onlineVocab) els.wrappers.onlineVocab.classList.add('hidden');
                 if(els.wrappers.offlineVocab) els.wrappers.offlineVocab.classList.remove('hidden');
             }
         };
 
-        const saveApiKey = () => { const key = els.inputs.apiKey.value.trim(); if(key) { localStorage.setItem('vocab_ai_key', key); checkKeyStatus(); alert("Đã lưu Key!"); toggleSettings(); } };
+        const saveApiKey = () => { const key = els.inputs.apiKey.value.trim(); if(key) { localStorage.setItem('vocab_ai_key', key); checkKeyStatus(); alert("Đã lưu Key!"); backFromSettings(); } };
 
-        const toggleSettings = () => { const isHidden = els.settings.panel.classList.contains('hidden'); toggleModal(els.settings.panel, els.settings.content, els.settings.backdrop, isHidden); };
+        const openSettingsScreen = () => { switchScreen('settings'); checkKeyStatus(); };
+        const backFromSettings = () => { switchScreen('start'); };
+
         const openDictModal = () => { toggleModal(els.dict.modal, els.dict.content, els.dict.backdrop, true); setTimeout(() => els.dict.input.focus(), 300); };
         const closeDictModal = () => toggleModal(els.dict.modal, els.dict.content, els.dict.backdrop, false);
         const openTheoryModal = () => { toggleModal(els.theory.modal, els.theory.content, els.theory.backdrop, true); switchTheoryTab('grammar'); };
@@ -657,15 +666,13 @@
         };
 
         // EXPOSE TO WINDOW FOR HTML EVENT HANDLERS
-        Object.assign(window, { saveApiKey, openDictModal, closeDictModal, lookupDictionary, switchTheoryTab, openTheoryModal, closeTheoryModal, backToTheoryList, loadTheory, showLoading, toggleSettings, updateLevel, setMode, switchScreen, resetGame, checkAnswer, nextQuestion, startGeneration, playTTS });
+        Object.assign(window, { saveApiKey, openDictModal, closeDictModal, lookupDictionary, switchTheoryTab, openTheoryModal, closeTheoryModal, backToTheoryList, loadTheory, showLoading, openSettingsScreen, backFromSettings, updateLevel, setMode, switchScreen, resetGame, checkAnswer, nextQuestion, startGeneration, playTTS });
 
         checkKeyStatus();
         els.dict.input.addEventListener('keypress', (e) => { if(e.key === 'Enter') lookupDictionary(); });
         els.inputs.answer.addEventListener('keypress', (e) => { if(e.key === 'Enter') checkAnswer(); });
         els.config.qtyInput.addEventListener('input', (e) => { els.config.qtyDisplay.textContent = `${e.target.value} câu`; });
 
-        // --- 3. FINAL INITIALIZATION: ENSURE CORRECT START STATE ---
-        // Gọi hàm resetGame() để đảm bảo chỉ có Start Screen hiển thị, và Game Screen ẩn hoàn toàn
         resetGame();
         setMode('vocab');
     </script>
