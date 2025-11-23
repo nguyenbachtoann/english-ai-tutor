@@ -2,9 +2,9 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <!-- interactive-widget=resizes-content helps viewport resize when keyboard opens -->
+    <!-- Sử dụng dvh và fit=cover để tính toán chiều cao chính xác. interactive-widget=resizes-content -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
-    <title>AI Tutor: v1.6 (Data Restored)</title>
+    <title>AI Tutor: v1.9 (Header Always Visible)</title>
     
     <!-- PWA Setup -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -22,8 +22,13 @@
     
     <style>
         :root { --sat: env(safe-area-inset-top); --sab: env(safe-area-inset-bottom); }
-        /* Use dvh (dynamic viewport height) for better mobile browser support */
-        body { font-family: 'Quicksand', sans-serif; background-color: #fdfbf7; height: 100dvh; overflow: hidden; }
+        /* Sử dụng dvh cho chiều cao chính xác trên mobile */
+        body { 
+            font-family: 'Quicksand', sans-serif; 
+            background-color: #fdfbf7; 
+            height: 100dvh; /* Chiều cao động (Dynamic Viewport Height) */
+            overflow: hidden; 
+        }
         
         #app-container { height: 100%; display: flex; flex-direction: column; background-color: #fdfbf7; }
         #app { background-color: white; height: 100%; width: 100%; display: flex; flex-direction: column; }
@@ -49,18 +54,42 @@
         .safe-pb-footer { padding-bottom: calc(var(--sab) + 2rem); }
         .safe-pt { padding-top: calc(var(--sat) + 0.5rem); }
 
-        /* --- SMART KEYBOARD MODE STYLES --- */
-        body.keyboard-mode #mainHeader { display: none !important; }
+        /* --- SMART KEYBOARD MODE STYLES (v1.9 - Minimal Changes) --- */
+        /* Giữ lại body.keyboard-mode chỉ để đánh dấu trạng thái */
+        
+        /* Tối ưu màn hình Game/Start: Giữ Header, chỉ thu nhỏ nội dung */
         body.keyboard-mode #logo-container { display: none !important; } 
         body.keyboard-mode #configSection { display: none !important; } 
-        body.keyboard-mode #gameHeader { margin-top: 0.5rem; margin-bottom: 0.2rem; }
-        body.keyboard-mode #progressBarContainer { display: none !important; }
-        body.keyboard-mode #instructionText { display: none !important; }
-        body.keyboard-mode #gameScreen { justify-content: flex-start; }
-        body.keyboard-mode #mainDisplay { font-size: 1.25rem; margin-bottom: 0.25rem; margin-top: 0.25rem; }
-        body.keyboard-mode #subDisplay { font-size: 0.8rem; padding: 0.2rem 0.5rem; }
-        body.keyboard-mode #inputContainer { padding-bottom: 0.5rem; margin-top: 0.5rem; }
-        body.keyboard-mode #startScreenContent { justify-content: flex-start; padding-top: 1rem; }
+
+        /* Tối ưu khu vực hiển thị câu hỏi và căn chỉnh lại vị trí khi không gian hẹp */
+        body.keyboard-mode #gameDisplayWrapper {
+            flex-grow: 0; 
+            min-height: auto;
+            /* Cần thu nhỏ chiều cao tối đa của khu vực câu hỏi để nhường chỗ cho input */
+            max-height: 40dvh; /* Giới hạn chiều cao động */
+            justify-content: center;
+            align-items: center;
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+        }
+
+        body.keyboard-mode #mainDisplay { 
+            font-size: 1.5rem; 
+            margin-bottom: 0.1rem; 
+            margin-top: 0.1rem; 
+            line-height: 1.2;
+        }
+        body.keyboard-mode #subDisplay { font-size: 0.75rem; padding: 0.1rem 0.4rem; }
+        
+        /* Đảm bảo input container luôn nằm ở dưới cùng của viewport đã resize */
+        body.keyboard-mode #inputContainer { 
+            padding-bottom: 0.5rem; 
+            margin-top: 0.5rem; 
+        }
+        body.keyboard-mode #inputContainer #checkBtn {
+            margin-bottom: 0 !important;
+        }
+        
     </style>
 </head>
 <body>
@@ -68,7 +97,7 @@
     <div id="app-container">
         <div id="app">
             
-            <!-- HEADER -->
+            <!-- HEADER (LUÔN HIỂN THỊ) -->
             <div id="mainHeader" class="px-3 pb-3 pt-[calc(env(safe-area-inset-top)+0.5rem)] bg-yellow-100/90 backdrop-blur-md flex justify-between items-center z-20 shrink-0 border-b border-yellow-200 sticky top-0 transition-all duration-300">
                 <div class="flex items-center gap-2">
                     <button onclick="resetGame()" class="w-10 h-10 flex items-center justify-center text-yellow-800 rounded-full hover:bg-yellow-200/50"><i class="fas fa-home text-lg"></i></button>
@@ -80,6 +109,9 @@
                     <button onclick="toggleSettings()" class="w-10 h-10 flex items-center justify-center text-yellow-800 rounded-full hover:bg-yellow-200/50"><i class="fas fa-cog text-lg"></i></button>
                 </div>
             </div>
+            
+            <!-- REMOVED: minimalGameHeader (v1.9) -->
+
 
             <!-- SETTINGS MODAL -->
             <div id="settingsPanel" class="hidden absolute inset-0 bg-white z-50 flex flex-col animate-fade-in pt-[calc(env(safe-area-inset-top))]">
@@ -225,14 +257,15 @@
 
                 <!-- GAME SCREEN -->
                 <div id="gameScreen" class="hidden flex-1 flex flex-col h-full">
+                    <!-- GAME HEADER (Header này nằm trong khu vực scrollable, dưới mainHeader) -->
                     <div id="gameHeader" class="flex justify-between items-center mb-3 shrink-0">
                         <span class="font-bold text-gray-500 text-xs uppercase tracking-wider truncate max-w-[60%]" id="gameTitle">Bài học</span>
                         <div class="bg-gray-100 px-2 py-1 rounded-lg text-xs font-mono text-gray-600"><span id="currentQ">1</span>/<span id="totalQ">10</span></div>
                     </div>
                     <div id="progressBarContainer" class="w-full bg-gray-100 rounded-full h-1.5 mb-6 shrink-0"><div id="progressBar" class="bg-yellow-400 h-full rounded-full transition-all duration-300 ease-out" style="width: 10%"></div></div>
                     
-                    <!-- Game Display -->
-                    <div class="flex-1 flex flex-col justify-center items-center mb-4 min-h-0 transition-all duration-300">
+                    <!-- Game Display Wrapper (Tối ưu cho Keyboard) -->
+                    <div id="gameDisplayWrapper" class="flex-1 flex flex-col justify-center items-center mb-4 min-h-0 transition-all duration-300">
                         <span id="instructionText" class="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4 bg-gray-50 px-3 py-1 rounded-full">Instruction</span>
                         <div class="w-full flex flex-col items-center justify-center py-4">
                             <h2 id="mainDisplay" class="text-3xl sm:text-4xl font-black text-center text-gray-800 mb-2 px-2 leading-tight break-words max-w-full transition-all duration-300">Loading...</h2>
@@ -243,7 +276,7 @@
                     <!-- Input Area -->
                     <div id="inputContainer" class="mt-auto w-full pb-2 flex flex-col transition-all duration-300">
                         <input type="text" id="answerInput" class="w-full bg-white border-2 border-gray-200 text-center text-xl p-4 rounded-2xl focus:outline-none focus:border-yellow-400 mb-3 transition-all duration-300" placeholder="Nhập đáp án..." autocomplete="off">
-                        <button id="checkBtn" onclick="checkAnswer()" class="w-full bg-gray-800 text-white font-bold py-4 rounded-2xl shadow-lg active:scale-95 flex items-center justify-center gap-2 mb-4"><span>Kiểm tra</span> <i class="fas fa-check"></i></button>
+                        <button id="checkBtn" onclick="checkAnswer()" class="w-full bg-gray-800 text-white font-bold py-4 rounded-2xl shadow-lg active:scale-95 flex items-center justify-center gap-2"><i class="fas fa-check-circle text-xl mr-2"></i><span>Kiểm tra</span></button>
                         <div class="h-safe-keyboard hidden"></div>
                     </div>
                 </div>
@@ -305,7 +338,7 @@
         const offlineData = {
             vocab: { "Daily Life": [{vi: "Cà phê", en: "coffee"}, {vi: "Máy tính", en: "computer"}, {vi: "Sách", en: "book"}, {vi: "Bút", en: "pen"}, {vi: "Trường học", en: "school"}, {vi: "Bạn bè", en: "friend"}, {vi: "Gia đình", en: "family"}, {vi: "Nước", en: "water"}, {vi: "Thức ăn", en: "food"}, {vi: "Tiền", en: "money"}, {vi: "Cửa", en: "door"}, {vi: "Ghế", en: "chair"}, {vi: "Bàn", en: "table"}, {vi: "Thành phố", en: "city"}, {vi: "Công việc", en: "job"}, {vi: "Giường ngủ", en: "bed"}, {vi: "Bếp", en: "kitchen"}, {vi: "Điện thoại", en: "phone"}, {vi: "Xe buýt", en: "bus"}, {vi: "Bữa sáng", en: "breakfast"}], "Work & Business": [{vi: "Phát triển", en: "develop"}, {vi: "Thành tựu", en: "achievement"}, {vi: "Thử thách", en: "challenge"}, {vi: "Môi trường", en: "environment"}, {vi: "Xã hội", en: "society"}, {vi: "Kinh tế", en: "economy"}, {vi: "Văn hóa", en: "culture"}, {vi: "Giải pháp", en: "solution"}, {vi: "Cơ hội", en: "opportunity"}, {vi: "Kiến thức", en: "knowledge"}, {vi: "Kinh nghiệm", en: "experience"}, {vi: "Quyết định", en: "decision"}, {vi: "Ảnh hưởng", en: "influence"}, {vi: "Công nghệ", en: "technology"}, {vi: "Sáng tạo", en: "creative"}, {vi: "Thị trường", en: "market"}, {vi: "Khách hàng", en: "customer"}, {vi: "Đầu tư", en: "investment"}, {vi: "Lợi nhuận", en: "profit"}, {vi: "Quản lý", en: "management"}], "Academic & IELTS": [{vi: "Toàn diện", en: "comprehensive"}, {vi: "Đáng kể", en: "significant"}, {vi: "Sâu sắc", en: "profound"}, {vi: "Mơ hồ", en: "ambiguous"}, {vi: "Tỉ mỉ", en: "meticulous"}, {vi: "Bền vững", en: "sustainable"}, {vi: "Thiết yếu", en: "indispensable"}, {vi: "Lỗi thời", en: "obsolete"}, {vi: "Thịnh vượng", en: "prosperous"}, {vi: "Bất lợi", en: "detrimental"}, {vi: "Thuyết phục", en: "persuasive"}, {vi: "Nhất quán", en: "consistent"}, {vi: "Khó nắm bắt", en: "elusive"}, {vi: "Tinh tế", en: "exquisite"}, {vi: "Kiên cường", en: "resilient"}, {vi: "Giảm nhẹ", en: "mitigate"}, {vi: "Làm trầm trọng", en: "exacerbate"}, {vi: "Phổ biến", en: "prevalent"}, {vi: "Bất bình đẳng", en: "inequality"}, {vi: "Đô thị hóa", en: "urbanization"}], "Travel & Food": [{vi: "Hành lý", en: "luggage"}, {vi: "Hộ chiếu", en: "passport"}, {vi: "Đặt phòng", en: "reservation"}, {vi: "Thực đơn", en: "menu"}, {vi: "Ngon", en: "delicious"}, {vi: "Sân bay", en: "airport"}, {vi: "Khách sạn", en: "hotel"}, {vi: "Bản đồ", en: "map"}, {vi: "Du khách", en: "tourist"}, {vi: "Chuyến bay", en: "flight"}, {vi: "Đặc sản", en: "specialty"}, {vi: "Cay", en: "spicy"}, {vi: "Mặn", en: "salty"}, {vi: "Ngọt", en: "sweet"}, {vi: "Chua", en: "sour"}] },
             grammar: { "Present Simple": [{question: "She usually ___ (walk) to work.", verb: "walk", answer: "walks", explanation: "Thói quen ở hiện tại (She -> V+s)."}, {question: "The sun ___ (rise) in the East.", verb: "rise", answer: "rises", explanation: "Sự thật hiển nhiên."}], "Present Continuous": [{question: "Look! It ___ (rain) outside.", verb: "rain", answer: "is raining", explanation: "Đang xảy ra lúc nói (Look!)."}, {question: "I ___ (study) now.", verb: "study", answer: "am studying", explanation: "Đang diễn ra (now)."}], "Present Perfect": [{question: "I ___ (see) that movie twice.", verb: "see", answer: "have seen", explanation: "Kinh nghiệm trong quá khứ."}], "Present Perfect Continuous": [{question: "It ___ (rain) for 3 hours.", verb: "rain", answer: "has been raining", explanation: "Nhấn mạnh quá trình liên tục."}], "Past Simple": [{question: "I ___ (go) to the cinema yesterday.", verb: "go", answer: "went", explanation: "Đã xảy ra và kết thúc (yesterday)."}], "Past Continuous": [{question: "I ___ (read) when he came.", verb: "read", answer: "was reading", explanation: "Đang xảy ra thì hành động khác xen vào."}], "Past Perfect": [{question: "When I arrived, the train ___ (leave).", verb: "leave", answer: "had left", explanation: "Xảy ra trước 1 hành động QK khác."}], "Past Perfect Continuous": [{question: "He was tired because he ___ (work) all day.", verb: "work", answer: "had been working", explanation: "Nguyên nhân của trạng thái QK."}], "Future Simple": [{question: "I think it ___ (rain) tomorrow.", verb: "rain", answer: "will rain", explanation: "Dự đoán không căn cứ."}], "Future Continuous": [{question: "At 9 AM tomorrow, I ___ (work).", verb: "work", answer: "will be working", explanation: "Thời điểm cụ thể trong TL."}], "Future Perfect": [{question: "By next year, I ___ (graduate).", verb: "graduate", answer: "will have graduated", explanation: "Hoàn thành trước mốc TL (By)."}], "Future Perfect Continuous": [{question: "By 2030, I ___ (teach) for 20 years.", verb: "teach", answer: "will have been teaching", explanation: "Quá trình tính đến mốc TL."}] },
-            forms: { "irregular": [{question: "go (V2)", answer: "went", explanation: "go - went - gone"}, {question: "buy (V2)", answer: "bought", explanation: "buy - bought - bought"}], "irregular_v3": [{question: "go (V3)", answer: "gone", explanation: "go - went - gone"}, {question: "write (V3)", answer: "written", explanation: "write - wrote - written"}], "noun_suffix": [{question: "inform (Noun -tion)", answer: "information", explanation: "Thêm -ation."}, {question: "develop (Noun -ment)", answer: "development", explanation: "Thêm -ment."}], "adj_suffix": [{question: "beauty (Adj -ful)", answer: "beautiful", explanation: "y -> i + ful."}, {question: "care (Adj -less)", answer: "careless", explanation: "Thêm -less."}], "prefixes": [{question: "happy (Prefix: not)", answer: "unhappy", explanation: "Thêm un-."}, {question: "agree (Prefix: not)", answer: "disagree", explanation: "Thêm dis-."}], "verb_noun": [{question: "decide (Noun)", answer: "decision", explanation: "de -> sion."}, {question: "arrive (Noun)", answer: "arrival", explanation: "e -> al."}], "noun_adj": [{question: "danger (Adj)", answer: "dangerous", explanation: "+ ous."}, {question: "fame (Adj)", answer: "famous", explanation: "e -> ous."}], "adj_adv": [{question: "quick (Adv)", answer: "quickly", explanation: "+ ly."}, {question: "happy (Adv)", answer: "happily", explanation: "y -> i + ly."}], "ing": [{question: "run", answer: "running", explanation: "Gấp đôi phụ âm."}, {question: "swim", answer: "swimming", explanation: "Gấp đôi phụ âm."}], "ed": [{question: "stop", answer: "stopped", explanation: "Gấp đôi phụ âm."}, {question: "plan", answer: "planned", explanation: "Gấp đôi phụ âm."}], "classify": [{question: "She runs [fast]. (Type?)", answer: "adverb", explanation: "Bổ nghĩa cho động từ runs."}, {question: "It is a [fast] car. (Type?)", answer: "adjective", explanation: "Bổ nghĩa cho danh từ car."}] },
+            forms: { "irregular": [{question: "go (V2)", answer: "went", explanation: "go - went - gone"}, {question: "buy (V2)", answer: "bought", explanation: "buy - bought - bought"}], "irregular_v3": [{question: "go (V3)", answer: "gone", explanation: "go - went - gone"}, {question: "write (V3)", answer: "written", explanation: "write - wrote - written"}], "noun_suffix": [{question: "inform (Noun -tion)", answer: "information", explanation: "Thêm -ation."}, {question: "develop (Noun -ment)", answer: "development", explanation: "Thêm -ment."}], "adj_suffix": [{question: "beauty (Adj -ful)", answer: "beautiful", explanation: "y -> i + ful."}, {question: "care (Adj -less)", answer: "careless", explanation: "Thêm -less."}], "prefixes": [{question: "happy (Prefix: not)", answer: "unhappy", explanation: "Thêm un-."}, {question: "agree (Prefix: not)", answer: "disagree", explanation: "Thêm dis-."}], "verb_noun": [{question: "decide (Noun)", answer: "decision", explanation: "de -> sion."}, {question: "arrive (Noun)", answer: "arrival", explanation: "e -> al."}], "noun_adj": [{question: "danger (Adj)", answer: "dangerous", explanation: "+ ous."}, {question: "fame (Adj)", answer: "famous", explanation: "e -> ous."}], "adj_adv": [{question: "quick (Adv)", answer: "quickly", explanation: "+ ly."}, {question: "happy (Adv)", "answer": "happily", explanation: "y -> i + ly."}], "ing": [{question: "run", answer: "running", explanation: "Gấp đôi phụ âm."}, {question: "swim", answer: "swimming", explanation: "Gấp đôi phụ âm."}], "ed": [{question: "stop", answer: "stopped", explanation: "Gấp đôi phụ âm."}, {question: "plan", answer: "planned", explanation: "Gấp đôi phụ âm."}], "classify": [{question: "She runs [fast]. (Type?)", answer: "adverb", explanation: "Bổ nghĩa cho động từ runs."}, {question: "It is a [fast] car. (Type?)", answer: "adjective", explanation: "Bổ nghĩa cho danh từ car."}] },
             theory: {
                 "Present Simple": { title: "Thì Hiện Tại Đơn (Present Simple)", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Công thức</h3><div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm font-mono"><div class="mb-1"><span class="text-green-600 font-bold">(+)</span> S + V(s/es)</div><div class="mb-1"><span class="text-red-500 font-bold">(-)</span> S + do/does + not + V</div><div><span class="text-blue-500 font-bold">(?)</span> Do/Does + S + V?</div></div><h3 class="font-bold text-indigo-700 mb-2">2. Cách dùng</h3><ul class="list-disc list-inside space-y-1 mb-4 text-gray-700"><li>Diễn tả thói quen, hành động lặp đi lặp lại.</li><li>Diễn tả sự thật hiển nhiên.</li><li>Lịch trình cố định.</li></ul><h3 class="font-bold text-indigo-700 mb-2">3. Dấu hiệu</h3><p class="text-gray-700 italic">Always, usually, often, every day...</p>` },
                 "Present Continuous": { title: "Thì Hiện Tại Tiếp Diễn", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Công thức</h3><div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm font-mono"><div class="mb-1"><span class="text-green-600 font-bold">(+)</span> S + am/is/are + V-ing</div></div><h3 class="font-bold text-indigo-700 mb-2">2. Cách dùng</h3><ul class="list-disc list-inside space-y-1 mb-4 text-gray-700"><li>Hành động đang xảy ra lúc nói.</li><li>Hành động đang diễn ra xung quanh thời điểm nói.</li></ul><h3 class="font-bold text-indigo-700 mb-2">3. Dấu hiệu</h3><p class="text-gray-700 italic">Now, at the moment, Look!...</p>` },
@@ -339,7 +372,7 @@
                 },
                 "prefixes": {
                     title: "Tiền tố phổ biến (Prefixes)",
-                    content: `<p class="mb-2 text-sm">Thêm vào trước từ gốc để đổi nghĩa (thường là nghĩa phủ định).</p><ul class="list-disc ml-5 text-sm space-y-1"><li><b>un-:</b> unhappy, unsafe</li><li><b>im- (trước p, m):</b> impossible, impolite</li><li><b>in-:</b> incorrect, informal</li><li><b>dis-:</b> disagree, dislike</li><li><b>re- (làm lại):</b> rewrite, replay</li><li><b>pre- (trước):</b> preview, pretest</li></ul>`
+                    content: `<p class="mb-2 text-sm">Thêm vào trước từ gốc để đổi nghĩa (thường là nghĩa phủ định).</p><ul class="list-disc ml-5 text-sm space-y-1"><li><b>un-:</b> unhappy, unsafe</li><li><b>-im (trước p, m):</b> impossible, impolite</li><li><b>in-:</b> incorrect, informal</li><li><b>dis-:</b> disagree, dislike</li><li><b>re- (làm lại):</b> rewrite, replay</li><li><b>pre- (trước):</b> preview, pretest</li></ul>`
                 },
                 "verb_noun": {
                     title: "Chuyển Động từ thành Danh từ",
@@ -385,7 +418,9 @@
             status: { text: document.getElementById('dataSourceText') },
             theory: { modal: document.getElementById('theoryModal'), listGrammar: document.getElementById('theoryListGrammar'), listForms: document.getElementById('theoryListForms'), detail: document.getElementById('theoryDetail'), content: document.getElementById('theoryDetailContent'), tabs: { grammar: document.getElementById('btnTheoryGrammar'), forms: document.getElementById('btnTheoryForms') } },
             dict: { modal: document.getElementById('dictModal'), result: document.getElementById('dictResultArea'), input: document.getElementById('dictInput') },
-            wrappers: { onlineVocab: document.getElementById('onlineVocabInput'), offlineVocab: document.getElementById('offlineVocabSelect') }
+            wrappers: { onlineVocab: document.getElementById('onlineVocabInput'), offlineVocab: document.getElementById('offlineVocabSelect') },
+            gameScreen: document.getElementById('gameScreen'),
+            gameDisplayWrapper: document.getElementById('gameDisplayWrapper')
         };
 
         const formReadableNames = { "irregular": "Động từ Bất quy tắc (V2)", "irregular_v3": "Quá khứ phân từ (V3)", "noun_suffix": "Hậu tố Danh từ", "adj_suffix": "Hậu tố Tính từ", "prefixes": "Tiền tố (Prefixes)", "verb_noun": "Động từ → Danh từ", "noun_adj": "Danh từ → Tính từ", "adj_adv": "Tính từ → Trạng từ", "ing": "Quy tắc thêm đuôi -ING", "ed": "Quy tắc thêm đuôi -ED", "classify": "Phân loại từ (Word Class)" };
@@ -553,7 +588,18 @@
             els.feedback.correctText.textContent = gameState.currentCorrect; els.feedback.explanation.textContent = item.explanation ? "💡 " + item.explanation : "";
             els.feedback.overlay.classList.remove('hidden');
         };
-        window.nextQuestion = () => { els.feedback.overlay.classList.add('hidden'); gameState.currentIdx++; if(gameState.currentIdx >= gameState.data.length) finishGame(); else updateUI(); };
+        window.nextQuestion = () => { 
+            els.feedback.overlay.classList.add('hidden'); 
+            gameState.currentIdx++; 
+            if(gameState.currentIdx >= gameState.data.length) {
+                finishGame();
+            } else {
+                updateUI(); 
+                if (isKeyboardVisible) {
+                    // Không cần updateMinimalHeader vì đã xóa nó
+                }
+            }
+        };
         function updateUI() {
             const item = gameState.data[gameState.currentIdx]; els.game.qNum.textContent = gameState.currentIdx + 1; els.game.progress.style.width = `${((gameState.currentIdx + 1) / gameState.data.length) * 100}%`; els.inputs.answer.value = ""; els.inputs.answer.focus();
             if(gameState.mode === 'vocab') { els.game.display.textContent = item.vi; els.game.instruction.textContent = "Dịch sang Tiếng Anh"; els.game.subDisplay.classList.add('hidden'); gameState.currentCorrect = item.en; }
@@ -569,21 +615,71 @@
         }
         window.playTTS = () => { const u = new SpeechSynthesisUtterance(gameState.currentCorrect); u.lang = 'en-US'; speechSynthesis.speak(u); };
         window.setMode = (m) => { ['vocab', 'grammar', 'forms'].forEach(x => { els.tabs[x].className = `flex-1 py-2 rounded-xl text-xs sm:text-sm font-bold transition ${x===m ? 'tab-active' : 'tab-inactive bg-transparent'}`; els.views[x].classList.toggle('hidden', x !== m); }); els.config.section.classList.remove('hidden'); };
-        window.resetGame = () => switchScreen('start');
-        window.switchScreen = (s) => { Object.values(els.screens).forEach(e => e.classList.add('hidden')); els.screens[s].classList.remove('hidden'); };
+        window.resetGame = () => {
+             // Đảm bảo thoát khỏi keyboard mode khi về màn hình chính
+             exitKeyboardMode();
+             switchScreen('start');
+        };
+        window.switchScreen = (s) => { 
+            Object.values(els.screens).forEach(e => e.classList.add('hidden')); 
+            els.screens[s].classList.remove('hidden'); 
+            
+            // Nếu chuyển sang màn hình Game, đảm bảo các phần tử game chiếm đúng không gian
+            if (s === 'game') {
+                // Đặt lại display wrapper về chế độ mặc định (flex-grow: 1)
+                els.gameDisplayWrapper.classList.remove('flex-grow-0', 'max-h-[40dvh]', 'justify-center', 'items-center', 'padding-top-0_5', 'padding-bottom-0_5');
+                els.gameDisplayWrapper.classList.add('flex-1', 'justify-center', 'items-center', 'mb-4');
+            } else {
+                 // Đảm bảo không ở keyboard mode khi không phải màn hình input
+                 exitKeyboardMode();
+            }
+        };
         window.showLoading = (b) => els.loading.overlay.classList.toggle('hidden', !b);
         window.toggleSettings = () => els.settings.panel.classList.toggle('hidden');
         window.updateLevel = (val, el) => { document.getElementById('levelSelect').value = val; document.querySelectorAll('.level-card').forEach(c => { c.classList.remove('selected', 'bg-yellow-50', 'border-yellow-400'); c.classList.add('bg-gray-50', 'border-transparent'); }); el.classList.add('selected'); };
         els.inputs.answer.addEventListener('keypress', (e) => { if(e.key === 'Enter') checkAnswer(); });
         els.config.qtyInput.addEventListener('input', (e) => { els.config.qtyDisplay.textContent = `${e.target.value} câu`; });
 
-        const enterKeyboardMode = () => document.body.classList.add('keyboard-mode');
-        const exitKeyboardMode = () => document.body.classList.remove('keyboard-mode');
+        // --- KEYBOARD HANDLING V1.9 (FIXED) ---
+        let isKeyboardVisible = false;
+        
+        const enterKeyboardMode = (event) => {
+            if (event && event.target.tagName !== 'INPUT' && event.target.tagName !== 'TEXTAREA' && event.target.id !== 'vocabTopicInput') return;
+            isKeyboardVisible = true;
+            document.body.classList.add('keyboard-mode');
+            
+            // Áp dụng tối ưu UI khi keyboard hiện
+            if (!els.screens.game.classList.contains('hidden')) {
+                // Chế độ tối giản cho Game Display Wrapper (như bạn yêu cầu)
+                els.gameDisplayWrapper.classList.remove('flex-1', 'justify-center', 'items-center', 'mb-4');
+                els.gameDisplayWrapper.classList.add('flex-grow-0', 'max-h-[40dvh]', 'justify-center', 'items-center', 'padding-top-0_5', 'padding-bottom-0_5');
+            } else if (!els.screens.start.classList.contains('hidden')) {
+                // Tối ưu màn hình Start
+                 document.getElementById('startScreenContent').classList.add('justify-content-flex-start');
+            }
+        };
+
+        const exitKeyboardMode = () => {
+            isKeyboardVisible = false;
+            document.body.classList.remove('keyboard-mode');
+            
+            // Khôi phục UI về trạng thái bình thường
+            if (!els.screens.game.classList.contains('hidden')) {
+                els.gameDisplayWrapper.classList.remove('flex-grow-0', 'max-h-[40dvh]', 'justify-center', 'items-center', 'padding-top-0_5', 'padding-bottom-0_5');
+                els.gameDisplayWrapper.classList.add('flex-1', 'justify-center', 'items-center', 'mb-4');
+            } else if (!els.screens.start.classList.contains('hidden')) {
+                document.getElementById('startScreenContent').classList.remove('justify-content-flex-start');
+            }
+        };
+
+        // Gắn sự kiện focus/blur cho tất cả các input cần kích hoạt chế độ tối giản
         els.inputs.answer.addEventListener('focus', enterKeyboardMode);
         els.inputs.answer.addEventListener('blur', exitKeyboardMode);
         els.inputs.dict.addEventListener('focus', enterKeyboardMode);
         els.inputs.dict.addEventListener('blur', exitKeyboardMode);
-
+        els.inputs.vocabTopic.addEventListener('focus', enterKeyboardMode);
+        els.inputs.vocabTopic.addEventListener('blur', exitKeyboardMode);
+        
         setMode('vocab');
     </script>
 </body>
