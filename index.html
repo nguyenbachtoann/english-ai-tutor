@@ -2,8 +2,9 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>AI Tutor: v1.4 (Flat & Smart Input)</title>
+    <!-- interactive-widget=resizes-content helps viewport resize when keyboard opens -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
+    <title>AI Tutor: v1.6 (Data Restored)</title>
     
     <!-- PWA Setup -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -21,13 +22,12 @@
     
     <style>
         :root { --sat: env(safe-area-inset-top); --sab: env(safe-area-inset-bottom); }
-        body { font-family: 'Quicksand', sans-serif; background-color: #fdfbf7; height: 100vh; overflow: hidden; }
+        /* Use dvh (dynamic viewport height) for better mobile browser support */
+        body { font-family: 'Quicksand', sans-serif; background-color: #fdfbf7; height: 100dvh; overflow: hidden; }
         
-        /* Flattened App Container - No Shadows/Borders on Mobile View */
         #app-container { height: 100%; display: flex; flex-direction: column; background-color: #fdfbf7; }
         #app { background-color: white; height: 100%; width: 100%; display: flex; flex-direction: column; }
         
-        /* Only apply max-width on larger screens to keep it centered like a phone */
         @media (min-width: 768px) {
             #app { max-width: 28rem; margin: 0 auto; border-left: 1px solid #f3f4f6; border-right: 1px solid #f3f4f6; }
         }
@@ -45,20 +45,22 @@
         @keyframes pop { 0% { transform: scale(0.95); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
         .pop-in { animation: pop 0.2s ease-out forwards; }
         
-        /* Safe Areas */
-        .safe-pb { padding-bottom: calc(var(--sab) + 1rem); }
+        /* Enhanced Safe Area Padding for Footer text visibility */
+        .safe-pb-footer { padding-bottom: calc(var(--sab) + 2rem); }
         .safe-pt { padding-top: calc(var(--sat) + 0.5rem); }
 
-        /* --- KEYBOARD MODE STYLES (Minimize UI) --- */
+        /* --- SMART KEYBOARD MODE STYLES --- */
         body.keyboard-mode #mainHeader { display: none !important; }
+        body.keyboard-mode #logo-container { display: none !important; } 
+        body.keyboard-mode #configSection { display: none !important; } 
         body.keyboard-mode #gameHeader { margin-top: 0.5rem; margin-bottom: 0.2rem; }
         body.keyboard-mode #progressBarContainer { display: none !important; }
         body.keyboard-mode #instructionText { display: none !important; }
         body.keyboard-mode #gameScreen { justify-content: flex-start; }
-        body.keyboard-mode #mainDisplay { font-size: 1.5rem; margin-bottom: 0.5rem; margin-top: 0.5rem; }
+        body.keyboard-mode #mainDisplay { font-size: 1.25rem; margin-bottom: 0.25rem; margin-top: 0.25rem; }
         body.keyboard-mode #subDisplay { font-size: 0.8rem; padding: 0.2rem 0.5rem; }
-        body.keyboard-mode #inputContainer { padding-bottom: 0.5rem; }
-        body.keyboard-mode .safe-pb { padding-bottom: 0.5rem; } /* Override safe padding when keyboard is up */
+        body.keyboard-mode #inputContainer { padding-bottom: 0.5rem; margin-top: 0.5rem; }
+        body.keyboard-mode #startScreenContent { justify-content: flex-start; padding-top: 1rem; }
     </style>
 </head>
 <body>
@@ -66,7 +68,7 @@
     <div id="app-container">
         <div id="app">
             
-            <!-- HEADER (ID added for hiding) -->
+            <!-- HEADER -->
             <div id="mainHeader" class="px-3 pb-3 pt-[calc(env(safe-area-inset-top)+0.5rem)] bg-yellow-100/90 backdrop-blur-md flex justify-between items-center z-20 shrink-0 border-b border-yellow-200 sticky top-0 transition-all duration-300">
                 <div class="flex items-center gap-2">
                     <button onclick="resetGame()" class="w-10 h-10 flex items-center justify-center text-yellow-800 rounded-full hover:bg-yellow-200/50"><i class="fas fa-home text-lg"></i></button>
@@ -85,10 +87,10 @@
                     <h2 class="text-lg font-bold text-gray-800">Cài đặt</h2>
                     <button onclick="toggleSettings()" class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-600"><i class="fas fa-times"></i></button>
                 </div>
-                <div class="p-6 flex-1 overflow-y-auto safe-pb">
+                <div class="p-6 flex-1 overflow-y-auto safe-pb-footer">
                     <div class="mb-6 p-5 bg-purple-50 rounded-2xl border border-purple-100 shadow-sm">
                         <label class="block text-sm font-bold text-purple-900 mb-2"><i class="fas fa-key"></i> Google Gemini API Key</label>
-                        <p class="text-xs text-gray-600 mb-3">Key giúp tạo bài tập vô hạn và giải thích chi tiết hơn. (Từ điển cơ bản không cần Key).</p>
+                        <p class="text-xs text-gray-600 mb-3">Key giúp tạo bài tập vô hạn và giải thích chi tiết hơn.</p>
                         <input type="password" id="userApiKeyInput" placeholder="Dán API Key..." class="w-full p-3 bg-white border border-purple-200 rounded-xl mb-3 text-sm">
                         <button onclick="saveApiKey()" class="w-full bg-purple-600 text-white font-bold py-3 rounded-xl hover:bg-purple-700">Lưu Key</button>
                         <p id="keyStatus" class="text-xs mt-3 text-center font-medium text-gray-400">Chưa kết nối</p>
@@ -99,21 +101,20 @@
             <!-- DICTIONARY MODAL -->
             <div id="dictModal" class="hidden absolute inset-0 bg-white z-50 flex flex-col animate-fade-in pt-[calc(env(safe-area-inset-top))]">
                 <div class="p-3 border-b flex justify-between items-center bg-orange-50 shrink-0">
-                    <h2 class="text-base font-bold text-orange-900 truncate flex-1"><i class="fas fa-language mr-2"></i>Từ Điển (Miễn Phí)</h2>
+                    <h2 class="text-base font-bold text-orange-900 truncate flex-1"><i class="fas fa-language mr-2"></i>Từ Điển</h2>
                     <button onclick="closeDictModal()" class="w-8 h-8 flex items-center justify-center text-orange-400 hover:text-orange-600 bg-white rounded-full"><i class="fas fa-times"></i></button>
                 </div>
                 <div class="p-4 border-b bg-white shadow-sm">
                     <div class="relative flex items-center">
-                        <input type="text" id="dictInput" placeholder="Nhập từ (Anh hoặc Việt)..." class="w-full pl-10 pr-12 py-3 bg-gray-100 border-2 border-transparent focus:bg-white focus:border-orange-300 rounded-xl focus:outline-none transition text-gray-800 font-medium">
+                        <input type="text" id="dictInput" placeholder="Nhập từ..." class="w-full pl-10 pr-12 py-3 bg-gray-100 border-2 border-transparent focus:bg-white focus:border-orange-300 rounded-xl focus:outline-none transition text-gray-800 font-medium">
                         <i class="fas fa-search absolute left-4 text-gray-400"></i>
                         <button onclick="lookupDictionary()" class="absolute right-2 text-orange-500 hover:bg-orange-100 p-2 rounded-lg"><i class="fas fa-arrow-right"></i></button>
                     </div>
                 </div>
-                <div class="flex-1 overflow-y-auto p-4 custom-scroll bg-gray-50 safe-pb" id="dictResultArea">
+                <div class="flex-1 overflow-y-auto p-4 custom-scroll bg-gray-50 safe-pb-footer" id="dictResultArea">
                     <div class="flex flex-col items-center justify-center h-64 text-gray-400">
                         <i class="fas fa-spell-check text-4xl mb-3 opacity-50"></i>
-                        <p class="text-sm">Nhập tiếng Anh hoặc Tiếng Việt.</p>
-                        <p class="text-xs mt-1">Hệ thống tự động dịch.</p>
+                        <p class="text-sm">Hệ thống tự động dịch.</p>
                     </div>
                 </div>
             </div>
@@ -128,7 +129,7 @@
                     <button onclick="switchTheoryTab('grammar')" id="btnTheoryGrammar" class="flex-1 py-3 text-sm font-bold text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50/50">12 Thì</button>
                     <button onclick="switchTheoryTab('forms')" id="btnTheoryForms" class="flex-1 py-3 text-sm font-bold text-gray-500 hover:text-indigo-600">Biến thể</button>
                 </div>
-                <div class="flex-1 overflow-y-auto p-4 custom-scroll bg-gray-50 safe-pb" id="theoryContent">
+                <div class="flex-1 overflow-y-auto p-4 custom-scroll bg-gray-50 safe-pb-footer" id="theoryContent">
                     <div id="theoryListGrammar" class="grid grid-cols-1 gap-2"></div>
                     <div id="theoryListForms" class="hidden grid grid-cols-1 gap-2"></div>
                     <div id="theoryDetail" class="hidden h-full flex flex-col">
@@ -144,68 +145,82 @@
             </div>
 
             <!-- MAIN CONTENT -->
-            <div id="mainContent" class="flex-1 flex flex-col p-4 overflow-y-auto custom-scroll relative safe-pb">
+            <div id="mainContent" class="flex-1 flex flex-col p-4 overflow-y-auto custom-scroll relative">
+                
                 <!-- START SCREEN -->
                 <div id="startScreen" class="flex-1 flex flex-col h-full">
+                    <!-- Tabs -->
                     <div class="flex bg-gray-100 p-1.5 rounded-2xl mb-4 shrink-0 shadow-inner">
                         <button onclick="setMode('vocab')" id="tabVocab" class="flex-1 py-2 rounded-xl text-xs sm:text-sm font-bold transition tab-active">Từ Vựng</button>
                         <button onclick="setMode('grammar')" id="tabGrammar" class="flex-1 py-2 rounded-xl text-xs sm:text-sm font-bold transition tab-inactive">Ngữ Pháp</button>
                         <button onclick="setMode('forms')" id="tabForms" class="flex-1 py-2 rounded-xl text-xs sm:text-sm font-bold transition tab-inactive">Biến Thể</button>
                     </div>
 
-                    <div class="flex-1 flex flex-col justify-center min-h-0">
-                        <div id="configSection" class="hidden w-full mb-4 space-y-4">
+                    <!-- Center Content -->
+                    <div id="startScreenContent" class="flex-1 flex flex-col justify-center min-h-0 w-full max-w-md mx-auto transition-all duration-300">
+                        
+                        <!-- Input Views -->
+                        <div class="mb-4">
+                            <div id="viewVocab" class="flex flex-col items-center text-center w-full">
+                                <div id="logo-container" class="text-4xl sm:text-5xl mb-4 animate-bounce-slow">🥑</div>
+                                <h2 class="text-lg sm:text-xl font-bold mb-2 text-gray-800">Từ Vựng</h2>
+                                <div class="w-full relative">
+                                    <div id="onlineVocabInput" class="w-full"><input type="text" id="vocabTopicInput" placeholder="Chủ đề (cần Key)..." class="w-full p-4 border-2 border-yellow-100 rounded-2xl focus:outline-none focus:border-yellow-400 text-center shadow-sm"></div>
+                                    <div id="offlineVocabSelect" class="w-full hidden"><select id="vocabTopicSelect" class="w-full p-4 border-2 border-gray-200 rounded-2xl bg-white text-base shadow-sm appearance-none text-gray-700 font-medium text-center"></select><div class="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-400"><i class="fas fa-chevron-down"></i></div></div>
+                                </div>
+                            </div>
+
+                            <div id="viewGrammar" class="hidden flex flex-col items-center text-center w-full">
+                                <div id="logo-container" class="text-4xl sm:text-5xl mb-4">📝</div>
+                                <h2 class="text-lg sm:text-xl font-bold mb-2 text-gray-800">Luyện 12 Thì</h2>
+                                <div class="w-full px-2 relative"><select id="grammarTenseSelect" class="w-full p-4 border-2 border-indigo-100 rounded-2xl bg-white text-base shadow-sm appearance-none text-center"></select><div class="absolute right-6 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-400"><i class="fas fa-chevron-down"></i></div></div>
+                            </div>
+
+                            <div id="viewForms" class="hidden flex flex-col items-center text-center w-full">
+                                <div id="logo-container" class="text-4xl sm:text-5xl mb-4">🔀</div>
+                                <h2 class="text-lg sm:text-xl font-bold mb-2 text-gray-800">Loại Từ & Biến Thể</h2>
+                                <div class="w-full px-2 relative"><select id="formsTypeSelect" class="w-full p-4 border-2 border-green-100 rounded-2xl bg-white text-base shadow-sm appearance-none text-gray-700 text-center"></select><div class="absolute right-6 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-400"><i class="fas fa-chevron-down"></i></div></div>
+                            </div>
+                        </div>
+
+                        <!-- Config Section -->
+                        <div id="configSection" class="w-full mb-4 space-y-4 bg-gray-50 p-3 rounded-xl border border-gray-100">
                             <input type="hidden" id="levelSelect" value="A1-A2">
                             <div>
-                                <label class="block text-xs font-bold text-gray-400 mb-2 ml-1 uppercase tracking-wider">Trình độ</label>
-                                <div class="grid grid-cols-2 gap-2">
-                                    <div onclick="updateLevel('A1-A2', this)" class="level-card selected cursor-pointer p-3 rounded-xl bg-gray-50 flex items-center gap-3">
-                                        <div class="w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-lg">🌱</div><div><div class="text-sm font-bold text-gray-700">Cơ bản</div><div class="text-[10px] text-gray-400 font-bold">A1-A2</div></div>
+                                <div class="flex justify-between items-center mb-2">
+                                    <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Trình độ</label>
+                                </div>
+                                <div class="grid grid-cols-4 gap-1 sm:gap-2">
+                                    <div onclick="updateLevel('A1-A2', this)" class="level-card selected cursor-pointer p-2 rounded-lg bg-white border border-transparent text-center">
+                                        <div class="text-xl">🌱</div><div class="text-[10px] text-gray-600 font-bold mt-1">Dễ</div>
                                     </div>
-                                    <div onclick="updateLevel('B1-B2', this)" class="level-card cursor-pointer p-3 rounded-xl bg-gray-50 flex items-center gap-3">
-                                        <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-lg">🚀</div><div><div class="text-sm font-bold text-gray-700">Trung bình</div><div class="text-[10px] text-gray-400 font-bold">B1-B2</div></div>
+                                    <div onclick="updateLevel('B1-B2', this)" class="level-card cursor-pointer p-2 rounded-lg bg-white border border-transparent text-center">
+                                        <div class="text-xl">🚀</div><div class="text-[10px] text-gray-600 font-bold mt-1">TB</div>
                                     </div>
-                                    <div onclick="updateLevel('C1-C2', this)" class="level-card cursor-pointer p-3 rounded-xl bg-gray-50 flex items-center gap-3">
-                                        <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-lg">🔥</div><div><div class="text-sm font-bold text-gray-700">Nâng cao</div><div class="text-[10px] text-gray-400 font-bold">C1-C2</div></div>
+                                    <div onclick="updateLevel('C1-C2', this)" class="level-card cursor-pointer p-2 rounded-lg bg-white border border-transparent text-center">
+                                        <div class="text-xl">🔥</div><div class="text-[10px] text-gray-600 font-bold mt-1">Khó</div>
                                     </div>
-                                    <div onclick="updateLevel('IELTS', this)" class="level-card cursor-pointer p-3 rounded-xl bg-gray-50 flex items-center gap-3">
-                                        <div class="w-8 h-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-lg">🎓</div><div><div class="text-sm font-bold text-gray-700">Học thuật</div><div class="text-[10px] text-gray-400 font-bold">IELTS</div></div>
+                                    <div onclick="updateLevel('IELTS', this)" class="level-card cursor-pointer p-2 rounded-lg bg-white border border-transparent text-center">
+                                        <div class="text-xl">🎓</div><div class="text-[10px] text-gray-600 font-bold mt-1">IELTS</div>
                                     </div>
                                 </div>
                             </div>
                             <div>
-                                <div class="flex justify-between items-center mb-3">
-                                    <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Số câu hỏi</label>
-                                    <span id="qtyDisplay" class="text-sm font-bold text-yellow-700 bg-yellow-100 px-3 py-1 rounded-full shadow-sm">10 câu</span>
+                                <div class="flex justify-between items-center mb-2">
+                                    <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Số lượng</label>
+                                    <span id="qtyDisplay" class="text-[10px] font-bold text-yellow-700 bg-yellow-100 px-2 py-0.5 rounded-full">10 câu</span>
                                 </div>
-                                <input type="range" id="quantityRange" min="5" max="100" step="5" value="10" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-yellow-400">
+                                <input type="range" id="quantityRange" min="5" max="50" step="5" value="10" class="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-yellow-400">
                             </div>
                         </div>
 
-                        <div id="viewVocab" class="flex flex-col h-full justify-center items-center text-center w-full">
-                            <div class="text-4xl sm:text-5xl mb-4 animate-bounce-slow">🥑</div>
-                            <h2 class="text-lg sm:text-xl font-bold mb-1 text-gray-800">Từ Vựng</h2>
-                            <div class="w-full relative mb-4">
-                                <div id="onlineVocabInput" class="w-full"><input type="text" id="vocabTopicInput" placeholder="Nhập chủ đề (cần Key)..." class="w-full p-4 border-2 border-yellow-100 rounded-2xl focus:outline-none focus:border-yellow-400 text-center shadow-sm"></div>
-                                <div id="offlineVocabSelect" class="w-full hidden"><select id="vocabTopicSelect" class="w-full p-4 border-2 border-gray-200 rounded-2xl bg-white text-base shadow-sm appearance-none text-gray-700 font-medium"></select><div class="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-400"><i class="fas fa-chevron-down"></i></div></div>
-                            </div>
-                        </div>
-
-                        <div id="viewGrammar" class="hidden flex flex-col h-full justify-center items-center text-center w-full">
-                            <div class="text-4xl sm:text-5xl mb-4">📝</div>
-                            <h2 class="text-lg sm:text-xl font-bold mb-1 text-gray-800">Luyện 12 Thì</h2>
-                            <div class="w-full mb-4 px-2"><select id="grammarTenseSelect" class="w-full p-4 border-2 border-indigo-100 rounded-2xl bg-white text-base shadow-sm appearance-none"></select></div>
-                        </div>
-
-                        <div id="viewForms" class="hidden flex flex-col h-full justify-center items-center text-center w-full">
-                            <div class="text-4xl sm:text-5xl mb-4">🔀</div>
-                            <h2 class="text-lg sm:text-xl font-bold mb-1 text-gray-800">Loại Từ & Biến Thể</h2>
-                            <div class="w-full mb-4 px-2"><select id="formsTypeSelect" class="w-full p-4 border-2 border-green-100 rounded-2xl bg-white text-base shadow-sm appearance-none text-gray-700"></select></div>
-                        </div>
-
-                        <button onclick="startGeneration()" id="startBtn" class="w-full bg-yellow-400 text-yellow-900 font-bold py-4 rounded-2xl shadow-lg active:scale-95 transition flex items-center justify-center gap-2 mb-4"><i class="fas fa-play"></i> Tạo Bài Tập</button>
+                        <button onclick="startGeneration()" id="startBtn" class="w-full bg-yellow-400 text-yellow-900 font-bold py-4 rounded-2xl shadow-lg active:scale-95 transition flex items-center justify-center gap-2 mt-2"><i class="fas fa-play"></i> Tạo Bài Tập</button>
                     </div>
-                    <div class="mt-auto pt-4 pb-2 text-center"><p id="dataSourceText" class="text-[10px] text-gray-400 font-medium bg-gray-50 px-3 py-1 rounded-full inline-block">Source: Offline</p></div>
+                    
+                    <!-- Footer -->
+                    <div class="mt-auto pt-4 text-center shrink-0 safe-pb-footer">
+                        <p id="dataSourceText" class="text-[10px] text-gray-400 font-medium bg-gray-50 px-3 py-1 rounded-full inline-block border border-gray-100 shadow-sm">Source: Offline</p>
+                    </div>
                 </div>
 
                 <!-- GAME SCREEN -->
@@ -215,6 +230,8 @@
                         <div class="bg-gray-100 px-2 py-1 rounded-lg text-xs font-mono text-gray-600"><span id="currentQ">1</span>/<span id="totalQ">10</span></div>
                     </div>
                     <div id="progressBarContainer" class="w-full bg-gray-100 rounded-full h-1.5 mb-6 shrink-0"><div id="progressBar" class="bg-yellow-400 h-full rounded-full transition-all duration-300 ease-out" style="width: 10%"></div></div>
+                    
+                    <!-- Game Display -->
                     <div class="flex-1 flex flex-col justify-center items-center mb-4 min-h-0 transition-all duration-300">
                         <span id="instructionText" class="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4 bg-gray-50 px-3 py-1 rounded-full">Instruction</span>
                         <div class="w-full flex flex-col items-center justify-center py-4">
@@ -222,15 +239,18 @@
                             <p id="subDisplay" class="text-indigo-500 font-medium text-base hidden bg-indigo-50 px-3 py-1 rounded-lg mt-2 transition-all duration-300">(hint)</p>
                         </div>
                     </div>
+                    
+                    <!-- Input Area -->
                     <div id="inputContainer" class="mt-auto w-full pb-2 flex flex-col transition-all duration-300">
                         <input type="text" id="answerInput" class="w-full bg-white border-2 border-gray-200 text-center text-xl p-4 rounded-2xl focus:outline-none focus:border-yellow-400 mb-3 transition-all duration-300" placeholder="Nhập đáp án..." autocomplete="off">
                         <button id="checkBtn" onclick="checkAnswer()" class="w-full bg-gray-800 text-white font-bold py-4 rounded-2xl shadow-lg active:scale-95 flex items-center justify-center gap-2 mb-4"><span>Kiểm tra</span> <i class="fas fa-check"></i></button>
+                        <div class="h-safe-keyboard hidden"></div>
                     </div>
                 </div>
 
                 <!-- FEEDBACK & RESULT -->
                 <div id="feedbackOverlay" class="hidden fixed inset-0 z-50 bg-white/95 backdrop-blur-md flex flex-col items-center justify-center text-center p-6 pop-in">
-                    <div class="flex-1 flex flex-col items-center justify-center w-full min-h-0 safe-pb">
+                    <div class="flex-1 flex flex-col items-center justify-center w-full min-h-0 safe-pb-footer">
                         <div id="feedbackIcon" class="text-6xl mb-4">🎉</div>
                         <h3 id="feedbackTitle" class="text-2xl font-bold mb-6">Chính xác!</h3>
                         <div class="bg-gray-50 rounded-2xl p-6 w-full max-w-sm mb-6 border border-gray-100 shadow-sm relative overflow-hidden shrink-0">
@@ -243,10 +263,10 @@
                              <p id="grammarExplanation" class="text-sm text-indigo-600 mt-4 pt-3 border-t border-gray-200 italic hidden leading-relaxed text-left"></p>
                         </div>
                     </div>
-                    <button onclick="nextQuestion()" id="nextBtn" class="w-full bg-yellow-400 text-yellow-900 font-bold py-4 rounded-2xl shadow-lg mt-auto mb-4 shrink-0 safe-pb">Tiếp tục <i class="fas fa-arrow-right ml-2"></i></button>
+                    <button onclick="nextQuestion()" id="nextBtn" class="w-full bg-yellow-400 text-yellow-900 font-bold py-4 rounded-2xl shadow-lg mt-auto mb-4 shrink-0 safe-pb-footer">Tiếp tục <i class="fas fa-arrow-right ml-2"></i></button>
                 </div>
 
-                <div id="resultScreen" class="hidden flex-1 flex flex-col justify-center items-center text-center h-full safe-pb">
+                <div id="resultScreen" class="hidden flex-1 flex flex-col justify-center items-center text-center h-full safe-pb-footer">
                     <div class="text-6xl mb-4 animate-bounce">🏆</div>
                     <h2 class="text-2xl font-bold mb-2 text-gray-800">Hoàn thành!</h2>
                     <div class="flex items-center gap-2 mb-6 bg-yellow-50 px-4 py-2 rounded-full border border-yellow-100">
@@ -281,6 +301,7 @@
             }
         })();
 
+        // --- FULL RESTORED DATA ---
         const offlineData = {
             vocab: { "Daily Life": [{vi: "Cà phê", en: "coffee"}, {vi: "Máy tính", en: "computer"}, {vi: "Sách", en: "book"}, {vi: "Bút", en: "pen"}, {vi: "Trường học", en: "school"}, {vi: "Bạn bè", en: "friend"}, {vi: "Gia đình", en: "family"}, {vi: "Nước", en: "water"}, {vi: "Thức ăn", en: "food"}, {vi: "Tiền", en: "money"}, {vi: "Cửa", en: "door"}, {vi: "Ghế", en: "chair"}, {vi: "Bàn", en: "table"}, {vi: "Thành phố", en: "city"}, {vi: "Công việc", en: "job"}, {vi: "Giường ngủ", en: "bed"}, {vi: "Bếp", en: "kitchen"}, {vi: "Điện thoại", en: "phone"}, {vi: "Xe buýt", en: "bus"}, {vi: "Bữa sáng", en: "breakfast"}], "Work & Business": [{vi: "Phát triển", en: "develop"}, {vi: "Thành tựu", en: "achievement"}, {vi: "Thử thách", en: "challenge"}, {vi: "Môi trường", en: "environment"}, {vi: "Xã hội", en: "society"}, {vi: "Kinh tế", en: "economy"}, {vi: "Văn hóa", en: "culture"}, {vi: "Giải pháp", en: "solution"}, {vi: "Cơ hội", en: "opportunity"}, {vi: "Kiến thức", en: "knowledge"}, {vi: "Kinh nghiệm", en: "experience"}, {vi: "Quyết định", en: "decision"}, {vi: "Ảnh hưởng", en: "influence"}, {vi: "Công nghệ", en: "technology"}, {vi: "Sáng tạo", en: "creative"}, {vi: "Thị trường", en: "market"}, {vi: "Khách hàng", en: "customer"}, {vi: "Đầu tư", en: "investment"}, {vi: "Lợi nhuận", en: "profit"}, {vi: "Quản lý", en: "management"}], "Academic & IELTS": [{vi: "Toàn diện", en: "comprehensive"}, {vi: "Đáng kể", en: "significant"}, {vi: "Sâu sắc", en: "profound"}, {vi: "Mơ hồ", en: "ambiguous"}, {vi: "Tỉ mỉ", en: "meticulous"}, {vi: "Bền vững", en: "sustainable"}, {vi: "Thiết yếu", en: "indispensable"}, {vi: "Lỗi thời", en: "obsolete"}, {vi: "Thịnh vượng", en: "prosperous"}, {vi: "Bất lợi", en: "detrimental"}, {vi: "Thuyết phục", en: "persuasive"}, {vi: "Nhất quán", en: "consistent"}, {vi: "Khó nắm bắt", en: "elusive"}, {vi: "Tinh tế", en: "exquisite"}, {vi: "Kiên cường", en: "resilient"}, {vi: "Giảm nhẹ", en: "mitigate"}, {vi: "Làm trầm trọng", en: "exacerbate"}, {vi: "Phổ biến", en: "prevalent"}, {vi: "Bất bình đẳng", en: "inequality"}, {vi: "Đô thị hóa", en: "urbanization"}], "Travel & Food": [{vi: "Hành lý", en: "luggage"}, {vi: "Hộ chiếu", en: "passport"}, {vi: "Đặt phòng", en: "reservation"}, {vi: "Thực đơn", en: "menu"}, {vi: "Ngon", en: "delicious"}, {vi: "Sân bay", en: "airport"}, {vi: "Khách sạn", en: "hotel"}, {vi: "Bản đồ", en: "map"}, {vi: "Du khách", en: "tourist"}, {vi: "Chuyến bay", en: "flight"}, {vi: "Đặc sản", en: "specialty"}, {vi: "Cay", en: "spicy"}, {vi: "Mặn", en: "salty"}, {vi: "Ngọt", en: "sweet"}, {vi: "Chua", en: "sour"}] },
             grammar: { "Present Simple": [{question: "She usually ___ (walk) to work.", verb: "walk", answer: "walks", explanation: "Thói quen ở hiện tại (She -> V+s)."}, {question: "The sun ___ (rise) in the East.", verb: "rise", answer: "rises", explanation: "Sự thật hiển nhiên."}], "Present Continuous": [{question: "Look! It ___ (rain) outside.", verb: "rain", answer: "is raining", explanation: "Đang xảy ra lúc nói (Look!)."}, {question: "I ___ (study) now.", verb: "study", answer: "am studying", explanation: "Đang diễn ra (now)."}], "Present Perfect": [{question: "I ___ (see) that movie twice.", verb: "see", answer: "have seen", explanation: "Kinh nghiệm trong quá khứ."}], "Present Perfect Continuous": [{question: "It ___ (rain) for 3 hours.", verb: "rain", answer: "has been raining", explanation: "Nhấn mạnh quá trình liên tục."}], "Past Simple": [{question: "I ___ (go) to the cinema yesterday.", verb: "go", answer: "went", explanation: "Đã xảy ra và kết thúc (yesterday)."}], "Past Continuous": [{question: "I ___ (read) when he came.", verb: "read", answer: "was reading", explanation: "Đang xảy ra thì hành động khác xen vào."}], "Past Perfect": [{question: "When I arrived, the train ___ (leave).", verb: "leave", answer: "had left", explanation: "Xảy ra trước 1 hành động QK khác."}], "Past Perfect Continuous": [{question: "He was tired because he ___ (work) all day.", verb: "work", answer: "had been working", explanation: "Nguyên nhân của trạng thái QK."}], "Future Simple": [{question: "I think it ___ (rain) tomorrow.", verb: "rain", answer: "will rain", explanation: "Dự đoán không căn cứ."}], "Future Continuous": [{question: "At 9 AM tomorrow, I ___ (work).", verb: "work", answer: "will be working", explanation: "Thời điểm cụ thể trong TL."}], "Future Perfect": [{question: "By next year, I ___ (graduate).", verb: "graduate", answer: "will have graduated", explanation: "Hoàn thành trước mốc TL (By)."}], "Future Perfect Continuous": [{question: "By 2030, I ___ (teach) for 20 years.", verb: "teach", answer: "will have been teaching", explanation: "Quá trình tính đến mốc TL."}] },
@@ -298,17 +319,52 @@
                 "Future Continuous": { title: "Thì Tương Lai Tiếp Diễn", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Công thức</h3><div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm font-mono">S + will + be + V-ing</div><p class="text-gray-700">Sẽ đang xảy ra tại 1 thời điểm trong TL.</p>` },
                 "Future Perfect": { title: "Thì Tương Lai Hoàn Thành", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Công thức</h3><div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm font-mono">S + will + have + V3/ed</div><p class="text-gray-700">Sẽ hoàn thành trước 1 thời điểm trong TL.</p>` },
                 "Future Perfect Continuous": { title: "TL Hoàn Thành Tiếp Diễn", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Công thức</h3><div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm font-mono">S + will + have + been + V-ing</div><p class="text-gray-700">Nhấn mạnh quá trình tính đến 1 thời điểm trong TL.</p>` },
-                "irregular": { title: "Động từ Bất Quy Tắc (V2)", content: `<p class="mb-2 text-gray-600">Đây là các động từ không tuân theo quy tắc thêm -ed khi chuyển sang quá khứ đơn.</p><table class="w-full text-sm text-left border rounded-lg overflow-hidden"><thead><tr class="bg-gray-100"><th class="p-2 border">V1 (Hiện tại)</th><th class="p-2 border">V2 (Quá khứ)</th></tr></thead><tbody><tr><td class="p-2 border">Go</td><td class="p-2 border">Went</td></tr><tr><td class="p-2 border">Buy</td><td class="p-2 border">Bought</td></tr><tr><td class="p-2 border">See</td><td class="p-2 border">Saw</td></tr><tr><td class="p-2 border">Do</td><td class="p-2 border">Did</td></tr><tr><td class="p-2 border">Have</td><td class="p-2 border">Had</td></tr></tbody></table>` },
-                "irregular_v3": { title: "Quá khứ phân từ (V3)", content: `<p class="mb-2 text-gray-600">Dùng trong các thì Hoàn thành (Perfect tenses) và Câu bị động.</p><table class="w-full text-sm text-left border rounded-lg overflow-hidden"><thead><tr class="bg-gray-100"><th class="p-2 border">V1</th><th class="p-2 border">V2</th><th class="p-2 border text-red-600 font-bold">V3</th></tr></thead><tbody><tr><td class="p-2 border">Go</td><td class="p-2 border">Went</td><td class="p-2 border text-red-600">Gone</td></tr><tr><td class="p-2 border">Eat</td><td class="p-2 border">Ate</td><td class="p-2 border text-red-600">Eaten</td></tr><tr><td class="p-2 border">Write</td><td class="p-2 border">Wrote</td><td class="p-2 border text-red-600">Written</td></tr><tr><td class="p-2 border">Take</td><td class="p-2 border">Took</td><td class="p-2 border text-red-600">Taken</td></tr></tbody></table>` },
-                "noun_suffix": { title: "Hậu tố Danh từ (Noun Suffixes)", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Chỉ người</h3><ul class="list-disc ml-5 mb-2 text-sm"><li><b>-er/or:</b> teacher, actor, worker</li><li><b>-ist:</b> artist, scientist</li><li><b>-ee:</b> employee, trainee</li></ul><h3 class="font-bold text-indigo-700 mb-2">2. Chỉ vật/trừu tượng</h3><ul class="list-disc ml-5 text-sm"><li><b>-tion/sion:</b> information, decision</li><li><b>-ment:</b> development, government</li><li><b>-ness:</b> happiness, sadness</li><li><b>-ity:</b> ability, activity</li></ul>` },
-                "adj_suffix": { title: "Hậu tố Tính từ (Adjective Suffixes)", content: `<ul class="list-disc ml-5 text-sm space-y-1"><li><b>-ful (đầy):</b> helpful, beautiful</li><li><b>-less (không):</b> careless, homeless</li><li><b>-able/ible (có thể):</b> comfortable, visible</li><li><b>-ive:</b> active, creative</li><li><b>-ous:</b> dangerous, famous</li><li><b>-y:</b> sunny, rainy, windy</li><li><b>-al:</b> national, traditional</li></ul>` },
-                "prefixes": { title: "Tiền tố phổ biến (Prefixes)", content: `<p class="mb-2 text-sm">Thêm vào trước từ gốc để đổi nghĩa (thường là nghĩa phủ định).</p><ul class="list-disc ml-5 text-sm space-y-1"><li><b>un-:</b> unhappy, unsafe</li><li><b>im- (trước p, m):</b> impossible, impolite</li><li><b>in-:</b> incorrect, informal</li><li><b>dis-:</b> disagree, dislike</li><li><b>re- (làm lại):</b> rewrite, replay</li><li><b>pre- (trước):</b> preview, pretest</li></ul>` },
-                "verb_noun": { title: "Chuyển Động từ thành Danh từ", content: `<div class="bg-green-50 p-3 rounded mb-2 border border-green-200"><span class="font-bold">Quy tắc chung:</span> Thêm hậu tố danh từ vào động từ.</div><ul class="text-sm space-y-2"><li><b>Decide</b> (v) -> <b>Decision</b> (n)</li><li><b>Solve</b> (v) -> <b>Solution</b> (n)</li><li><b>Arrive</b> (v) -> <b>Arrival</b> (n)</li><li><b>Perform</b> (v) -> <b>Performance</b> (n)</li></ul>` },
-                "noun_adj": { title: "Chuyển Danh từ thành Tính từ", content: `<div class="bg-blue-50 p-3 rounded mb-2 border border-blue-200"><span class="font-bold">Quy tắc:</span> Thêm hậu tố tính từ.</div><ul class="text-sm space-y-2"><li><b>Danger</b> (n) -> <b>Dangerous</b> (adj)</li><li><b>Care</b> (n) -> <b>Careful/Careless</b> (adj)</li><li><b>Nature</b> (n) -> <b>Natural</b> (adj)</li><li><b>Sun</b> (n) -> <b>Sunny</b> (adj)</li></ul>` },
-                "adj_adv": { title: "Tính từ & Trạng từ", content: `<div class="bg-yellow-50 p-3 rounded mb-2 border border-yellow-200"><span class="font-bold">Công thức:</span> Adj + ly = Adv</div><ul class="text-sm space-y-1 mb-2"><li>Quick -> Quickly</li><li>Bad -> Badly</li><li>Happy -> Happily (y -> i + ly)</li></ul><p class="font-bold text-red-500 text-sm">Ngoại lệ:</p><ul class="text-sm"><li>Good -> Well</li><li>Fast -> Fast (giữ nguyên)</li><li>Hard -> Hard</li></ul>` },
-                "ing": { title: "Quy tắc thêm đuôi -ING", content: `<ol class="list-decimal ml-5 text-sm space-y-2"><li><b>Thông thường:</b> Thêm -ing (walk -> walking)</li><li><b>Tận cùng là e:</b> Bỏ e thêm ing (write -> writing)</li><li><b>Tận cùng là ie:</b> Đổi ie thành y (lie -> lying)</li><li><b>1 âm tiết, tận cùng 1 phụ âm, trước là 1 nguyên âm:</b> Gấp đôi phụ âm (run -> running, sit -> sitting)</li></ol>` },
-                "ed": { title: "Quy tắc thêm đuôi -ED", content: `<ol class="list-decimal ml-5 text-sm space-y-2"><li><b>Thông thường:</b> Thêm -ed (watch -> watched)</li><li><b>Tận cùng là e:</b> Thêm d (live -> lived)</li><li><b>Tận cùng là y (trước là phụ âm):</b> Đổi y thành i + ed (study -> studied)</li><li><b>Gấp đôi phụ âm cuối:</b> stop -> stopped, plan -> planned</li></ol>` },
-                "classify": { title: "Phân loại từ (Word Class)", content: `<div class="space-y-3 text-sm"><div><span class="font-bold text-blue-600">Noun (Danh từ):</span> Chỉ người, vật, nơi chốn.<br>Vị trí: Đầu câu (Chủ ngữ), sau động từ (Tân ngữ).</div><div><span class="font-bold text-red-600">Verb (Động từ):</span> Chỉ hành động, trạng thái.<br>Vị trí: Sau chủ ngữ.</div><div><span class="font-bold text-green-600">Adjective (Tính từ):</span> Chỉ tính chất.<br>Vị trí: Trước danh từ, sau tobe.</div><div><span class="font-bold text-purple-600">Adverb (Trạng từ):</span> Bổ nghĩa cho động từ/tính từ.<br>Vị trí: Sau động từ thường, cuối câu.</div></div>` }
+                
+                // === RESTORED FORMS DATA ===
+                "irregular": { 
+                    title: "Động từ Bất Quy Tắc (V2)", 
+                    content: `<p class="mb-2 text-gray-600">Đây là các động từ không tuân theo quy tắc thêm -ed khi chuyển sang quá khứ đơn.</p><table class="w-full text-sm text-left border rounded-lg overflow-hidden"><thead><tr class="bg-gray-100"><th class="p-2 border">V1 (Hiện tại)</th><th class="p-2 border">V2 (Quá khứ)</th></tr></thead><tbody><tr><td class="p-2 border">Go</td><td class="p-2 border">Went</td></tr><tr><td class="p-2 border">Buy</td><td class="p-2 border">Bought</td></tr><tr><td class="p-2 border">See</td><td class="p-2 border">Saw</td></tr><tr><td class="p-2 border">Do</td><td class="p-2 border">Did</td></tr><tr><td class="p-2 border">Have</td><td class="p-2 border">Had</td></tr></tbody></table>`
+                },
+                "irregular_v3": { 
+                    title: "Quá khứ phân từ (V3)", 
+                    content: `<p class="mb-2 text-gray-600">Dùng trong các thì Hoàn thành (Perfect tenses) và Câu bị động.</p><table class="w-full text-sm text-left border rounded-lg overflow-hidden"><thead><tr class="bg-gray-100"><th class="p-2 border">V1</th><th class="p-2 border">V2</th><th class="p-2 border text-red-600 font-bold">V3</th></tr></thead><tbody><tr><td class="p-2 border">Go</td><td class="p-2 border">Went</td><td class="p-2 border text-red-600">Gone</td></tr><tr><td class="p-2 border">Eat</td><td class="p-2 border">Ate</td><td class="p-2 border text-red-600">Eaten</td></tr><tr><td class="p-2 border">Write</td><td class="p-2 border">Wrote</td><td class="p-2 border text-red-600">Written</td></tr><tr><td class="p-2 border">Take</td><td class="p-2 border">Took</td><td class="p-2 border text-red-600">Taken</td></tr></tbody></table>` 
+                },
+                "noun_suffix": {
+                    title: "Hậu tố Danh từ (Noun Suffixes)",
+                    content: `<h3 class="font-bold text-indigo-700 mb-2">1. Chỉ người</h3><ul class="list-disc ml-5 mb-2 text-sm"><li><b>-er/or:</b> teacher, actor, worker</li><li><b>-ist:</b> artist, scientist</li><li><b>-ee:</b> employee, trainee</li></ul><h3 class="font-bold text-indigo-700 mb-2">2. Chỉ vật/trừu tượng</h3><ul class="list-disc ml-5 text-sm"><li><b>-tion/sion:</b> information, decision</li><li><b>-ment:</b> development, government</li><li><b>-ness:</b> happiness, sadness</li><li><b>-ity:</b> ability, activity</li></ul>`
+                },
+                "adj_suffix": {
+                    title: "Hậu tố Tính từ (Adjective Suffixes)",
+                    content: `<ul class="list-disc ml-5 text-sm space-y-1"><li><b>-ful (đầy):</b> helpful, beautiful</li><li><b>-less (không):</b> careless, homeless</li><li><b>-able/ible (có thể):</b> comfortable, visible</li><li><b>-ive:</b> active, creative</li><li><b>-ous:</b> dangerous, famous</li><li><b>-y:</b> sunny, rainy, windy</li><li><b>-al:</b> national, traditional</li></ul>`
+                },
+                "prefixes": {
+                    title: "Tiền tố phổ biến (Prefixes)",
+                    content: `<p class="mb-2 text-sm">Thêm vào trước từ gốc để đổi nghĩa (thường là nghĩa phủ định).</p><ul class="list-disc ml-5 text-sm space-y-1"><li><b>un-:</b> unhappy, unsafe</li><li><b>im- (trước p, m):</b> impossible, impolite</li><li><b>in-:</b> incorrect, informal</li><li><b>dis-:</b> disagree, dislike</li><li><b>re- (làm lại):</b> rewrite, replay</li><li><b>pre- (trước):</b> preview, pretest</li></ul>`
+                },
+                "verb_noun": {
+                    title: "Chuyển Động từ thành Danh từ",
+                    content: `<div class="bg-green-50 p-3 rounded mb-2 border border-green-200"><span class="font-bold">Quy tắc chung:</span> Thêm hậu tố danh từ vào động từ.</div><ul class="text-sm space-y-2"><li><b>Decide</b> (v) -> <b>Decision</b> (n)</li><li><b>Solve</b> (v) -> <b>Solution</b> (n)</li><li><b>Arrive</b> (v) -> <b>Arrival</b> (n)</li><li><b>Perform</b> (v) -> <b>Performance</b> (n)</li></ul>`
+                },
+                "noun_adj": {
+                    title: "Chuyển Danh từ thành Tính từ",
+                    content: `<div class="bg-blue-50 p-3 rounded mb-2 border border-blue-200"><span class="font-bold">Quy tắc:</span> Thêm hậu tố tính từ.</div><ul class="text-sm space-y-2"><li><b>Danger</b> (n) -> <b>Dangerous</b> (adj)</li><li><b>Care</b> (n) -> <b>Careful/Careless</b> (adj)</li><li><b>Nature</b> (n) -> <b>Natural</b> (adj)</li><li><b>Sun</b> (n) -> <b>Sunny</b> (adj)</li></ul>`
+                },
+                "adj_adv": {
+                    title: "Tính từ & Trạng từ",
+                    content: `<div class="bg-yellow-50 p-3 rounded mb-2 border border-yellow-200"><span class="font-bold">Công thức:</span> Adj + ly = Adv</div><ul class="text-sm space-y-1 mb-2"><li>Quick -> Quickly</li><li>Bad -> Badly</li><li>Happy -> Happily (y -> i + ly)</li></ul><p class="font-bold text-red-500 text-sm">Ngoại lệ:</p><ul class="text-sm"><li>Good -> Well</li><li>Fast -> Fast (giữ nguyên)</li><li>Hard -> Hard</li></ul>`
+                },
+                "ing": {
+                    title: "Quy tắc thêm đuôi -ING",
+                    content: `<ol class="list-decimal ml-5 text-sm space-y-2"><li><b>Thông thường:</b> Thêm -ing (walk -> walking)</li><li><b>Tận cùng là e:</b> Bỏ e thêm ing (write -> writing)</li><li><b>Tận cùng là ie:</b> Đổi ie thành y (lie -> lying)</li><li><b>1 âm tiết, tận cùng 1 phụ âm, trước là 1 nguyên âm:</b> Gấp đôi phụ âm (run -> running, sit -> sitting)</li></ol>`
+                },
+                "ed": {
+                    title: "Quy tắc thêm đuôi -ED",
+                    content: `<ol class="list-decimal ml-5 text-sm space-y-2"><li><b>Thông thường:</b> Thêm -ed (watch -> watched)</li><li><b>Tận cùng là e:</b> Thêm d (live -> lived)</li><li><b>Tận cùng là y (trước là phụ âm):</b> Đổi y thành i + ed (study -> studied)</li><li><b>Gấp đôi phụ âm cuối:</b> stop -> stopped, plan -> planned</li></ol>`
+                },
+                "classify": {
+                    title: "Phân loại từ (Word Class)",
+                    content: `<div class="space-y-3 text-sm"><div><span class="font-bold text-blue-600">Noun (Danh từ):</span> Chỉ người, vật, nơi chốn.<br>Vị trí: Đầu câu (Chủ ngữ), sau động từ (Tân ngữ).</div><div><span class="font-bold text-red-600">Verb (Động từ):</span> Chỉ hành động, trạng thái.<br>Vị trí: Sau chủ ngữ.</div><div><span class="font-bold text-green-600">Adjective (Tính từ):</span> Chỉ tính chất.<br>Vị trí: Trước danh từ, sau tobe.</div><div><span class="font-bold text-purple-600">Adverb (Trạng từ):</span> Bổ nghĩa cho động từ/tính từ.<br>Vị trí: Sau động từ thường, cuối câu.</div></div>`
+                }
             }
         };
 
@@ -486,7 +542,6 @@
         window.startGame = () => { gameState.currentIdx = 0; gameState.score = 0; gameState.history = []; els.game.totalQ.textContent = gameState.data.length; switchScreen('game'); updateUI(); };
         window.checkAnswer = () => { 
             const user = els.inputs.answer.value.trim().toLowerCase(); if(!user) return;
-            // Fix: Guard against undefined item if index out of bounds or data missing
             if (gameState.currentIdx >= gameState.data.length) return;
             const item = gameState.data[gameState.currentIdx];
             if (!item) return;
@@ -507,10 +562,8 @@
         }
         function finishGame() {
             document.getElementById('finalScore').textContent = gameState.score; 
-            // Fix: ensure element exists
             const totalEl = document.getElementById('totalScoreQ');
             if(totalEl) totalEl.textContent = gameState.data.length;
-            
             document.getElementById('resultList').innerHTML = gameState.history.map(h => `<div class="p-3 border-b border-gray-100 flex gap-2"><span>${h.ok?'✅':'❌'}</span><div class="flex-1"><div class="text-xs text-gray-500">${h.q}</div><div class="font-bold text-green-600">${h.a}</div>${!h.ok ? `<div class="text-sm line-through text-red-300">${h.u}</div>` : ''}</div></div>`).join('');
             switchScreen('result');
         }
@@ -524,15 +577,10 @@
         els.inputs.answer.addEventListener('keypress', (e) => { if(e.key === 'Enter') checkAnswer(); });
         els.config.qtyInput.addEventListener('input', (e) => { els.config.qtyDisplay.textContent = `${e.target.value} câu`; });
 
-        // --- NEW: Keyboard Mode Handlers (Minimize UI) ---
         const enterKeyboardMode = () => document.body.classList.add('keyboard-mode');
         const exitKeyboardMode = () => document.body.classList.remove('keyboard-mode');
-
-        // Apply to main game input
         els.inputs.answer.addEventListener('focus', enterKeyboardMode);
         els.inputs.answer.addEventListener('blur', exitKeyboardMode);
-        
-        // Also apply to Dictionary Input for consistency
         els.inputs.dict.addEventListener('focus', enterKeyboardMode);
         els.inputs.dict.addEventListener('blur', exitKeyboardMode);
 
