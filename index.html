@@ -2,15 +2,13 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
+    <!-- interactive-widget=resizes-content: BẮT BUỘC để viewport co lại khi có bàn phím -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
-    <title>AI Tutor: v3.8.5 (CSS Lockout - Final)</title>
+    <title>AI Tutor: v3.9.0 (Absolute Fix)</title>
 
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="theme-color" content="#FFFBEB">
-
-    <link rel="apple-touch-icon" id="apple-icon" href="">
-    <link rel="icon" id="fav-icon" type="image/png" href="">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700;800&display=swap" rel="stylesheet">
@@ -22,120 +20,111 @@
         ::-webkit-scrollbar { width: 0px; background: transparent; display: none; }
         * { -ms-overflow-style: none; scrollbar-width: none; }
 
-        html { height: 100%; width: 100%; position: fixed; overflow: hidden; overscroll-behavior: none; }
-        body {
-            height: 100%; width: 100%; position: fixed; top: 0; left: 0;
-            overflow: hidden; font-family: 'Quicksand', sans-serif;
-            background-color: #FFFBEB; touch-action: none;
+        html, body {
+            height: 100%; width: 100%;
+            overflow: hidden; /* Khóa cuộn toàn trang */
+            font-family: 'Quicksand', sans-serif;
+            background-color: #FFFBEB;
+            position: fixed; /* Chống trôi trên iOS */
+            top: 0; left: 0;
         }
 
-        /* App Viewport sẽ được JS tính toán và đặt chiều cao chính xác theo VisualViewport */
-        #app-viewport {
-            position: fixed; left: 0; right: 0; top: 0;
-            display: flex; flex-direction: column;
-            background-color: #FFFBEB; overflow: hidden; z-index: 10;
+        /* --- LAYOUT TUYỆT ĐỐI (ABSOLUTE LAYOUT) --- */
+        /* Đây là cách layout kiểu ứng dụng Native: Các phần tử được neo cứng vị trí */
+
+        /* 1. HEADER: Neo ở đỉnh */
+        #mainHeader {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: auto;
+            z-index: 50;
+            background-color: #FFFBEB;
+            transition: transform 0.2s ease; /* Hiệu ứng ẩn hiện mượt */
         }
 
-        /* FIX Header Stability: Đảm bảo Header luôn ở vị trí cố định */
-        #mainHeader { flex: none; transition: all 0.2s ease-in-out; }
-        #mainContent { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
-
-        /* --- GAME SCREEN LAYOUT --- */
-        #gameScreen:not(.hidden) {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
+        /* 2. INPUT AREA: Neo ở đáy */
+        #inputContainerWrapper {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            z-index: 60;
+            background-color: #FFFBEB;
+            /* Height là auto để nó ôm lấy nội dung bên trong */
         }
 
-        #gameHeaderWrapper { flex: none; transition: all 0.2s ease-in-out; }
-
-        #gameDisplayWrapper {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-
-            /* Logic: LUÔN BÁM TRÊN (Flex-start) */
-            align-items: center;
-            justify-content: flex-start;
-
-            overflow-y: auto;
+        /* 3. MIDDLE CONTENT: Neo giữa Header và Input */
+        /* Chúng ta dùng JS hoặc CSS Calc để set top/bottom cho phần này */
+        #mainContent {
+            position: absolute;
+            top: 60px; /* Chiều cao ước lượng của Header */
+            bottom: 140px; /* Chiều cao ước lượng của Input */
+            left: 0; right: 0;
+            overflow-y: auto; /* Chỉ cuộn nội dung trong vùng này */
             overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
             width: 100%;
             -webkit-overflow-scrolling: touch;
-            padding: 0 1.25rem;
-            transition: padding 0.15s ease-in-out;
+            transition: all 0.1s; /* Resize mượt */
         }
 
-        .game-content-box {
-            /* Mặc định căn giữa bằng margin-top: auto */
-            margin-top: auto;
-            margin-bottom: auto;
+        /* --- CSS CHO CÁC MÀN HÌNH CỤ THỂ --- */
 
-            width: 100%;
+        /* Màn hình Game: Căn giữa nội dung */
+        #gameScreenContent {
+            min-height: 100%;
             display: flex;
             flex-direction: column;
+            justify-content: center; /* Căn giữa dọc */
             align-items: center;
-            justify-content: center;
-            padding-top: 1.5rem; padding-bottom: 1.5rem;
-            min-height: 150px;
-            transition: all 0.15s ease-in-out;
+            padding: 1rem;
         }
 
-        #inputContainer {
-            flex: none;
-            background: #FFFBEB;
-            z-index: 20;
-            padding: 1.25rem;
-            padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
-            box-shadow: 0 -5px 20px rgba(0,0,0,0.02);
-            transition: all 0.15s ease-in-out;
-        }
+        /* --- AUTO-ADAPT KHI CÓ BÀN PHÍM (Mobile Keyboard Mode) --- */
+        /* Khi chiều cao màn hình < 500px (tức là khi bàn phím hiện lên chiếm chỗ) */
+        @media (max-height: 500px) {
+            /* 1. Ẩn Header để lấy chỗ */
+            #mainHeader {
+                transform: translateY(-100%); /* Trượt header lên khỏi màn hình */
+                pointer-events: none;
+            }
 
-        /* Cải thiện khả năng phản hồi của input trên mobile */
-        #answerInput { touch-action: manipulation; }
-        #mainDisplay, #instructionText { transition: all 0.15s ease-in-out; }
+            /* 2. Mở rộng phần giữa lên đỉnh (vì header đã ẩn) */
+            #mainContent {
+                top: 0 !important;
+                bottom: 80px !important; /* Thu nhỏ bottom lại vì Input input cũng bé lại */
+            }
 
-        /* --- KEYBOARD MODE (QUAN TRỌNG: Tắt transition và chuyển Margin) --- */
+            /* 3. Tinh chỉnh hiển thị nội dung cho gọn */
+            #gameScreenContent {
+                justify-content: flex-end !important; /* Đẩy nội dung xuống gần input cho dễ nhìn */
+                padding-bottom: 0.5rem !important;
+            }
 
-        body.keyboard-active #gameDisplayWrapper {
-            padding-bottom: 0.5rem !important;
-            overflow-y: hidden !important;
-            transition: none !important; /* Fix: Tắt transition */
-            padding-top: 0.5rem !important;
-        }
+            .game-content-box {
+                margin-top: 0 !important;
+                transform: scale(0.9); /* Thu nhỏ nhẹ nội dung cho vừa mắt */
+                transform-origin: bottom center;
+            }
 
-        body.keyboard-active .game-content-box {
-            /* Fix: Loại bỏ margin auto để bám trên và tránh giật */
-            margin-top: 0.5rem !important;
-            margin-bottom: 0 !important;
+            #mainDisplay { font-size: 1.5rem !important; margin-bottom: 0.25rem !important; }
+            #instructionText { margin-bottom: 0.25rem !important; }
+            #subDisplay { display: none !important; } /* Ẩn gợi ý */
 
-            padding-top: 0.5rem !important;
-            padding-bottom: 0.5rem !important;
-            min-height: 0 !important;
-
-            transition: none !important;
-        }
-
-        body.keyboard-active #mainDisplay {
-            font-size: 1.4rem !important;
-            margin-bottom: 0.25rem !important;
-            transition: none !important;
-        }
-        body.keyboard-active #instructionText {
-            font-size: 0.65rem !important;
-            margin-bottom: 0.25rem !important;
-            transition: none !important;
-        }
-
-        body.keyboard-active #inputContainer {
-            padding: 0.75rem !important;
-            border-top: 1px solid rgba(0,0,0,0.05);
-            transition: none !important;
-        }
-        body.keyboard-active #answerInput,
-        body.keyboard-active #checkBtn {
-            transition: none !important;
+            /* 4. Tinh chỉnh Input cho gọn */
+            #inputContainerWrapper {
+                padding-top: 0.5rem !important;
+                padding-bottom: 0.5rem !important;
+            }
+            #answerInput {
+                padding: 0.5rem 1rem !important;
+                font-size: 1rem !important;
+                height: 3rem !important;
+            }
+            #checkBtn {
+                padding: 0.5rem !important;
+                height: 3rem !important;
+                font-size: 1rem !important;
+            }
         }
 
         /* --- UTILS --- */
@@ -149,207 +138,202 @@
         .screen-fade { animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         .input-focus:focus-within { border-color: #FBBF24; box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.2); }
-        select { background-image: none !important; }
     </style>
 </head>
 <body>
-    <div id="app-viewport">
-        <!-- HEADER -->
-        <div id="mainHeader" class="px-4 pb-3 pt-[calc(env(safe-area-inset-top)+0.75rem)] bg-[#FFFBEB] flex justify-between items-center border-b border-yellow-100/50">
-            <div class="flex items-center gap-3">
-                <button onclick="resetGame()" class="w-10 h-10 flex items-center justify-center text-yellow-800 bg-white rounded-full shadow-sm active:scale-90 transition-transform"><i class="fas fa-home"></i></button>
-                <h1 class="text-xl font-extrabold text-yellow-900 tracking-tight flex items-center gap-2 cursor-pointer" onclick="resetGame()"><span class="text-2xl filter drop-shadow-sm">🥑</span> AI Tutor</h1>
+    <!-- HEADER (Absolute Top) -->
+    <div id="mainHeader" class="px-4 py-3 pt-[calc(env(safe-area-inset-top)+0.75rem)] flex justify-between items-center border-b border-yellow-100/50">
+        <div class="flex items-center gap-3">
+            <button onclick="resetGame()" class="w-10 h-10 flex items-center justify-center text-yellow-800 bg-white rounded-full shadow-sm active:scale-90 transition-transform"><i class="fas fa-home"></i></button>
+            <h1 class="text-xl font-extrabold text-yellow-900 tracking-tight flex items-center gap-2 cursor-pointer" onclick="resetGame()"><span class="text-2xl filter drop-shadow-sm">🥑</span> AI Tutor</h1>
+        </div>
+        <div class="flex gap-2">
+            <button onclick="openDictModal()" class="w-10 h-10 flex items-center justify-center text-yellow-700 bg-white rounded-full shadow-sm active:scale-90 transition-transform"><i class="fas fa-search"></i></button>
+            <button onclick="openTheoryModal()" class="w-10 h-10 flex items-center justify-center text-indigo-600 bg-white rounded-full shadow-sm active:scale-90 transition-transform"><i class="fas fa-book-open"></i></button>
+            <button onclick="openSettingsScreen()" class="w-10 h-10 flex items-center justify-center text-gray-600 bg-white rounded-full shadow-sm active:scale-90 transition-transform"><i class="fas fa-cog"></i></button>
+        </div>
+    </div>
+
+    <!-- MIDDLE CONTENT (Absolute Middle - Resizeable) -->
+    <div id="mainContent">
+        <!-- START SCREEN -->
+        <div id="startScreen" class="w-full min-h-full flex flex-col p-5 screen-fade">
+            <div class="flex bg-gray-100/80 p-1.5 rounded-2xl mb-6 shadow-inner shrink-0">
+                <button onclick="setMode('vocab')" id="tabVocab" class="tab-btn flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition tab-active">Từ Vựng</button>
+                <button onclick="setMode('grammar')" id="tabGrammar" class="tab-btn flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition tab-inactive">Ngữ Pháp</button>
+                <button onclick="setMode('forms')" id="tabForms" class="tab-btn flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition tab-inactive">Biến Thể</button>
             </div>
-            <div class="flex gap-2">
-                <button onclick="openDictModal()" class="w-10 h-10 flex items-center justify-center text-yellow-700 bg-white rounded-full shadow-sm active:scale-90 transition-transform"><i class="fas fa-search"></i></button>
-                <button onclick="openTheoryModal()" class="w-10 h-10 flex items-center justify-center text-indigo-600 bg-white rounded-full shadow-sm active:scale-90 transition-transform"><i class="fas fa-book-open"></i></button>
-                <button onclick="openSettingsScreen()" class="w-10 h-10 flex items-center justify-center text-gray-600 bg-white rounded-full shadow-sm active:scale-90 transition-transform"><i class="fas fa-cog"></i></button>
+
+            <div id="startScreenContent" class="w-full max-w-md mx-auto flex-1 flex flex-col justify-center pb-20">
+                <div id="viewVocab" class="flex flex-col items-center w-full animate-fadeIn">
+                    <div class="w-24 h-24 bg-gradient-to-tr from-yellow-200 to-yellow-400 rounded-3xl flex items-center justify-center text-5xl shadow-lg mb-4 text-white transform rotate-3">🥑</div>
+                    <h2 class="text-2xl font-black text-gray-800 mb-1">Học Từ Vựng</h2>
+                    <p class="text-sm text-gray-500 mb-6 font-medium">Nhập chủ đề bất kỳ để AI tạo bài tập</p>
+                    <div id="onlineVocabInput" class="w-full input-focus rounded-2xl transition-all duration-200">
+                        <input type="text" id="vocabTopicInput" placeholder="VD: Travel, Business, Food..." class="w-full p-5 bg-white border-2 border-transparent text-center text-lg font-bold text-gray-800 rounded-2xl shadow-sm focus:outline-none placeholder-gray-300">
+                    </div>
+                    <div id="offlineVocabSelect" class="w-full hidden mt-2"><div class="relative w-full"><select id="vocabTopicSelect" class="w-full p-5 bg-white border-none rounded-2xl text-base font-bold text-center text-gray-700 shadow-sm appearance-none focus:ring-0"></select><div class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"><i class="fas fa-chevron-down"></i></div></div></div>
+                </div>
+
+                <div id="viewGrammar" class="hidden flex flex-col items-center w-full animate-fadeIn">
+                    <div class="w-24 h-24 bg-gradient-to-tr from-indigo-300 to-indigo-500 rounded-3xl flex items-center justify-center text-5xl shadow-lg mb-4 text-white transform -rotate-3">📝</div>
+                    <h2 class="text-2xl font-black text-gray-800 mb-1">Luyện 12 Thì</h2>
+                    <p class="text-sm text-gray-500 mb-6 font-medium">Chọn thì bạn muốn ôn tập</p>
+                    <div class="relative w-full"><select id="grammarTenseSelect" class="w-full p-5 bg-white border-none rounded-2xl text-base font-bold text-center text-indigo-900 shadow-sm appearance-none focus:outline-none"></select><div class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"><i class="fas fa-chevron-down"></i></div></div>
+                </div>
+
+                <div id="viewForms" class="hidden flex flex-col items-center w-full animate-fadeIn">
+                    <div class="w-24 h-24 bg-gradient-to-tr from-green-300 to-green-500 rounded-3xl flex items-center justify-center text-5xl shadow-lg mb-4 text-white transform rotate-3">🔀</div>
+                    <h2 class="text-2xl font-black text-gray-800 mb-1">Biến Thể Từ</h2>
+                    <p class="text-sm text-gray-500 mb-6 font-medium">Luyện tập Word Forms</p>
+                    <div class="relative w-full"><select id="formsTypeSelect" class="w-full p-5 bg-white border-none rounded-2xl text-base font-bold text-center text-green-900 shadow-sm appearance-none focus:outline-none"></select><div class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"><i class="fas fa-chevron-down"></i></div></div>
+                </div>
+
+                <div id="configSection" class="w-full mt-8 mb-6 bg-white p-6 rounded-3xl shadow-sm border border-gray-100 transition-all">
+                    <input type="hidden" id="levelSelect" value="A1-A2">
+                    <div class="flex justify-between items-center mb-3"><label class="text-xs font-bold text-gray-400 tracking-wider">TRÌNH ĐỘ</label></div>
+                    <div class="grid grid-cols-4 gap-2 mb-6">
+                        <div onclick="updateLevel('A1-A2', this)" class="level-card selected cursor-pointer py-4 rounded-2xl bg-gray-50 text-center"><div class="text-2xl mb-1">🌱</div><div class="text-[10px] font-bold text-gray-600">Dễ</div></div>
+                        <div onclick="updateLevel('B1-B2', this)" class="level-card cursor-pointer py-4 rounded-2xl bg-gray-50 text-center"><div class="text-2xl mb-1">🚀</div><div class="text-[10px] font-bold text-gray-600">TB</div></div>
+                        <div onclick="updateLevel('C1-C2', this)" class="level-card cursor-pointer py-4 rounded-2xl bg-gray-50 text-center"><div class="text-2xl mb-1">🔥</div><div class="text-[10px] font-bold text-gray-600">Khó</div></div>
+                        <div onclick="updateLevel('IELTS', this)" class="level-card cursor-pointer py-4 rounded-2xl bg-gray-50 text-center"><div class="text-2xl mb-1">🎓</div><div class="text-[10px] font-bold text-gray-600">IELTS</div></div>
+                    </div>
+                    <div class="flex justify-between items-center mb-3"><label class="text-xs font-bold text-gray-400 tracking-wider">SỐ LƯỢNG</label><span id="qtyDisplay" class="text-xs font-bold text-white bg-gray-900 px-2 py-1 rounded-lg">10 câu</span></div>
+                    <input type="range" id="quantityRange" min="5" max="30" step="5" value="10" class="w-full h-2 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-yellow-500 hover:accent-yellow-400">
+                </div>
+
+                <button onclick="startGeneration()" id="startBtn" class="w-full bg-gray-900 text-white font-bold text-lg py-4 rounded-3xl shadow-xl shadow-gray-300/50 active:scale-[0.98] transition-all flex items-center justify-center gap-3 mt-2">
+                    <i class="fas fa-play text-yellow-400"></i> Bắt Đầu
+                </button>
             </div>
         </div>
 
-        <!-- MAIN CONTENT -->
-        <div id="mainContent">
-            <!-- START SCREEN -->
-            <div id="startScreen" class="flex-1 flex flex-col w-full h-full overflow-y-auto screen-fade p-5">
-                <div class="flex bg-gray-100/80 p-1.5 rounded-2xl mb-6 shadow-inner shrink-0">
-                    <button onclick="setMode('vocab')" id="tabVocab" class="tab-btn flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition tab-active">Từ Vựng</button>
-                    <button onclick="setMode('grammar')" id="tabGrammar" class="tab-btn flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition tab-inactive">Ngữ Pháp</button>
-                    <button onclick="setMode('forms')" id="tabForms" class="tab-btn flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition tab-inactive">Biến Thể</button>
-                </div>
-
-                <div id="startScreenContent" class="w-full max-w-md mx-auto flex-1 flex flex-col justify-center pb-20">
-                    <div id="viewVocab" class="flex flex-col items-center w-full animate-fadeIn">
-                        <div class="w-24 h-24 bg-gradient-to-tr from-yellow-200 to-yellow-400 rounded-3xl flex items-center justify-center text-5xl shadow-lg mb-4 text-white transform rotate-3">🥑</div>
-                        <h2 class="text-2xl font-black text-gray-800 mb-1">Học Từ Vựng</h2>
-                        <p class="text-sm text-gray-500 mb-6 font-medium">Nhập chủ đề bất kỳ để AI tạo bài tập</p>
-                        <div id="onlineVocabInput" class="w-full input-focus rounded-2xl transition-all duration-200">
-                            <input type="text" id="vocabTopicInput" placeholder="VD: Travel, Business, Food..." class="w-full p-5 bg-white border-2 border-transparent text-center text-lg font-bold text-gray-800 rounded-2xl shadow-sm focus:outline-none placeholder-gray-300">
-                        </div>
-                        <div id="offlineVocabSelect" class="w-full hidden mt-2"><div class="relative w-full"><select id="vocabTopicSelect" class="w-full p-5 bg-white border-none rounded-2xl text-base font-bold text-center text-gray-700 shadow-sm appearance-none focus:ring-0"></select><div class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"><i class="fas fa-chevron-down"></i></div></div></div>
-                    </div>
-
-                    <div id="viewGrammar" class="hidden flex flex-col items-center w-full animate-fadeIn">
-                        <div class="w-24 h-24 bg-gradient-to-tr from-indigo-300 to-indigo-500 rounded-3xl flex items-center justify-center text-5xl shadow-lg mb-4 text-white transform -rotate-3">📝</div>
-                        <h2 class="text-2xl font-black text-gray-800 mb-1">Luyện 12 Thì</h2>
-                        <p class="text-sm text-gray-500 mb-6 font-medium">Chọn thì bạn muốn ôn tập</p>
-                        <div class="relative w-full"><select id="grammarTenseSelect" class="w-full p-5 bg-white border-none rounded-2xl text-base font-bold text-center text-indigo-900 shadow-sm appearance-none focus:outline-none"></select><div class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"><i class="fas fa-chevron-down"></i></div></div>
-                    </div>
-
-                    <div id="viewForms" class="hidden flex flex-col items-center w-full animate-fadeIn">
-                        <div class="w-24 h-24 bg-gradient-to-tr from-green-300 to-green-500 rounded-3xl flex items-center justify-center text-5xl shadow-lg mb-4 text-white transform rotate-3">🔀</div>
-                        <h2 class="text-2xl font-black text-gray-800 mb-1">Biến Thể Từ</h2>
-                        <p class="text-sm text-gray-500 mb-6 font-medium">Luyện tập Word Forms</p>
-                        <div class="relative w-full"><select id="formsTypeSelect" class="w-full p-5 bg-white border-none rounded-2xl text-base font-bold text-center text-green-900 shadow-sm appearance-none focus:outline-none"></select><div class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"><i class="fas fa-chevron-down"></i></div></div>
-                    </div>
-
-                    <div id="configSection" class="w-full mt-8 mb-6 bg-white p-6 rounded-3xl shadow-sm border border-gray-100 transition-all">
-                        <input type="hidden" id="levelSelect" value="A1-A2">
-                        <div class="flex justify-between items-center mb-3"><label class="text-xs font-bold text-gray-400 tracking-wider">TRÌNH ĐỘ</label></div>
-                        <div class="grid grid-cols-4 gap-2 mb-6">
-                            <div onclick="updateLevel('A1-A2', this)" class="level-card selected cursor-pointer py-4 rounded-2xl bg-gray-50 text-center"><div class="text-2xl mb-1">🌱</div><div class="text-[10px] font-bold text-gray-600">Dễ</div></div>
-                            <div onclick="updateLevel('B1-B2', this)" class="level-card cursor-pointer py-4 rounded-2xl bg-gray-50 text-center"><div class="text-2xl mb-1">🚀</div><div class="text-[10px] font-bold text-gray-600">TB</div></div>
-                            <div onclick="updateLevel('C1-C2', this)" class="level-card cursor-pointer py-4 rounded-2xl bg-gray-50 text-center"><div class="text-2xl mb-1">🔥</div><div class="text-[10px] font-bold text-gray-600">Khó</div></div>
-                            <div onclick="updateLevel('IELTS', this)" class="level-card cursor-pointer py-4 rounded-2xl bg-gray-50 text-center"><div class="text-2xl mb-1">🎓</div><div class="text-[10px] font-bold text-gray-600">IELTS</div></div>
-                        </div>
-                        <div class="flex justify-between items-center mb-3"><label class="text-xs font-bold text-gray-400 tracking-wider">SỐ LƯỢNG</label><span id="qtyDisplay" class="text-xs font-bold text-white bg-gray-900 px-2 py-1 rounded-lg">10 câu</span></div>
-                        <input type="range" id="quantityRange" min="5" max="30" step="5" value="10" class="w-full h-2 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-yellow-500 hover:accent-yellow-400">
-                    </div>
-
-                    <button onclick="startGeneration()" id="startBtn" class="w-full bg-gray-900 text-white font-bold text-lg py-4 rounded-3xl shadow-xl shadow-gray-300/50 active:scale-[0.98] transition-all flex items-center justify-center gap-3 mt-2">
-                        <i class="fas fa-play text-yellow-400"></i> Bắt Đầu
-                    </button>
+        <!-- SETTINGS SCREEN -->
+        <div id="settingsScreen" class="hidden w-full min-h-full flex flex-col p-5 screen-fade">
+            <button onclick="backFromSettings()" class="mb-6 flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-gray-700 bg-gray-100 px-4 py-2 rounded-xl active:scale-95 transition-all w-fit">
+                <i class="fas fa-arrow-left"></i> Quay lại
+            </button>
+            <div class="w-full max-w-lg mx-auto">
+                <h2 class="text-2xl font-bold mb-6 text-gray-800 flex items-center gap-3"><i class="fas fa-cog text-gray-400"></i> Cài đặt Ứng dụng</h2>
+                <div class="mb-6 p-6 bg-indigo-50 rounded-3xl border border-indigo-100 shadow-lg">
+                    <label class="block text-sm font-bold text-indigo-900 mb-2 uppercase tracking-wider">🔑 Google Gemini API Key</label>
+                    <input type="password" id="userApiKeyInput" placeholder="Dán API Key vào đây..."
+                           class="w-full p-4 border border-indigo-200 bg-white rounded-xl mb-3 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition text-gray-700 font-mono text-sm">
+                    <button onclick="saveApiKey()" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-200 active:scale-[0.99]">Lưu Key</button>
+                    <p id="keyStatus" class="text-xs mt-3 text-center text-gray-400 font-medium">Chưa kết nối</p>
                 </div>
             </div>
+        </div>
 
-            <!-- SETTINGS SCREEN (Màn hình mới) -->
-            <div id="settingsScreen" class="hidden flex-1 flex-col w-full h-full overflow-y-auto screen-fade p-5">
-                <button onclick="backFromSettings()" class="mb-6 flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-gray-700 bg-gray-100 px-4 py-2 rounded-xl active:scale-95 transition-all w-fit">
-                    <i class="fas fa-arrow-left"></i> Quay lại
-                </button>
-                <div class="w-full max-w-lg mx-auto">
-                    <h2 class="text-2xl font-bold mb-6 text-gray-800 flex items-center gap-3"><i class="fas fa-cog text-gray-400"></i> Cài đặt Ứng dụng</h2>
-                    <div class="mb-6 p-6 bg-indigo-50 rounded-3xl border border-indigo-100 shadow-lg">
-                        <label class="block text-sm font-bold text-indigo-900 mb-2 uppercase tracking-wider">🔑 Google Gemini API Key</label>
-                        <input type="password" id="userApiKeyInput" placeholder="Dán API Key vào đây..."
-                               class="w-full p-4 border border-indigo-200 bg-white rounded-xl mb-3 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition text-gray-700 font-mono text-sm">
-                        <button onclick="saveApiKey()" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-200 active:scale-[0.99]">Lưu Key</button>
-                        <p id="keyStatus" class="text-xs mt-3 text-center text-gray-400 font-medium">Chưa kết nối</p>
-                    </div>
-
-                    <div class="mb-6 p-6 bg-white rounded-3xl border border-gray-100 shadow-lg">
-                        <h3 class="text-lg font-bold text-gray-800 mb-2">Thông tin Phiên bản</h3>
-                        <p class="text-sm text-gray-600">Phiên bản hiện tại: <span class="font-mono font-bold text-yellow-700">v3.7.8</span></p>
-                        <p class="text-sm text-gray-600">Mô hình AI: Gemini 2.5 Flash</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- GAME SCREEN -->
-            <div id="gameScreen" class="hidden w-full h-full bg-white relative">
-                <div class="shrink-0 px-5 pt-4 pb-2 bg-white z-10 transition-all" id="gameHeaderWrapper">
-                    <div id="gameHeader" class="flex justify-between items-center mb-3 transition-all">
+        <!-- GAME SCREEN (Nội dung game) -->
+        <div id="gameScreen" class="hidden w-full h-full relative">
+            <div id="gameScreenContent">
+                <!-- Header của Game (Câu số mấy) -->
+                <div class="w-full shrink-0 px-2 pb-2 z-10" id="gameHeaderWrapper">
+                    <div id="gameHeader" class="flex justify-between items-center mb-2">
                         <span class="font-bold text-gray-400 text-xs uppercase tracking-wider truncate max-w-[60%]" id="gameTitle">General</span>
                         <div class="bg-gray-100 px-3 py-1 rounded-full text-xs font-bold text-gray-600 flex items-center gap-1">
                             <i class="fas fa-flag text-yellow-500"></i> <span id="currentQ">1</span>/<span id="totalQ">10</span>
                         </div>
                     </div>
-                    <div id="progressBarContainer" class="w-full bg-gray-100 rounded-full h-2 overflow-hidden transition-all"><div id="progressBar" class="bg-yellow-400 h-full rounded-full transition-all duration-500 ease-out shadow-[0_0_10px_rgba(250,204,21,0.5)]" style="width: 10%"></div></div>
+                    <div id="progressBarContainer" class="w-full bg-gray-100 rounded-full h-2 overflow-hidden"><div id="progressBar" class="bg-yellow-400 h-full rounded-full transition-all duration-500 ease-out shadow-[0_0_10px_rgba(250,204,21,0.5)]" style="width: 10%"></div></div>
                 </div>
 
-                <div id="gameDisplayWrapper">
-                    <div class="game-content-box px-5">
-                        <span id="instructionText" class="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-4 bg-gray-50 px-4 py-1.5 rounded-full border border-gray-100 transition-all">Translate</span>
-                        <h2 id="mainDisplay" class="text-3xl sm:text-4xl font-black text-center text-gray-800 mb-3 leading-tight break-words max-w-full drop-shadow-sm transition-all">Loading...</h2>
-                        <p id="subDisplay" class="text-indigo-500 font-bold text-sm hidden bg-indigo-50 px-4 py-2 rounded-xl mt-2 animate-bounce-slow border border-indigo-100 transition-all">(hint)</p>
-                    </div>
-                </div>
-
-                <div id="inputContainer" class="w-full shadow-[0_-5px_20px_rgba(0,0,0,0.02)]">
-                    <div class="relative w-full mb-3 group">
-                        <input type="text" id="answerInput" class="w-full bg-gray-50 border-2 border-transparent text-center text-xl font-bold p-4 rounded-3xl focus:outline-none focus:bg-white focus:border-yellow-400 transition-all shadow-inner placeholder-gray-300" placeholder="Nhập đáp án..." autocomplete="off" touch-action="manipulation">
-                        <div class="absolute inset-y-0 right-4 flex items-center pointer-events-none text-gray-300 group-focus-within:text-yellow-400 transition-colors"><i class="fas fa-pen"></i></div>
-                    </div>
-                    <button id="checkBtn" onclick="checkAnswer()" class="w-full bg-gray-900 text-white font-bold text-lg py-4 rounded-3xl shadow-xl shadow-gray-400/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2"><span>Kiểm tra</span> <i class="fas fa-arrow-up transform rotate-45"></i></button>
-                </div>
-            </div>
-
-            <!-- RESULT SCREEN -->
-            <div id="resultScreen" class="hidden flex-1 flex flex-col w-full h-full overflow-y-auto p-6 text-center screen-fade bg-[#FFFBEB]">
-                <div class="flex-1 flex flex-col items-center justify-center w-full max-w-md mx-auto">
-                    <div class="relative mb-6">
-                        <div class="absolute inset-0 bg-yellow-300 blur-2xl opacity-30 rounded-full"></div>
-                        <div class="text-7xl relative animate-bounce">🏆</div>
-                    </div>
-                    <h2 class="text-3xl font-black mb-2 text-gray-800">Hoàn thành!</h2>
-                    <div class="flex items-center gap-3 mb-8 bg-white px-6 py-3 rounded-full border border-yellow-100 shadow-sm">
-                         <span class="text-gray-400 text-xs font-bold uppercase tracking-wider">Score</span>
-                         <div class="flex items-baseline gap-1">
-                            <span id="finalScore" class="font-black text-yellow-500 text-2xl">0</span>
-                            <span class="text-gray-300 text-lg">/</span>
-                            <span id="totalScoreQ" class="font-bold text-gray-400 text-lg">10</span>
-                         </div>
-                    </div>
-                    <div id="resultList" class="w-full bg-white rounded-3xl border border-white p-2 mb-4 overflow-y-auto max-h-[50vh] text-left shadow-lg shadow-yellow-100/50"></div>
-                </div>
-                <button onclick="resetGame()" class="w-full bg-gray-900 text-white font-bold py-4 rounded-3xl shadow-lg active:scale-95 shrink-0 mb-8"><i class="fas fa-redo mr-2"></i> Chơi lại</button>
-            </div>
-        </div>
-
-        <!-- MODALS (Dict, Theory, Feedback, Loading) - Settings Modal đã bị loại bỏ -->
-        <div id="dictModal" class="hidden fixed inset-0 z-[100] flex items-end sm:items-center justify-center pointer-events-none">
-            <div class="absolute inset-0 bg-black/40 backdrop-blur-sm pointer-events-auto transition-opacity duration-300 opacity-0" id="dictBackdrop" onclick="closeDictModal()"></div>
-            <div class="bg-white w-full sm:w-[28rem] h-[85vh] sm:h-[80vh] rounded-t-3xl sm:rounded-3xl flex flex-col pointer-events-auto transform transition-transform duration-300 translate-y-full" id="dictContent">
-                <div class="p-4 border-b flex items-center justify-between">
-                    <h2 class="font-bold text-lg text-orange-600 flex items-center gap-2"><i class="fas fa-language"></i> Từ Điển</h2>
-                    <button onclick="closeDictModal()" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500"><i class="fas fa-times"></i></button>
-                </div>
-                <div class="p-4 bg-gray-50"><div class="relative"><input type="text" id="dictInput" class="w-full pl-11 pr-12 py-3.5 bg-white border-none shadow-sm rounded-2xl font-bold text-gray-700 placeholder-gray-400 focus:ring-2 focus:ring-orange-200" placeholder="Nhập từ cần tra..."><i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-300"></i><button onclick="lookupDictionary()" class="absolute right-2 top-2 p-1.5 bg-orange-100 text-orange-600 rounded-xl"><i class="fas fa-arrow-right"></i></button></div></div>
-                <div class="flex-1 overflow-y-auto p-5" id="dictResultArea"><div class="text-center text-gray-400 mt-10"><i class="fas fa-book text-4xl mb-2 opacity-20"></i><p class="text-sm">Tra từ Anh-Việt / Việt-Anh</p></div></div>
-            </div>
-        </div>
-
-        <div id="theoryModal" class="hidden fixed inset-0 z-[100] flex items-end sm:items-center justify-center pointer-events-none">
-            <div class="absolute inset-0 bg-black/40 backdrop-blur-sm pointer-events-auto transition-opacity duration-300 opacity-0" id="theoryBackdrop" onclick="closeTheoryModal()"></div>
-            <div class="bg-white w-full sm:w-[28rem] h-[85vh] sm:h-[80vh] rounded-t-3xl sm:rounded-3xl flex flex-col pointer-events-auto transform transition-transform duration-300 translate-y-full" id="theoryContentPanel">
-                <div class="p-4 border-b flex items-center justify-between bg-indigo-50/50 rounded-t-3xl">
-                    <h2 class="font-bold text-lg text-indigo-900 flex items-center gap-2"><i class="fas fa-graduation-cap"></i> Sổ tay</h2>
-                    <button onclick="closeTheoryModal()" class="w-8 h-8 rounded-full bg-white flex items-center justify-center text-gray-500 shadow-sm"><i class="fas fa-times"></i></button>
-                </div>
-                <div class="flex p-2 gap-2 bg-white border-b" id="theoryTabs">
-                    <button onclick="switchTheoryTab('grammar')" id="btnTheoryGrammar" class="flex-1 py-2.5 rounded-xl text-xs font-bold bg-indigo-100 text-indigo-700 transition-colors">12 Thì</button>
-                    <button onclick="switchTheoryTab('forms')" id="btnTheoryForms" class="flex-1 py-2.5 rounded-xl text-xs font-bold text-gray-500 hover:bg-gray-50 transition-colors">Biến thể</button>
-                </div>
-                <div class="flex-1 overflow-y-auto p-4 bg-gray-50" id="theoryContent">
-                    <div id="theoryListGrammar" class="space-y-2"></div>
-                    <div id="theoryListForms" class="hidden space-y-2"></div>
-                    <div id="theoryDetail" class="hidden h-full flex flex-col">
-                        <button onclick="backToTheoryList()" class="mb-4 bg-white px-4 py-2 rounded-xl shadow-sm w-fit text-xs font-bold text-gray-600 border border-gray-100"><i class="fas fa-arrow-left mr-1"></i> Quay lại</button>
-                        <div id="theoryDetailContent" class="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 text-sm leading-relaxed text-gray-700"></div>
-                    </div>
+                <!-- Nội dung chính (Câu hỏi) -->
+                <div class="game-content-box flex flex-col items-center justify-center p-4 w-full">
+                    <span id="instructionText" class="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-4 bg-gray-50 px-4 py-1.5 rounded-full border border-gray-100 transition-all">Translate</span>
+                    <h2 id="mainDisplay" class="text-3xl sm:text-4xl font-black text-center text-gray-800 mb-3 leading-tight break-words max-w-full drop-shadow-sm transition-all">Loading...</h2>
+                    <p id="subDisplay" class="text-indigo-500 font-bold text-sm hidden bg-indigo-50 px-4 py-2 rounded-xl mt-2 border border-indigo-100 transition-all">(hint)</p>
                 </div>
             </div>
         </div>
 
-        <div id="loadingOverlay" class="hidden absolute inset-0 bg-white/90 z-[110] flex flex-col items-center justify-center backdrop-blur-sm"><div class="loader mb-4"></div><p id="loadingText" class="text-gray-600 font-bold text-sm tracking-wide animate-pulse">ĐANG XỬ LÝ...</p></div>
-
-        <div id="feedbackOverlay" class="hidden fixed inset-0 z-[120] flex flex-col items-center justify-center pointer-events-none">
-            <div class="absolute inset-0 bg-white/95 backdrop-blur-md pointer-events-auto animate-fadeIn"></div>
-            <div class="relative z-10 flex flex-col items-center justify-center w-full max-w-sm p-6 text-center pointer-events-auto">
-                <div id="feedbackIcon" class="text-7xl mb-4 filter drop-shadow-md transform transition-transform hover:scale-110 duration-300">🎉</div>
-                <h3 id="feedbackTitle" class="text-3xl font-black mb-6 tracking-tight">Chính xác!</h3>
-                <div class="bg-white rounded-3xl p-6 w-full mb-8 border border-gray-100 shadow-xl relative overflow-hidden group">
-                    <div class="absolute top-0 left-0 w-2 h-full bg-green-500 transition-all group-hover:w-3" id="feedbackBorder"></div>
-                    <p class="text-gray-400 text-[10px] uppercase font-black tracking-[0.2em] mb-3">ĐÁP ÁN ĐÚNG</p>
-                    <div class="flex flex-col items-center gap-4">
-                        <span id="correctAnswerText" class="text-3xl font-black text-gray-800 break-words leading-tight">Answer</span>
-                        <button onclick="playTTS()" class="w-12 h-12 rounded-full bg-gray-50 border border-gray-200 text-gray-600 flex items-center justify-center shadow-sm active:scale-90 transition-transform"><i class="fas fa-volume-up text-lg"></i></button>
-                    </div>
-                    <p id="grammarExplanation" class="text-sm text-indigo-600 mt-5 pt-4 border-t border-gray-100 italic hidden text-left bg-indigo-50/50 -mx-6 -mb-6 p-6"></p>
+        <!-- RESULT SCREEN -->
+        <div id="resultScreen" class="hidden w-full min-h-full flex flex-col p-6 text-center screen-fade">
+            <div class="flex-1 flex flex-col items-center justify-center w-full max-w-md mx-auto">
+                <div class="relative mb-6">
+                    <div class="absolute inset-0 bg-yellow-300 blur-2xl opacity-30 rounded-full"></div>
+                    <div class="text-7xl relative animate-bounce">🏆</div>
                 </div>
-                <button onclick="nextQuestion(); document.getElementById('answerInput').focus();" class="w-full bg-gray-900 text-white font-bold text-lg py-4 rounded-3xl shadow-xl shadow-gray-400/40 active:scale-95 transition-transform flex items-center justify-center group">Tiếp tục <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i></button>
+                <h2 class="text-3xl font-black mb-2 text-gray-800">Hoàn thành!</h2>
+                <div class="flex items-center gap-3 mb-8 bg-white px-6 py-3 rounded-full border border-yellow-100 shadow-sm">
+                     <span class="text-gray-400 text-xs font-bold uppercase tracking-wider">Score</span>
+                     <div class="flex items-baseline gap-1">
+                        <span id="finalScore" class="font-black text-yellow-500 text-2xl">0</span>
+                        <span class="text-gray-300 text-lg">/</span>
+                        <span id="totalScoreQ" class="font-bold text-gray-400 text-lg">10</span>
+                     </div>
+                </div>
+                <div id="resultList" class="w-full bg-white rounded-3xl border border-white p-2 mb-4 overflow-y-auto max-h-[50vh] text-left shadow-lg shadow-yellow-100/50"></div>
+            </div>
+            <button onclick="resetGame()" class="w-full bg-gray-900 text-white font-bold py-4 rounded-3xl shadow-lg active:scale-95 shrink-0 mb-8"><i class="fas fa-redo mr-2"></i> Chơi lại</button>
+        </div>
+    </div>
+
+    <!-- INPUT CONTAINER (Absolute Bottom) -->
+    <div id="inputContainerWrapper" class="px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-[0_-5px_20px_rgba(0,0,0,0.03)] border-t border-gray-100 hidden">
+        <div class="w-full max-w-lg mx-auto">
+            <div class="relative w-full mb-3 group">
+                <input type="text" id="answerInput" class="w-full bg-gray-50 border-2 border-transparent text-center text-xl font-bold p-4 rounded-3xl focus:outline-none focus:bg-white focus:border-yellow-400 transition-all shadow-inner placeholder-gray-300" placeholder="Nhập đáp án..." autocomplete="off" touch-action="manipulation">
+                <div class="absolute inset-y-0 right-4 flex items-center pointer-events-none text-gray-300 group-focus-within:text-yellow-400 transition-colors"><i class="fas fa-pen"></i></div>
+            </div>
+            <button id="checkBtn" onclick="checkAnswer()" class="w-full bg-gray-900 text-white font-bold text-lg py-4 rounded-3xl shadow-xl shadow-gray-400/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2"><span>Kiểm tra</span> <i class="fas fa-arrow-up transform rotate-45"></i></button>
+        </div>
+    </div>
+
+    <!-- MODALS & OVERLAYS (Giữ nguyên) -->
+    <div id="dictModal" class="hidden fixed inset-0 z-[100] flex items-end sm:items-center justify-center pointer-events-none">
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm pointer-events-auto transition-opacity duration-300 opacity-0" id="dictBackdrop" onclick="closeDictModal()"></div>
+        <div class="bg-white w-full sm:w-[28rem] h-[85vh] sm:h-[80vh] rounded-t-3xl sm:rounded-3xl flex flex-col pointer-events-auto transform transition-transform duration-300 translate-y-full" id="dictContent">
+            <div class="p-4 border-b flex items-center justify-between">
+                <h2 class="font-bold text-lg text-orange-600 flex items-center gap-2"><i class="fas fa-language"></i> Từ Điển</h2>
+                <button onclick="closeDictModal()" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="p-4 bg-gray-50"><div class="relative"><input type="text" id="dictInput" class="w-full pl-11 pr-12 py-3.5 bg-white border-none shadow-sm rounded-2xl font-bold text-gray-700 placeholder-gray-400 focus:ring-2 focus:ring-orange-200" placeholder="Nhập từ cần tra..."><i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-300"></i><button onclick="lookupDictionary()" class="absolute right-2 top-2 p-1.5 bg-orange-100 text-orange-600 rounded-xl"><i class="fas fa-arrow-right"></i></button></div></div>
+            <div class="flex-1 overflow-y-auto p-5" id="dictResultArea"><div class="text-center text-gray-400 mt-10"><i class="fas fa-book text-4xl mb-2 opacity-20"></i><p class="text-sm">Tra từ Anh-Việt / Việt-Anh</p></div></div>
+        </div>
+    </div>
+
+    <div id="theoryModal" class="hidden fixed inset-0 z-[100] flex items-end sm:items-center justify-center pointer-events-none">
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm pointer-events-auto transition-opacity duration-300 opacity-0" id="theoryBackdrop" onclick="closeTheoryModal()"></div>
+        <div class="bg-white w-full sm:w-[28rem] h-[85vh] sm:h-[80vh] rounded-t-3xl sm:rounded-3xl flex flex-col pointer-events-auto transform transition-transform duration-300 translate-y-full" id="theoryContentPanel">
+            <div class="p-4 border-b flex items-center justify-between bg-indigo-50/50 rounded-t-3xl">
+                <h2 class="font-bold text-lg text-indigo-900 flex items-center gap-2"><i class="fas fa-graduation-cap"></i> Sổ tay</h2>
+                <button onclick="closeTheoryModal()" class="w-8 h-8 rounded-full bg-white flex items-center justify-center text-gray-500 shadow-sm"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="flex p-2 gap-2 bg-white border-b" id="theoryTabs">
+                <button onclick="switchTheoryTab('grammar')" id="btnTheoryGrammar" class="flex-1 py-2.5 rounded-xl text-xs font-bold bg-indigo-100 text-indigo-700 transition-colors">12 Thì</button>
+                <button onclick="switchTheoryTab('forms')" id="btnTheoryForms" class="flex-1 py-2.5 rounded-xl text-xs font-bold text-gray-500 hover:bg-gray-50 transition-colors">Biến thể</button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-4 bg-gray-50" id="theoryContent">
+                <div id="theoryListGrammar" class="space-y-2"></div>
+                <div id="theoryListForms" class="hidden space-y-2"></div>
+                <div id="theoryDetail" class="hidden h-full flex flex-col">
+                    <button onclick="backToTheoryList()" class="mb-4 bg-white px-4 py-2 rounded-xl shadow-sm w-fit text-xs font-bold text-gray-600 border border-gray-100"><i class="fas fa-arrow-left mr-1"></i> Quay lại</button>
+                    <div id="theoryDetailContent" class="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 text-sm leading-relaxed text-gray-700"></div>
+                </div>
             </div>
         </div>
+    </div>
 
+    <div id="loadingOverlay" class="hidden absolute inset-0 bg-white/90 z-[110] flex flex-col items-center justify-center backdrop-blur-sm"><div class="loader mb-4"></div><p id="loadingText" class="text-gray-600 font-bold text-sm tracking-wide animate-pulse">ĐANG XỬ LÝ...</p></div>
+
+    <div id="feedbackOverlay" class="hidden fixed inset-0 z-[120] flex flex-col items-center justify-center pointer-events-none">
+        <div class="absolute inset-0 bg-white/95 backdrop-blur-md pointer-events-auto animate-fadeIn"></div>
+        <div class="relative z-10 flex flex-col items-center justify-center w-full max-w-sm p-6 text-center pointer-events-auto">
+            <div id="feedbackIcon" class="text-7xl mb-4 filter drop-shadow-md transform transition-transform hover:scale-110 duration-300">🎉</div>
+            <h3 id="feedbackTitle" class="text-3xl font-black mb-6 tracking-tight">Chính xác!</h3>
+            <div class="bg-white rounded-3xl p-6 w-full mb-8 border border-gray-100 shadow-xl relative overflow-hidden group">
+                <div class="absolute top-0 left-0 w-2 h-full bg-green-500 transition-all group-hover:w-3" id="feedbackBorder"></div>
+                <p class="text-gray-400 text-[10px] uppercase font-black tracking-[0.2em] mb-3">ĐÁP ÁN ĐÚNG</p>
+                <div class="flex flex-col items-center gap-4">
+                    <span id="correctAnswerText" class="text-3xl font-black text-gray-800 break-words leading-tight">Answer</span>
+                    <button onclick="playTTS()" class="w-12 h-12 rounded-full bg-gray-50 border border-gray-200 text-gray-600 flex items-center justify-center shadow-sm active:scale-90 transition-transform"><i class="fas fa-volume-up text-lg"></i></button>
+                </div>
+                <p id="grammarExplanation" class="text-sm text-indigo-600 mt-5 pt-4 border-t border-gray-100 italic hidden text-left bg-indigo-50/50 -mx-6 -mb-6 p-6"></p>
+            </div>
+            <button onclick="nextQuestion(); document.getElementById('answerInput').focus();" class="w-full bg-gray-900 text-white font-bold text-lg py-4 rounded-3xl shadow-xl shadow-gray-400/40 active:scale-95 transition-transform flex items-center justify-center group">Tiếp tục <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i></button>
+        </div>
     </div>
 
     <script type="module">
@@ -358,47 +342,31 @@
             const grd = ctx.createLinearGradient(0, 0, 0, 512); grd.addColorStop(0, '#FFFBEB'); grd.addColorStop(1, '#FBBF24');
             ctx.fillStyle = grd; ctx.fillRect(0, 0, 512, 512); ctx.font = '300px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🥑', 256, 270);
             const url = canvas.toDataURL('image/png');
-            document.getElementById('apple-icon').href = url; document.getElementById('fav-icon').href = url;
+            document.getElementById('apple-icon') && (document.getElementById('apple-icon').href = url);
+            document.getElementById('fav-icon') && (document.getElementById('fav-icon').href = url);
         })();
 
-        // --- 1. GLOBAL ERROR HANDLER ---
-        window.onerror = function(msg, url, line, col, error) {
-            alert("Lỗi: " + msg + "\nTại dòng: " + line);
-            return false;
-        };
+        window.onerror = function(msg, url, line, col, error) { console.error("Lỗi: " + msg); return false; };
 
-        // --- 2. VIEWPORT FIX ---
-        // Đây là phần cốt lõi để đảm bảo sự ổn định tuyệt đối trên Mobile khi bàn phím hiện.
-        // Chiến lược: Loại bỏ hoàn toàn các transition gây trễ trong chế độ keyboard-active
-        // và đảm bảo container chính (app-viewport) luôn khớp VisualViewport.
+        // --- DYNAMIC LAYOUT CALCULATION (Fix overlap) ---
+        function updateLayout() {
+            const header = document.getElementById('mainHeader');
+            const input = document.getElementById('inputContainerWrapper');
+            const content = document.getElementById('mainContent');
 
-        if (window.visualViewport) {
-            function handleVisualResize() {
-                const appViewport = document.getElementById('app-viewport');
-                const height = window.visualViewport.height;
-                if (!height) return;
+            // Lấy chiều cao thực tế
+            const headerHeight = header.offsetHeight;
+            const inputHeight = input.classList.contains('hidden') ? 0 : input.offsetHeight;
 
-                // Set chiều cao và vị trí của toàn bộ ứng dụng bằng Visual Viewport
-                appViewport.style.height = `${height}px`;
-                appViewport.style.top = `${window.visualViewport.offsetTop}px`;
-
-                // Detection Logic: Phát hiện bàn phím
-                const isKeyboardActive = height < window.innerHeight * 0.70;
-
-                if (isKeyboardActive) {
-                    document.body.classList.add('keyboard-active');
-                } else {
-                    document.body.classList.remove('keyboard-active');
-                }
-
-                // Vô hiệu hóa cuộn gốc của trình duyệt
-                window.scrollTo(0, 0);
-            }
-            // Chỉ lắng nghe sự kiện resize (thường xảy ra khi keyboard hiện/ẩn)
-            window.visualViewport.addEventListener('resize', handleVisualResize);
-            window.addEventListener('scroll', () => window.scrollTo(0, 0)); // Chặn cuộn trên body/window
-            handleVisualResize();
+            // Cập nhật vị trí cho phần giữa (content)
+            content.style.top = `${headerHeight}px`;
+            content.style.bottom = `${inputHeight}px`;
         }
+
+        // Gọi updateLayout khi resize hoặc load
+        window.addEventListener('resize', updateLayout);
+        // Gọi định kỳ để đảm bảo nếu layout thay đổi (do animation) thì vẫn đúng
+        setInterval(updateLayout, 500);
 
         // --- DATA ---
         const offlineData = {
@@ -461,14 +429,13 @@
         let gameState = { mode: 'vocab', data: [], currentIdx: 0, score: 0, history: [], currentCorrect: "" };
         let theoryTab = 'grammar';
 
-        // --- ELEMENTS ---
         const els = {
             app: document.getElementById('app'),
             screens: { start: document.getElementById('startScreen'), game: document.getElementById('gameScreen'), result: document.getElementById('resultScreen'), settings: document.getElementById('settingsScreen') },
             tabs: { vocab: document.getElementById('tabVocab'), grammar: document.getElementById('tabGrammar'), forms: document.getElementById('tabForms') },
             views: { vocab: document.getElementById('viewVocab'), grammar: document.getElementById('viewGrammar'), forms: document.getElementById('viewForms') },
             inputs: { vocabTopic: document.getElementById('vocabTopicInput'), vocabSelect: document.getElementById('vocabTopicSelect'), grammarTense: document.getElementById('grammarTenseSelect'), formsType: document.getElementById('formsTypeSelect'), answer: document.getElementById('answerInput'), apiKey: document.getElementById('userApiKeyInput'), dict: document.getElementById('dictInput') },
-            game: { title: document.getElementById('gameTitle'), qNum: document.getElementById('currentQ'), totalQ: document.getElementById('totalQ'), progress: document.getElementById('progressBar'), display: document.getElementById('mainDisplay'), subDisplay: document.getElementById('subDisplay'), instruction: document.getElementById('instructionText') },
+            game: { title: document.getElementById('gameTitle'), qNum: document.getElementById('currentQ'), totalQ: document.getElementById('totalQ'), progress: document.getElementById('progressBar'), display: document.getElementById('mainDisplay'), subDisplay: document.getElementById('subDisplay'), instruction: document.getElementById('instructionText'), inputArea: document.getElementById('inputContainerWrapper') },
             feedback: { overlay: document.getElementById('feedbackOverlay'), title: document.getElementById('feedbackTitle'), correctText: document.getElementById('correctAnswerText'), explanation: document.getElementById('grammarExplanation'), border: document.getElementById('feedbackBorder') },
             settings: { panel: document.getElementById('settingsPanel'), content: document.getElementById('settingsContent'), backdrop: document.getElementById('settingsBackdrop'), keyStatus: document.getElementById('keyStatus') },
             dict: { modal: document.getElementById('dictModal'), content: document.getElementById('dictContent'), backdrop: document.getElementById('dictBackdrop'), result: document.getElementById('dictResultArea'), input: document.getElementById('dictInput') },
@@ -478,7 +445,6 @@
             loading: { overlay: document.getElementById('loadingOverlay'), text: document.getElementById('loadingText') }
         };
 
-        // --- INITIALIZATION ---
         try {
             if (els.inputs.grammarTense) els.inputs.grammarTense.innerHTML = Object.keys(offlineData.grammar).map(t => `<option value="${t}">${t}</option>`).join('');
             if (els.inputs.vocabSelect) els.inputs.vocabSelect.innerHTML = Object.keys(offlineData.vocab).map(t => `<option value="${t}">${t}</option>`).join('');
@@ -605,9 +571,12 @@
             Object.values(els.screens).forEach(e => e.classList.add('hidden'));
             // Show specific
             els.screens[s].classList.remove('hidden');
+            // Show/Hide input area
+            if (s === 'game') els.game.inputArea.classList.remove('hidden');
+            else els.game.inputArea.classList.add('hidden');
+            updateLayout();
         };
         const resetGame = () => {
-            document.body.classList.remove('keyboard-active');
             switchScreen('start');
         };
 
@@ -616,6 +585,7 @@
             els.game.qNum.textContent = gameState.currentIdx + 1;
             els.game.progress.style.width = `${((gameState.currentIdx + 1) / gameState.data.length) * 100}%`;
             els.inputs.answer.value = "";
+            els.inputs.answer.focus(); // Auto focus
 
             if(gameState.mode === 'vocab') {
                 els.game.display.textContent = item.vi; els.game.instruction.textContent = "TRANSLATE TO ENGLISH"; els.game.subDisplay.classList.add('hidden'); gameState.currentCorrect = item.en;
