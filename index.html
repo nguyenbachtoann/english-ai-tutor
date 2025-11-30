@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
-    <title>AI Tutor: v1.0.1</title>
+    <title>AI Tutor: v1.0.6</title>
 
     <!-- PWA Setup -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -41,15 +41,11 @@
 
         /* --- 3. LOGIC ULTRA COMPACT & KEYBOARD --- */
 
-        /* Mặc định cho màn hình rất thấp */
         @media (max-height: 550px) {
             #mainHeader { display: none !important; }
         }
 
-        /* Khi bàn phím hiện lên (class được JS thêm vào) */
         body.keyboard-mode #mainHeader { display: none !important; }
-
-        /* Tinh chỉnh game screen khi có phím */
         body.keyboard-mode #gameScreen { padding-top: 0 !important; }
         body.keyboard-mode #gameDisplayWrapper {
             justify-content: flex-end;
@@ -58,67 +54,40 @@
 
         /* Font chữ siêu nhỏ khi gõ phím */
         body.keyboard-mode #mainDisplay {
-            font-size: 0.85rem !important; /* Nhỏ hẳn lại (~13-14px) */
+            font-size: 0.85rem !important;
             line-height: 1.15 !important;
             margin-bottom: 0 !important;
             padding: 0 0.5rem;
         }
 
-        body.keyboard-mode #listeningDisplay button {
-            width: 2rem !important;
-            height: 2rem !important;
-            font-size: 0.9rem !important;
-            margin-bottom: 0 !important;
+        /* Reading Passage Compact Mode */
+        body.keyboard-mode #readingPassageDisplay {
+            max-height: 80px !important; /* Thu nhỏ đoạn văn khi hiện phím */
+            font-size: 0.75rem !important;
+            padding: 0.5rem !important;
         }
 
-        body.keyboard-mode #listeningDisplay p {
-            font-size: 0.5rem !important;
-            display: none; /* Ẩn text "Tap to listen" khi gõ phím */
-        }
+        body.keyboard-mode #listeningDisplay button { width: 2rem !important; height: 2rem !important; font-size: 0.9rem !important; margin-bottom: 0 !important; }
+        body.keyboard-mode #listeningDisplay p { display: none; }
 
         body.keyboard-mode #instructionText {
             font-size: 0.45rem !important;
             margin-bottom: 0 !important;
             padding: 0 0.3rem !important;
             opacity: 0.6;
-            height: 14px;
-            display: flex;
-            align-items: center;
+            height: 14px; display: flex; align-items: center;
         }
 
-        body.keyboard-mode .game-content-box {
-            min-height: 0 !important;
-            padding: 0.15rem 0 !important;
-            gap: 0.1rem !important;
-        }
-
-        body.keyboard-mode #subDisplay {
-            font-size: 0.6rem !important;
-            padding: 0 0.3rem !important;
-            margin-top: 0 !important;
-        }
+        body.keyboard-mode .game-content-box { min-height: 0 !important; padding: 0.15rem 0 !important; gap: 0.1rem !important; }
+        body.keyboard-mode #subDisplay { font-size: 0.6rem !important; padding: 0 0.3rem !important; margin-top: 0 !important; }
 
         /* ULTRA COMPACT INPUT AREA */
-        body.keyboard-mode #inputContainer {
-            padding: 0.2rem 0.5rem !important; /* Siêu mỏng */
-            border-top: 1px solid rgba(0,0,0,0.03);
-        }
+        body.keyboard-mode #inputContainer { padding: 0.2rem 0.5rem !important; border-top: 1px solid rgba(0,0,0,0.03); }
+        body.keyboard-mode #answerInput { height: 1.85rem !important; padding: 0 0.6rem !important; font-size: 0.85rem !important; border-radius: 0.4rem !important; border-width: 1px !important; }
+        body.keyboard-mode #checkBtn { width: 1.85rem !important; height: 1.85rem !important; border-radius: 0.4rem !important; font-size: 0.7rem !important; }
 
-        body.keyboard-mode #answerInput {
-            height: 1.85rem !important; /* ~30px */
-            padding: 0 0.6rem !important;
-            font-size: 0.85rem !important;
-            border-radius: 0.4rem !important;
-            border-width: 1px !important;
-        }
-
-        body.keyboard-mode #checkBtn {
-            width: 1.85rem !important; /* ~30px */
-            height: 1.85rem !important;
-            border-radius: 0.4rem !important;
-            font-size: 0.7rem !important;
-        }
-
+        /* Reading Options Buttons (hidden in keyboard mode usually, or made tiny) */
+        body.keyboard-mode #quickOptions { display: none !important; }
 
         /* --- UTILS --- */
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid #F59E0B; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
@@ -146,10 +115,46 @@
         .speaker-pulse { animation: speakerPulse 1.5s infinite; }
         @keyframes speakerPulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); } 70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(245, 158, 11, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); } }
 
-        /* Indicator Styles */
         .ai-status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
         .status-online { background-color: #10B981; box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2); }
         .status-offline { background-color: #9CA3AF; box-shadow: 0 0 0 2px rgba(156, 163, 175, 0.2); }
+
+        /* Reading Passage Styles */
+        .reading-passage-box {
+            background-color: #fffbeb;
+            border: 2px solid #fde68a;
+            border-radius: 12px;
+            padding: 12px;
+            font-size: 0.9rem;
+            color: #4b5563;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            text-align: left;
+            line-height: 1.5;
+            width: 100%;
+        }
+        .option-chip {
+            transition: all 0.2s;
+            cursor: pointer;
+            border: 2px solid #e5e7eb; /* Thicker border for better visibility */
+        }
+        .option-chip:active {
+            transform: scale(0.95);
+        }
+        /* Selected State for Options */
+        .option-selected {
+            background-color: #FEF3C7 !important; /* Yellow-100 */
+            border-color: #F59E0B !important; /* Yellow-500 */
+            color: #92400E !important; /* Yellow-800 */
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.3);
+            font-weight: 800;
+        }
+        /* Check Button Expansion */
+        .btn-expanded {
+            width: 100% !important;
+            border-radius: 1.5rem !important;
+        }
     </style>
 </head>
 <body>
@@ -162,7 +167,6 @@
                     <div class="flex items-baseline gap-1">
                         <h1 class="text-xl font-extrabold text-yellow-900 tracking-tight flex items-center gap-1"><span class="text-2xl filter drop-shadow-sm">🥑</span> AI Tutor</h1>
                     </div>
-                    <!-- AI STATUS INDICATOR -->
                     <div id="aiStatusBadge" class="flex items-center text-[10px] font-bold text-gray-400 leading-none mt-0.5 ml-1">
                         <span id="aiStatusDot" class="ai-status-dot status-offline"></span>
                         <span id="aiStatusText">OFFLINE</span>
@@ -181,9 +185,10 @@
 
             <!-- START SCREEN -->
             <div id="startScreen" class="flex-1 flex flex-col h-full scrollable-content custom-scroll p-4 w-full screen-fade">
-                <div class="flex bg-gray-100/80 p-1 rounded-xl mb-4 no-shrink shadow-inner overflow-x-auto">
+                <div class="flex bg-gray-100/80 p-1 rounded-xl mb-4 no-shrink shadow-inner overflow-x-auto gap-1">
                     <button onclick="setMode('vocab')" id="tabVocab" class="tab-btn flex-1 py-2 px-2 rounded-lg text-[10px] sm:text-xs font-bold transition tab-active whitespace-nowrap">TỪ VỰNG</button>
                     <button onclick="setMode('listening')" id="tabListening" class="tab-btn flex-1 py-2 px-2 rounded-lg text-[10px] sm:text-xs font-bold transition tab-inactive whitespace-nowrap"><i class="fas fa-headphones-alt mr-1"></i>NGHE</button>
+                    <button onclick="setMode('reading')" id="tabReading" class="tab-btn flex-1 py-2 px-2 rounded-lg text-[10px] sm:text-xs font-bold transition tab-inactive whitespace-nowrap">ĐỌC HIỂU</button>
                     <button onclick="setMode('grammar')" id="tabGrammar" class="tab-btn flex-1 py-2 px-2 rounded-lg text-[10px] sm:text-xs font-bold transition tab-inactive whitespace-nowrap">NGỮ PHÁP</button>
                     <button onclick="setMode('forms')" id="tabForms" class="tab-btn flex-1 py-2 px-2 rounded-lg text-[10px] sm:text-xs font-bold transition tab-inactive whitespace-nowrap">BIẾN THỂ</button>
                 </div>
@@ -211,11 +216,20 @@
                         </div>
                     </div>
 
+                    <!-- Reading View -->
+                    <div id="viewReading" class="hidden flex flex-col items-center w-full animate-fadeIn mb-4">
+                        <div class="w-16 h-16 bg-gradient-to-tr from-blue-300 to-cyan-400 rounded-2xl flex items-center justify-center text-3xl shadow-md mb-2 text-white transform rotate-2">📖</div>
+                        <h2 class="text-xl font-black text-gray-800 mb-0.5">Đọc Hiểu</h2>
+                        <p class="text-xs text-gray-500 mb-3 font-medium">Luyện kỹ năng Reading</p>
+                         <div class="relative w-full mb-2"><input type="text" id="readingTopicInput" placeholder="Nhập chủ đề đọc (VD: Environment)..." class="w-full p-3 bg-white border-2 border-transparent text-center text-base font-bold text-gray-800 rounded-xl shadow-sm focus:outline-none placeholder-gray-300 hidden"></div>
+                         <div class="relative w-full mb-2" id="readingSelectWrapper"><select id="readingTopicSelect" class="w-full p-3 bg-white border-none rounded-xl text-sm font-bold text-center text-cyan-900 shadow-sm appearance-none focus:outline-none"></select><div class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-xs"><i class="fas fa-chevron-down"></i></div></div>
+                    </div>
+
                     <!-- Grammar View -->
                     <div id="viewGrammar" class="hidden flex flex-col items-center w-full animate-fadeIn mb-4">
                         <div class="w-16 h-16 bg-gradient-to-tr from-indigo-300 to-indigo-500 rounded-2xl flex items-center justify-center text-3xl shadow-md mb-2 text-white transform -rotate-3">📝</div>
-                        <h2 class="text-xl font-black text-gray-800 mb-0.5">Luyện 12 Thì</h2>
-                        <p class="text-xs text-gray-500 mb-3 font-medium">Chọn thì bạn muốn ôn tập</p>
+                        <h2 class="text-xl font-black text-gray-800 mb-0.5">Luyện Ngữ Pháp</h2>
+                        <p class="text-xs text-gray-500 mb-3 font-medium">Chọn thì hoặc chủ đề</p>
                         <div class="relative w-full"><select id="grammarTenseSelect" class="w-full p-3 bg-white border-none rounded-xl text-sm font-bold text-center text-indigo-900 shadow-sm appearance-none focus:outline-none"></select><div class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-xs"><i class="fas fa-chevron-down"></i></div></div>
                     </div>
 
@@ -253,9 +267,9 @@
                         <input type="range" id="quantityRange" min="5" max="30" step="5" value="10" class="w-full h-1.5 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-yellow-500 hover:accent-yellow-400">
                     </div>
 
-                    <!-- SUBTLE VERSION INDICATOR (MOVED HERE) -->
+                    <!-- SUBTLE VERSION INDICATOR -->
                     <div class="w-full flex justify-end mt-1 pr-1">
-                        <span class="text-[0.5rem] text-gray-300 font-mono select-none">v1.0.1</span>
+                        <span class="text-[0.5rem] text-gray-300 font-mono select-none">v1.0.6</span>
                     </div>
 
                 </div>
@@ -277,6 +291,11 @@
                     <div class="game-content-box w-full flex flex-col items-center py-4 justify-center min-h-[100px] transition-all">
                         <span id="instructionText" class="text-[9px] font-bold text-gray-300 uppercase tracking-[0.2em] mb-2 bg-gray-50 px-3 py-1 rounded-full transition-all">Translate</span>
 
+                        <!-- READING PASSAGE AREA (Hidden by default) -->
+                        <div id="readingPassageDisplay" class="reading-passage-box hidden custom-scroll">
+                            This is where the reading passage will go. It can be quite long so we need it to scroll if necessary.
+                        </div>
+
                         <!-- Extra Compact Main Display -->
                         <h2 id="mainDisplay" class="text-xl sm:text-2xl font-black text-center text-gray-800 mb-2 leading-tight break-words max-w-full drop-shadow-sm transition-all">Loading...</h2>
 
@@ -287,15 +306,21 @@
                         </div>
 
                         <p id="subDisplay" class="text-indigo-500 font-bold text-xs hidden bg-indigo-50 px-3 py-1 rounded-lg mt-1 animate-bounce-slow border border-indigo-100 transition-all">(hint)</p>
+
+                        <!-- Quick Options for Reading/Quiz -->
+                        <div id="quickOptions" class="hidden flex-wrap justify-center gap-2 mt-2 w-full">
+                            <!-- JS will inject buttons here -->
+                        </div>
                     </div>
                 </div>
 
                 <!-- COMPACT INPUT ROW (Size decreased) -->
                 <div id="inputContainer" class="no-shrink p-2 bg-white border-t border-gray-50 w-full z-10 shadow-[0_-5px_20px_rgba(0,0,0,0.02)] transition-all">
                     <div class="flex items-center gap-2 w-full">
-                        <div class="relative flex-1 group">
+                        <div class="relative flex-1 group" id="inputWrapper">
                             <input type="text" id="answerInput" class="w-full bg-gray-50 border-2 border-transparent text-base font-bold py-2.5 px-4 rounded-xl focus:outline-none focus:bg-white focus:border-yellow-400 transition-all shadow-inner placeholder-gray-300" placeholder="Nhập đáp án..." autocomplete="off">
                         </div>
+                        <!-- Nút check linh hoạt -->
                         <button id="checkBtn" onclick="checkAnswer()" class="no-shrink w-11 h-11 bg-gray-900 text-white text-base rounded-xl shadow-lg shadow-gray-400/30 active:scale-[0.9] transition-all flex items-center justify-center hover:bg-black">
                             <i class="fas fa-check"></i>
                         </button>
@@ -407,8 +432,6 @@
             document.getElementById('apple-icon').href = url; document.getElementById('fav-icon').href = url;
         })();
 
-        // --- 4. THE VIEWPORT HANDLER (SMOOTH & INSTANT) ---
-        // Vẫn giữ logic JS để set height cho app-viewport chính xác
         if (window.visualViewport) {
             function handleVisualResize() {
                 const appViewport = document.getElementById('app-viewport');
@@ -418,12 +441,11 @@
                 appViewport.style.height = `${height}px`;
                 appViewport.style.top = `${offsetTop}px`;
 
-                // Fallback class JS (để hỗ trợ nếu media query không bắt được)
                 if (height < window.innerHeight * 0.75) {
                     document.body.classList.add('keyboard-mode');
                     setTimeout(() => {
                         const activeEl = document.activeElement;
-                        if(activeEl && activeEl.id === 'answerInput') {
+                        if(activeEl && activeEl.id === 'answerInput' && !activeEl.closest('#inputWrapper').classList.contains('hidden')) {
                             activeEl.scrollIntoView({block: "end", behavior: "smooth"});
                         }
                     }, 50);
@@ -431,7 +453,6 @@
                     document.body.classList.remove('keyboard-mode');
                 }
             }
-
             window.visualViewport.addEventListener('resize', handleVisualResize);
             window.visualViewport.addEventListener('scroll', handleVisualResize);
             handleVisualResize();
@@ -467,6 +488,32 @@
                 "ed": [{question: "stop", answer: "stopped", explanation: "Gấp đôi phụ âm."}, {question: "plan", answer: "planned", explanation: "Gấp đôi phụ âm."}],
                 "classify": [{question: "She runs [fast]. (Type?)", answer: "adverb", explanation: "Bổ nghĩa cho động từ runs."}, {question: "It is a [fast] car. (Type?)", "answer": "adjective", explanation: "Bổ nghĩa cho danh từ car."}]
             },
+            reading: {
+                "Daily Life": [
+                    {passage: "My name is John. I wake up at 6 AM every day. I brush my teeth and have breakfast. I usually eat bread and drink coffee. Then, I go to work by bus.", question: "What time does John wake up?", answer: "6 AM", options: ["6 AM", "7 AM", "8 AM"], type: "mc", explanation: "Text says: 'I wake up at 6 AM'."},
+                    {passage: "Sarah loves to read books. Her favorite genre is fantasy. She reads about dragons and magic castles. Every weekend, she visits the local library to borrow new books.", question: "Sarah hates reading books.", answer: "False", options: ["True", "False"], type: "tf", explanation: "Text says: 'Sarah loves to read books'."},
+                    {passage: "Tom has a dog named Max. Max is a golden retriever. He is very friendly and loves to play fetch in the park.", question: "Max is a ___ retriever.", answer: "golden", options: ["golden", "black", "white"], type: "cloze", explanation: "Text says: 'Max is a golden retriever'."}
+                ],
+                "Technology": [
+                    {passage: "The internet has changed how we communicate. We can send emails instantly. Video calls allow us to see friends far away. However, too much screen time can be bad for our eyes.", question: "Video calls allow us to see friends ___.", answer: "far away", options: ["nearby", "far away", "next door"], type: "mc", explanation: "Text says: 'Video calls allow us to see friends far away'."},
+                    {passage: "Artificial Intelligence (AI) is becoming popular. It helps machines learn from data. Some people worry about AI taking jobs, while others think it will create new opportunities.", question: "AI stands for Artificial Intelligence.", answer: "True", options: ["True", "False"], type: "tf", explanation: "Common knowledge/Context implies AI = Artificial Intelligence."}
+                ],
+                "Tenses (Mixed)": [
+                    {passage: "Last summer, I visited Paris. It was amazing. I ate croissants every morning. Now, I am back home, but I am planning to go again next year.", question: "When did the author visit Paris?", answer: "Last summer", options: ["Next year", "Last summer", "Now"], type: "mc", explanation: "Sentence 1: 'Last summer, I visited Paris'."},
+                    {passage: "John usually walks to work, but yesterday he drove because it was raining heavily. Today, the sun is shining, so he is walking again.", question: "Why did John drive yesterday?", answer: "It was raining", options: ["It was sunny", "He was tired", "It was raining"], type: "mc", explanation: "Text says: 'he drove because it was raining heavily'."},
+                    {passage: "She has lived here for ten years. She moved here in 2014. She still loves this city.", question: "She ___ here for ten years.", answer: "has lived", options: ["lives", "has lived", "lived"], type: "cloze", explanation: "Present Perfect for duration: 'has lived'."}
+                ],
+                "Vocab (Context)": [
+                    {passage: "The room was incredibly [cluttered]. There were books, clothes, and toys everywhere. It was hard to find a place to sit.", question: "What is the closest meaning to 'cluttered'?", answer: "messy", options: ["clean", "messy", "empty"], type: "mc", explanation: "Context: 'books, clothes... everywhere' implies messy."},
+                    {passage: "The movie was [hilarious]. I laughed so hard that I cried. It was the best comedy I have seen in years.", question: "'Hilarious' means very ___.", answer: "funny", options: ["sad", "funny", "scary"], type: "cloze", explanation: "Context: 'laughed so hard' -> funny."},
+                    {passage: "He felt [exhausted] after running the marathon. He could barely walk and needed to sleep immediately.", question: "True or False: He felt full of energy.", answer: "False", options: ["True", "False"], type: "tf", explanation: "'Exhausted' means very tired, not energetic."}
+                ],
+                "Grammar (Cloze)": [
+                    {passage: "London is famous ___ its red buses and black taxis. Many tourists visit the city every year.", question: "famous ___", answer: "for", options: ["of", "for", "with"], type: "cloze", explanation: "Collocation: 'famous for'."},
+                    {passage: "I enjoy ___ music in my free time. It helps me relax after a long day at work.", question: "I enjoy ___", answer: "listening to", options: ["listen to", "listening to", "listened to"], type: "mc", explanation: "Enjoy + V-ing."},
+                    {passage: "If it ___ tomorrow, we will stay at home and watch movies.", question: "If it ___", answer: "rains", options: ["rain", "rains", "will rain"], type: "cloze", explanation: "First Conditional: If + Present Simple."}
+                ]
+            },
             theory: {
                 "Present Simple": { title: "Thì Hiện Tại Đơn (Present Simple)", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Công thức</h3><div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm font-mono"><div class="mb-1"><span class="text-green-600 font-bold">(+)</span> S + V(s/es)</div><div class="mb-1"><span class="text-red-500 font-bold">(-)</span> S + do/does + not + V</div><div><span class="text-blue-500 font-bold">(?)</span> Do/Does + S + V?</div></div><h3 class="font-bold text-indigo-700 mb-2">2. Cách dùng</h3><ul class="list-disc list-inside space-y-1 mb-4 text-gray-700"><li>Diễn tả thói quen, hành động lặp đi lặp lại.</li><li>Diễn tả sự thật hiển nhiên.</li><li>Lịch trình cố định.</li></ul><h3 class="font-bold text-indigo-700 mb-2">3. Dấu hiệu</h3><p class="text-gray-700 italic">Always, usually, often, every day...</p>` },
                 "Present Continuous": { title: "Thì Hiện Tại Tiếp Diễn", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Công thức</h3><div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm font-mono"><div class="mb-1"><span class="text-green-600 font-bold">(+)</span> S + am/is/are + V-ing</div></div><h3 class="font-bold text-indigo-700 mb-2">2. Cách dùng</h3><ul class="list-disc list-inside space-y-1 mb-4 text-gray-700"><li>Hành động đang xảy ra lúc nói.</li><li>Hành động đang diễn ra xung quanh thời điểm nói.</li></ul><h3 class="font-bold text-indigo-700 mb-2">3. Dấu hiệu</h3><p class="text-gray-700 italic">Now, at the moment, Look!...</p>` },
@@ -499,24 +546,27 @@
         const els = {
             app: document.getElementById('app'),
             screens: { start: document.getElementById('startScreen'), game: document.getElementById('gameScreen'), result: document.getElementById('resultScreen') },
-            tabs: { vocab: document.getElementById('tabVocab'), listening: document.getElementById('tabListening'), grammar: document.getElementById('tabGrammar'), forms: document.getElementById('tabForms') },
-            views: { vocab: document.getElementById('viewVocab'), listening: document.getElementById('viewListening'), grammar: document.getElementById('viewGrammar'), forms: document.getElementById('viewForms') },
-            inputs: { vocabTopic: document.getElementById('vocabTopicInput'), vocabSelect: document.getElementById('vocabTopicSelect'), grammarTense: document.getElementById('grammarTenseSelect'), formsType: document.getElementById('formsTypeSelect'), answer: document.getElementById('answerInput'), apiKey: document.getElementById('userApiKeyInput'), dict: document.getElementById('dictInput') },
-            game: { title: document.getElementById('gameTitle'), qNum: document.getElementById('currentQ'), totalQ: document.getElementById('totalQ'), progress: document.getElementById('progressBar'), display: document.getElementById('mainDisplay'), listeningDisplay: document.getElementById('listeningDisplay'), subDisplay: document.getElementById('subDisplay'), instruction: document.getElementById('instructionText') },
+            tabs: { vocab: document.getElementById('tabVocab'), listening: document.getElementById('tabListening'), reading: document.getElementById('tabReading'), grammar: document.getElementById('tabGrammar'), forms: document.getElementById('tabForms') },
+            views: { vocab: document.getElementById('viewVocab'), listening: document.getElementById('viewListening'), reading: document.getElementById('viewReading'), grammar: document.getElementById('viewGrammar'), forms: document.getElementById('viewForms') },
+            inputs: { vocabTopic: document.getElementById('vocabTopicInput'), vocabSelect: document.getElementById('vocabTopicSelect'), readingTopic: document.getElementById('readingTopicInput'), readingSelect: document.getElementById('readingTopicSelect'), grammarTense: document.getElementById('grammarTenseSelect'), formsType: document.getElementById('formsTypeSelect'), answer: document.getElementById('answerInput'), apiKey: document.getElementById('userApiKeyInput'), dict: document.getElementById('dictInput') },
+            game: { title: document.getElementById('gameTitle'), qNum: document.getElementById('currentQ'), totalQ: document.getElementById('totalQ'), progress: document.getElementById('progressBar'), display: document.getElementById('mainDisplay'), passageDisplay: document.getElementById('readingPassageDisplay'), listeningDisplay: document.getElementById('listeningDisplay'), subDisplay: document.getElementById('subDisplay'), instruction: document.getElementById('instructionText'), quickOptions: document.getElementById('quickOptions') },
             feedback: { overlay: document.getElementById('feedbackOverlay'), title: document.getElementById('feedbackTitle'), correctText: document.getElementById('correctAnswerText'), explanation: document.getElementById('grammarExplanation'), synonym: document.getElementById('synonymText'), border: document.getElementById('feedbackBorder') },
             settings: { panel: document.getElementById('settingsPanel'), content: document.getElementById('settingsContent'), backdrop: document.getElementById('settingsBackdrop'), keyStatus: document.getElementById('keyStatus') },
             dict: { modal: document.getElementById('dictModal'), content: document.getElementById('dictContent'), backdrop: document.getElementById('dictBackdrop'), result: document.getElementById('dictResultArea'), input: document.getElementById('dictInput') },
             theory: { modal: document.getElementById('theoryModal'), content: document.getElementById('theoryContentPanel'), backdrop: document.getElementById('theoryBackdrop'), listGrammar: document.getElementById('theoryListGrammar'), listForms: document.getElementById('theoryListForms'), detail: document.getElementById('theoryDetail'), contentText: document.getElementById('theoryDetailContent'), tabs: { grammar: document.getElementById('btnTheoryGrammar'), forms: document.getElementById('btnTheoryForms') } },
-            wrappers: { onlineVocab: document.getElementById('onlineVocabInput'), offlineVocab: document.getElementById('offlineVocabSelect') },
+            wrappers: { onlineVocab: document.getElementById('onlineVocabInput'), offlineVocab: document.getElementById('offlineVocabSelect'), readingInput: document.getElementById('readingTopicInput'), readingSelect: document.getElementById('readingSelectWrapper'), inputWrapper: document.getElementById('inputWrapper') },
             config: { level: document.getElementById('levelSelect'), qtyInput: document.getElementById('quantityRange'), qtyDisplay: document.getElementById('qtyDisplay'), section: document.getElementById('configSection'), startBtn: document.getElementById('startBtn') },
             loading: { overlay: document.getElementById('loadingOverlay'), text: document.getElementById('loadingText') },
-            aiStatus: { dot: document.getElementById('aiStatusDot'), text: document.getElementById('aiStatusText') } // Added for new indicator
+            aiStatus: { dot: document.getElementById('aiStatusDot'), text: document.getElementById('aiStatusText') },
+            // Add checkBtn to els for easy access
+            checkBtn: document.getElementById('checkBtn')
         };
 
         const formReadableNames = { "irregular": "Động từ Bất quy tắc", "irregular_v3": "Quá khứ phân từ", "noun_suffix": "Hậu tố Danh từ", "adj_suffix": "Hậu tố Tính từ", "prefixes": "Tiền tố", "verb_noun": "Động từ → Danh từ", "noun_adj": "Danh từ → Tính từ", "adj_adv": "Tính từ → Trạng từ", "ing": "Đuôi -ING", "ed": "Đuôi -ED", "classify": "Phân loại từ" };
 
         if (els.inputs.grammarTense) els.inputs.grammarTense.innerHTML = Object.keys(offlineData.grammar).map(t => `<option value="${t}">${t}</option>`).join('');
         if (els.inputs.vocabSelect) els.inputs.vocabSelect.innerHTML = Object.keys(offlineData.vocab).map(t => `<option value="${t}">${t}</option>`).join('');
+        if (els.inputs.readingSelect) els.inputs.readingSelect.innerHTML = Object.keys(offlineData.reading).map(t => `<option value="${t}">${t}</option>`).join('');
         if (els.inputs.formsType) els.inputs.formsType.innerHTML = Object.keys(offlineData.forms).map(t => `<option value="${t}">${formReadableNames[t] || t}</option>`).join('');
 
         const getApiKey = () => localStorage.getItem('vocab_ai_key');
@@ -554,6 +604,11 @@
 
                 if(els.wrappers.onlineVocab) els.wrappers.onlineVocab.classList.remove('hidden');
                 if(els.wrappers.offlineVocab) els.wrappers.offlineVocab.classList.add('hidden');
+
+                // Show AI Input for Reading when online
+                if(els.wrappers.readingInput) els.wrappers.readingInput.classList.remove('hidden');
+                if(els.wrappers.readingSelect) els.wrappers.readingSelect.classList.add('hidden');
+
             } else {
                 // Settings Panel Status
                 els.settings.keyStatus.textContent = "⚠️ Chế độ Offline";
@@ -568,6 +623,10 @@
 
                 if(els.wrappers.onlineVocab) els.wrappers.onlineVocab.classList.add('hidden');
                 if(els.wrappers.offlineVocab) els.wrappers.offlineVocab.classList.remove('hidden');
+
+                // Show Select for Reading when offline
+                if(els.wrappers.readingInput) els.wrappers.readingInput.classList.add('hidden');
+                if(els.wrappers.readingSelect) els.wrappers.readingSelect.classList.remove('hidden');
             }
         };
 
@@ -646,8 +705,7 @@
         const updateLevel = (val, el) => { document.getElementById('levelSelect').value = val; document.querySelectorAll('.level-card').forEach(c => { c.classList.remove('selected', 'bg-yellow-50', 'border-yellow-400'); c.classList.add('bg-gray-50', 'border-transparent'); }); el.classList.add('selected'); };
 
         const setMode = (m) => {
-            // Include listening mode in tab reset
-            ['vocab', 'listening', 'grammar', 'forms'].forEach(x => {
+            ['vocab', 'listening', 'reading', 'grammar', 'forms'].forEach(x => {
                 els.tabs[x].className = `tab-btn flex-1 py-2 px-2 rounded-lg text-[10px] sm:text-xs font-bold transition whitespace-nowrap ${x===m ? 'tab-active' : 'tab-inactive'}`;
                 els.views[x].classList.toggle('hidden', x !== m);
             });
@@ -665,39 +723,99 @@
             els.game.qNum.textContent = gameState.currentIdx + 1;
             els.game.progress.style.width = `${((gameState.currentIdx + 1) / gameState.data.length) * 100}%`;
             els.inputs.answer.value = "";
+            els.game.quickOptions.classList.add('hidden');
+            els.game.quickOptions.innerHTML = ''; // Clear old buttons
 
             // Reset displays
             els.game.display.classList.remove('hidden');
             els.game.listeningDisplay.classList.add('hidden');
             els.game.subDisplay.classList.add('hidden');
+            els.game.passageDisplay.classList.add('hidden'); // Hide reading passage by default
+
+            // RESET INPUT CONTAINER (Default state: visible input, small button)
+            els.wrappers.inputWrapper.classList.remove('hidden');
+            els.checkBtn.classList.remove('btn-expanded', 'w-full', 'rounded-3xl');
+            els.checkBtn.classList.add('w-11', 'rounded-xl', 'no-shrink');
+            els.checkBtn.innerHTML = '<i class="fas fa-check"></i>';
+
 
             if(gameState.mode === 'vocab') {
                 els.game.display.textContent = item.vi; els.game.instruction.textContent = "TRANSLATE TO ENGLISH";
                 gameState.currentCorrect = item.en;
                 gameState.currentOthers = item.others ? item.others.split(',').map(s => s.trim().toLowerCase()) : [];
-            } else if (gameState.mode === 'listening') {
-                // LISTENING MODE UI
+            }
+            else if (gameState.mode === 'listening') {
                 els.game.display.classList.add('hidden');
                 els.game.listeningDisplay.classList.remove('hidden');
                 els.game.instruction.textContent = "LISTEN & WRITE";
-                els.game.subDisplay.textContent = `(Nghĩa: ${item.vi})`; // Show hint by default or on toggle
+                els.game.subDisplay.textContent = `(Nghĩa: ${item.vi})`;
                 els.game.subDisplay.classList.remove('hidden');
-
                 gameState.currentCorrect = item.en;
                 gameState.currentOthers = item.others ? item.others.split(',').map(s => s.trim().toLowerCase()) : [];
-
-                // Play audio automatically after short delay
                 setTimeout(() => playTTS(), 500);
+            }
+            else if (gameState.mode === 'reading') {
+                // READING MODE UI
+                els.game.passageDisplay.textContent = item.passage;
+                els.game.passageDisplay.classList.remove('hidden');
 
-            } else if (gameState.mode === 'grammar') {
+                els.game.display.textContent = item.question; // Question goes in main display
+                els.game.display.classList.remove('text-2xl', 'sm:text-2xl');
+                els.game.display.classList.add('text-lg', 'sm:text-xl'); // Smaller font for question
+
+                els.game.instruction.textContent = item.type === 'tf' ? "TRUE OR FALSE?" : (item.type === 'cloze' ? "FILL IN THE BLANK" : "MULTIPLE CHOICE");
+
+                gameState.currentCorrect = item.answer;
+                gameState.currentOthers = [];
+
+                // SMART UI LOGIC
+                if (item.type === 'cloze') {
+                    // Cloze: Keep Input box visible, standard button
+                    // No changes needed, default state is correct
+                } else {
+                    // MCQ / TrueFalse: Hide Input box, Make Check Button Big
+                    els.wrappers.inputWrapper.classList.add('hidden');
+                    els.checkBtn.classList.remove('w-11', 'rounded-xl', 'no-shrink');
+                    els.checkBtn.classList.add('btn-expanded', 'w-full', 'rounded-3xl'); // Custom classes
+                    els.checkBtn.innerHTML = '<span class="font-bold mr-2">KIỂM TRA</span> <i class="fas fa-check"></i>';
+                }
+
+                // OPTION BUTTONS
+                if (item.options && item.options.length > 0 && item.type !== 'cloze') {
+                    els.game.quickOptions.classList.remove('hidden');
+                    item.options.forEach(opt => {
+                        const btn = document.createElement('button');
+                        btn.className = "option-chip bg-white px-3 py-2 rounded-xl text-sm font-bold text-gray-700 shadow-sm w-full mb-1";
+                        btn.textContent = opt;
+                        btn.onclick = () => {
+                            // Highlight logic only
+                            Array.from(els.game.quickOptions.children).forEach(c => c.classList.remove('option-selected'));
+                            btn.classList.add('option-selected');
+                            // Update hidden input so checkAnswer works
+                            els.inputs.answer.value = opt;
+                        };
+                        els.game.quickOptions.appendChild(btn);
+                    });
+                }
+            }
+            else if (gameState.mode === 'grammar') {
                 els.game.display.textContent = item.question; els.game.instruction.textContent = "VERB CONJUGATION"; els.game.subDisplay.textContent = item.verb ? `Verb: (${item.verb})` : ""; els.game.subDisplay.classList.remove('hidden'); gameState.currentCorrect = item.answer; gameState.currentOthers = [];
-            } else if (gameState.mode === 'forms') {
+            }
+            else if (gameState.mode === 'forms') {
                 els.game.display.textContent = item.question; els.game.instruction.textContent = "WORD FORM"; els.game.subDisplay.classList.add('hidden'); gameState.currentCorrect = item.answer; gameState.currentOthers = [];
             }
         };
 
         const checkAnswer = () => {
-            const user = els.inputs.answer.value.trim().toLowerCase(); if(!user) return;
+            const user = els.inputs.answer.value.trim().toLowerCase();
+            if(!user) {
+                // Shake button if empty (only visual feedback needed for no input)
+                if(els.checkBtn.classList.contains('btn-expanded')) {
+                    els.checkBtn.classList.add('animate-pulse');
+                    setTimeout(()=>els.checkBtn.classList.remove('animate-pulse'), 200);
+                }
+                return;
+            }
             if (gameState.currentIdx >= gameState.data.length) return;
             const item = gameState.data[gameState.currentIdx];
             const mainCorrect = gameState.currentCorrect.toLowerCase();
@@ -705,7 +823,7 @@
             // Check against main answer AND synonyms
             const isCorrect = user === mainCorrect || gameState.currentOthers.includes(user);
 
-            gameState.history.push({ q: gameState.mode === 'listening' ? `🔊 ${item.en}` : els.game.display.textContent, a: gameState.currentCorrect, u: els.inputs.answer.value, ok: isCorrect });
+            gameState.history.push({ q: gameState.mode === 'listening' ? `🔊 ${item.en}` : (gameState.mode === 'reading' ? `📖 ${item.question}` : els.game.display.textContent), a: gameState.currentCorrect, u: els.inputs.answer.value, ok: isCorrect });
             if(isCorrect) gameState.score++;
 
             els.feedback.title.textContent = isCorrect ? "Tuyệt vời!" : "Sai rồi!";
@@ -755,40 +873,82 @@
             if(key) {
                 try {
                     let prompt = "", context = "";
-                    // VOCAB & LISTENING share the same generation prompt structure
+
                     if (type === 'vocab' || type === 'listening') {
                         context = els.inputs.vocabTopic.value || "General";
                         let levelInstruction = "";
                         switch(level) {
-                            case 'Level A': levelInstruction = "EXTREMELY BASIC, common daily words for beginners (CEFR A1-A2). Focus on concrete nouns and simple verbs."; break;
-                            case 'Level B': levelInstruction = "Intermediate vocabulary (CEFR B1-B2). Common phrasal verbs."; break;
-                            case 'Level C': levelInstruction = "Advanced, sophisticated vocabulary (CEFR C1-C2)."; break;
-                            case 'TOEIC': levelInstruction = "Business English, workplace communication, office settings."; break;
-                            case 'IELTS': levelInstruction = "Academic, formal vocabulary."; break;
+                            case 'Level A': levelInstruction = "EXTREMELY BASIC, common daily words (CEFR A1-A2)."; break;
+                            case 'Level B': levelInstruction = "Intermediate vocabulary (CEFR B1-B2)."; break;
+                            case 'Level C': levelInstruction = "Advanced vocabulary (CEFR C1-C2)."; break;
+                            case 'TOEIC': levelInstruction = "Business English."; break;
+                            case 'IELTS': levelInstruction = "Academic vocabulary."; break;
                             default: levelInstruction = "Common vocabulary.";
                         }
-                        // Reuse same structure for both
                         prompt = `Generate ${qty} English vocabulary pairs for topic '${context}'.
                         LEVEL REQUIREMENT: ${levelInstruction}
-                        OUTPUT FORMAT: JSON Array of objects with keys: "vi" (Vietnamese), "en" (English word/phrase), "others" (2-3 synonyms separated by comma).
+                        OUTPUT FORMAT: JSON Array of objects with keys: "vi", "en", "others" (synonyms).
                         Example: [{"vi": "vui", "en": "happy", "others": "glad, joyful"}]`;
                     }
-                    else if (type === 'grammar') { context = els.inputs.grammarTense.value; prompt = `Generate ${qty} grammar questions for tense '${context}'. JSON Format: [{"question":"...", "verb":"...", "answer":"...", "explanation":"..."}].`; }
-                    else if (type === 'forms') { context = els.inputs.formsType.value; prompt = `Generate ${qty} word-form questions for type '${context}'. JSON Format: [{"question":"...", "answer":"...", "explanation":"..."}].`; }
+                    else if (type === 'reading') {
+                        context = els.inputs.readingTopic.value || els.inputs.readingSelect.value || "Daily Life";
+                        prompt = `Generate ${qty} SHORT reading comprehension questions for topic '${context}'.
+                        LEVEL: ${level}.
+                        Mix different types: Multiple Choice (mc), True/False (tf), Cloze/Fill-in-blank (cloze).
+                        OUTPUT FORMAT: JSON Array of objects:
+                        [
+                          {
+                            "passage": "Short text (30-60 words).",
+                            "question": "Question about text?",
+                            "answer": "Correct Answer String",
+                            "options": ["Option A", "Option B", "Option C"] (Include answer in options - empty array if cloze/tf doesn't need it but tf usually implies options),
+                            "type": "mc" (or "tf" or "cloze"),
+                            "explanation": "Why correct?"
+                          }
+                        ]`;
+                    }
+                    else if (type === 'grammar') {
+                        context = els.inputs.grammarTense.value;
+                        prompt = `Generate ${qty} English grammar questions specifically about '${context}'.
+                        LEVEL: ${level}.
+                        Format: JSON Array of objects:
+                        [{"question": "Sentence with a ____ (verb)", "verb": "base_verb", "answer": "conjugated_verb", "explanation": "Grammar rule explanation"}]`;
+                    }
+                    else if (type === 'forms') {
+                        context = els.inputs.formsType.value;
+                        const friendlyName = formReadableNames[context] || context;
+                        prompt = `Generate ${qty} Word Form / Morphology exercises focusing on '${friendlyName}'.
+                        LEVEL: ${level}.
+                        Format: JSON Array of objects:
+                        [{"question": "Sentence with ____ (root_word)", "answer": "correct_form", "explanation": "Why this form?"}]`;
+                    }
 
-                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${key}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ contents: [{ parts: [{ text: prompt + " JSON ONLY." }] }] }) });
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${key}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ contents: [{ parts: [{ text: prompt + " RETURN PURE JSON ARRAY ONLY. NO MARKDOWN." }] }] }) });
                     const data = await res.json();
-                    gameState.data = JSON.parse(data.candidates[0].content.parts[0].text.replace(/```json|```/g, '').trim());
-                    if (type === 'forms') context = formReadableNames[context] || context;
-                    els.game.title.textContent = `${type.toUpperCase()}: ${context}`;
+
+                    if(data.error) { throw new Error(data.error.message); }
+
+                    let rawText = data.candidates[0].content.parts[0].text;
+                    // Clean markdown
+                    rawText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
+
+                    gameState.data = JSON.parse(rawText);
+
+                    let displayTitle = context;
+                    if (type === 'forms') displayTitle = formReadableNames[context] || context;
+                    els.game.title.textContent = `${type.toUpperCase()}: ${displayTitle} (AI)`;
                     startGame(); showLoading(false); return;
-                } catch(e) { console.error(e); }
+                } catch(e) {
+                    console.error(e);
+                    alert("Lỗi kết nối AI hoặc hết quota: " + e.message + ". Chuyển sang Offline mode.");
+                    // Fallback handled below
+                }
             }
 
             // 2. OFFLINE FALLBACK
             let source = []; let displayTitle = "";
-            // Reuse Vocab data for Listening mode in offline
             if(type === 'vocab' || type === 'listening') { displayTitle = els.inputs.vocabSelect.value; source = offlineData.vocab[displayTitle] || []; }
+            if(type === 'reading') { displayTitle = els.inputs.readingSelect.value; source = offlineData.reading[displayTitle] || []; }
             if(type === 'grammar') { displayTitle = els.inputs.grammarTense.value; source = offlineData.grammar[displayTitle] || []; }
             if(type === 'forms') { const rawType = els.inputs.formsType.value; displayTitle = formReadableNames[rawType] || rawType; source = offlineData.forms[rawType] || []; }
 
@@ -800,18 +960,20 @@
         const startGeneration = () => {
             let mode = 'vocab';
             if (!els.views.vocab.classList.contains('hidden')) mode = 'vocab';
-            else if (!els.views.listening.classList.contains('hidden')) mode = 'listening'; // Check new mode
+            else if (!els.views.listening.classList.contains('hidden')) mode = 'listening';
+            else if (!els.views.reading.classList.contains('hidden')) mode = 'reading'; // Check reading mode
             else if (!els.views.grammar.classList.contains('hidden')) mode = 'grammar';
             else if (!els.views.forms.classList.contains('hidden')) mode = 'forms';
             generateContent(mode);
         };
 
         const playTTS = () => {
-            // Only speak if we have data
+            // Reading logic: Speak passage if needed? Or just answer? Let's speak answer for now or passage if user clicks specific button (not implemented).
+            // Default behavior: Speak correct answer.
             if(gameState.currentCorrect) {
                 const u = new SpeechSynthesisUtterance(gameState.currentCorrect);
                 u.lang = 'en-US';
-                u.rate = 0.9; // Slightly slower for listening mode clarity
+                u.rate = 0.9;
                 speechSynthesis.speak(u);
             }
         };
