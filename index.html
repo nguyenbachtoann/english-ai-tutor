@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
-    <title>AI Tutor: v1.0.3</title>
+    <title>AI Tutor: v1.0.7</title>
 
     <!-- PWA Setup -->
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="AI Tutor">
     <meta name="theme-color" content="#FFFBEB">
 
     <link rel="apple-touch-icon" id="apple-icon" href="">
@@ -40,24 +41,24 @@
         }
 
         /* --- 3. LOGIC ULTRA COMPACT & KEYBOARD --- */
-
+        
         @media (max-height: 550px) {
             #mainHeader { display: none !important; }
         }
 
         body.keyboard-mode #mainHeader { display: none !important; }
         body.keyboard-mode #gameScreen { padding-top: 0 !important; }
-        body.keyboard-mode #gameDisplayWrapper {
-            justify-content: flex-end;
-            padding-bottom: 0 !important;
+        body.keyboard-mode #gameDisplayWrapper { 
+            justify-content: flex-end; 
+            padding-bottom: 0 !important; 
         }
-
+        
         /* Font chữ siêu nhỏ khi gõ phím */
-        body.keyboard-mode #mainDisplay {
-            font-size: 0.85rem !important;
+        body.keyboard-mode #mainDisplay { 
+            font-size: 0.85rem !important; 
             line-height: 1.15 !important;
             margin-bottom: 0 !important;
-            padding: 0 0.5rem;
+            padding: 0 0.5rem; 
         }
 
         /* Reading Passage Compact Mode */
@@ -66,18 +67,18 @@
             font-size: 0.75rem !important;
             padding: 0.5rem !important;
         }
-
+        
         body.keyboard-mode #listeningDisplay button { width: 2rem !important; height: 2rem !important; font-size: 0.9rem !important; margin-bottom: 0 !important; }
         body.keyboard-mode #listeningDisplay p { display: none; }
 
-        body.keyboard-mode #instructionText {
-            font-size: 0.45rem !important;
-            margin-bottom: 0 !important;
+        body.keyboard-mode #instructionText { 
+            font-size: 0.45rem !important; 
+            margin-bottom: 0 !important; 
             padding: 0 0.3rem !important;
             opacity: 0.6;
             height: 14px; display: flex; align-items: center;
         }
-
+        
         body.keyboard-mode .game-content-box { min-height: 0 !important; padding: 0.15rem 0 !important; gap: 0.1rem !important; }
         body.keyboard-mode #subDisplay { font-size: 0.6rem !important; padding: 0 0.3rem !important; margin-top: 0 !important; }
 
@@ -85,7 +86,7 @@
         body.keyboard-mode #inputContainer { padding: 0.2rem 0.5rem !important; border-top: 1px solid rgba(0,0,0,0.03); }
         body.keyboard-mode #answerInput { height: 1.85rem !important; padding: 0 0.6rem !important; font-size: 0.85rem !important; border-radius: 0.4rem !important; border-width: 1px !important; }
         body.keyboard-mode #checkBtn { width: 1.85rem !important; height: 1.85rem !important; border-radius: 0.4rem !important; font-size: 0.7rem !important; }
-
+        
         /* Reading Options Buttons (hidden in keyboard mode usually, or made tiny) */
         body.keyboard-mode #quickOptions { display: none !important; }
 
@@ -137,20 +138,18 @@
         .option-chip {
             transition: all 0.2s;
             cursor: pointer;
-            border: 2px solid #e5e7eb; /* Thicker border for better visibility */
+            border: 2px solid #e5e7eb;
         }
         .option-chip:active {
             transform: scale(0.95);
         }
-        /* Selected State for Options */
         .option-selected {
-            background-color: #FEF3C7 !important; /* Yellow-100 */
-            border-color: #F59E0B !important; /* Yellow-500 */
-            color: #92400E !important; /* Yellow-800 */
+            background-color: #FEF3C7 !important;
+            border-color: #F59E0B !important;
+            color: #92400E !important;
             box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.3);
             font-weight: 800;
         }
-        /* Check Button Expansion */
         .btn-expanded {
             width: 100% !important;
             border-radius: 1.5rem !important;
@@ -215,7 +214,7 @@
                             <p class="text-gray-600 italic text-xs">Sử dụng ô nhập liệu ở trên</p>
                         </div>
                     </div>
-
+                    
                     <!-- Reading View -->
                     <div id="viewReading" class="hidden flex flex-col items-center w-full animate-fadeIn mb-4">
                         <div class="w-16 h-16 bg-gradient-to-tr from-blue-300 to-cyan-400 rounded-2xl flex items-center justify-center text-3xl shadow-md mb-2 text-white transform rotate-2">📖</div>
@@ -250,7 +249,7 @@
                     <div id="configSection" class="w-full bg-white p-4 rounded-2xl shadow-sm border border-gray-100 transition-all">
                         <input type="hidden" id="levelSelect" value="Level A">
                         <div class="flex justify-between items-center mb-2"><label class="text-[10px] font-bold text-gray-400 tracking-wider uppercase">Cài đặt bài tập</label></div>
-
+                        
                         <!-- Level Grid Compact -->
                         <div class="grid grid-cols-3 gap-1.5 mb-1.5">
                             <div onclick="updateLevel('Level A', this)" class="level-card selected cursor-pointer py-2 rounded-xl bg-gray-50 text-center"><div class="text-base mb-0.5">🌱</div><div class="text-[9px] font-bold text-gray-600">Level A</div></div>
@@ -269,7 +268,7 @@
 
                     <!-- SUBTLE VERSION INDICATOR -->
                     <div class="w-full flex justify-end mt-1 pr-1">
-                        <span class="text-[0.5rem] text-gray-300 font-mono select-none">v1.0.6</span>
+                        <span class="text-[0.5rem] text-gray-300 font-mono select-none">v1.0.7</span>
                     </div>
 
                 </div>
@@ -290,7 +289,7 @@
                 <div id="gameDisplayWrapper" class="scrollable-content px-4 w-full flex items-center justify-center">
                     <div class="game-content-box w-full flex flex-col items-center py-4 justify-center min-h-[100px] transition-all">
                         <span id="instructionText" class="text-[9px] font-bold text-gray-300 uppercase tracking-[0.2em] mb-2 bg-gray-50 px-3 py-1 rounded-full transition-all">Translate</span>
-
+                        
                         <!-- READING PASSAGE AREA (Hidden by default) -->
                         <div id="readingPassageDisplay" class="reading-passage-box hidden custom-scroll">
                             This is where the reading passage will go. It can be quite long so we need it to scroll if necessary.
@@ -298,7 +297,7 @@
 
                         <!-- Extra Compact Main Display -->
                         <h2 id="mainDisplay" class="text-xl sm:text-2xl font-black text-center text-gray-800 mb-2 leading-tight break-words max-w-full drop-shadow-sm transition-all">Loading...</h2>
-
+                        
                         <!-- Smaller Listening Icon -->
                         <div id="listeningDisplay" class="hidden flex flex-col items-center">
                             <button onclick="playTTS()" class="w-16 h-16 rounded-full bg-pink-100 text-pink-500 flex items-center justify-center text-2xl shadow-md active:scale-95 transition-transform mb-2 speaker-pulse"><i class="fas fa-volume-up"></i></button>
@@ -306,7 +305,7 @@
                         </div>
 
                         <p id="subDisplay" class="text-indigo-500 font-bold text-xs hidden bg-indigo-50 px-3 py-1 rounded-lg mt-1 animate-bounce-slow border border-indigo-100 transition-all">(hint)</p>
-
+                        
                         <!-- Quick Options for Reading/Quiz -->
                         <div id="quickOptions" class="hidden flex-wrap justify-center gap-2 mt-2 w-full">
                             <!-- JS will inject buttons here -->
@@ -425,11 +424,37 @@
 
     <script type="module">
         (function setupPWA() {
-            const canvas = document.createElement('canvas'); canvas.width = 512; canvas.height = 512; const ctx = canvas.getContext('2d');
-            const grd = ctx.createLinearGradient(0, 0, 0, 512); grd.addColorStop(0, '#FFFBEB'); grd.addColorStop(1, '#FBBF24');
-            ctx.fillStyle = grd; ctx.fillRect(0, 0, 512, 512); ctx.font = '300px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🥑', 256, 270);
+            // HIGH QUALITY ICON GENERATION
+            const canvas = document.createElement('canvas');
+            canvas.width = 1024; // High resolution
+            canvas.height = 1024;
+            const ctx = canvas.getContext('2d');
+
+            // 1. Background: Vibrant Gradient (Amber Theme)
+            const grd = ctx.createLinearGradient(0, 0, 1024, 1024);
+            grd.addColorStop(0, '#FCD34D'); // Amber 300
+            grd.addColorStop(1, '#D97706'); // Amber 600
+            ctx.fillStyle = grd;
+            ctx.fillRect(0, 0, 1024, 1024);
+
+            // 2. Decorative Circle (Subtle)
+            ctx.beginPath();
+            ctx.arc(512, 512, 400, 0, 2 * Math.PI);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+            ctx.fill();
+
+            // 3. Main Icon (Avocado) - Center Aligned
+            ctx.font = '600px sans-serif'; 
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            // Offset Y slightly for visual centering
+            ctx.fillText('🥑', 512, 540);
+
             const url = canvas.toDataURL('image/png');
-            document.getElementById('apple-icon').href = url; document.getElementById('fav-icon').href = url;
+            const appleIcon = document.getElementById('apple-icon');
+            const favIcon = document.getElementById('fav-icon');
+            if (appleIcon) appleIcon.href = url;
+            if (favIcon) favIcon.href = url;
         })();
 
         if (window.visualViewport) {
@@ -558,7 +583,6 @@
             config: { level: document.getElementById('levelSelect'), qtyInput: document.getElementById('quantityRange'), qtyDisplay: document.getElementById('qtyDisplay'), section: document.getElementById('configSection'), startBtn: document.getElementById('startBtn') },
             loading: { overlay: document.getElementById('loadingOverlay'), text: document.getElementById('loadingText') },
             aiStatus: { dot: document.getElementById('aiStatusDot'), text: document.getElementById('aiStatusText') },
-            // Add checkBtn to els for easy access
             checkBtn: document.getElementById('checkBtn')
         };
 
@@ -591,10 +615,10 @@
             const key = getApiKey();
             if(key) {
                 // Settings Panel Status
-                els.settings.keyStatus.textContent = "✅ Đã kết nối AI";
-                els.settings.keyStatus.className = "text-xs mt-4 text-center font-bold text-green-600";
+                els.settings.keyStatus.textContent = "✅ Đã kết nối AI"; 
+                els.settings.keyStatus.className = "text-xs mt-4 text-center font-bold text-green-600"; 
                 els.inputs.apiKey.value = key;
-
+                
                 // Header Indicator Status
                 if(els.aiStatus.dot) {
                     els.aiStatus.dot.className = "ai-status-dot status-online";
@@ -604,16 +628,16 @@
 
                 if(els.wrappers.onlineVocab) els.wrappers.onlineVocab.classList.remove('hidden');
                 if(els.wrappers.offlineVocab) els.wrappers.offlineVocab.classList.add('hidden');
-
+                
                 // Show AI Input for Reading when online
                 if(els.wrappers.readingInput) els.wrappers.readingInput.classList.remove('hidden');
                 if(els.wrappers.readingSelect) els.wrappers.readingSelect.classList.add('hidden');
 
             } else {
                 // Settings Panel Status
-                els.settings.keyStatus.textContent = "⚠️ Chế độ Offline";
+                els.settings.keyStatus.textContent = "⚠️ Chế độ Offline"; 
                 els.settings.keyStatus.className = "text-xs mt-4 text-center font-medium text-gray-400";
-
+                
                 // Header Indicator Status
                 if(els.aiStatus.dot) {
                     els.aiStatus.dot.className = "ai-status-dot status-offline";
@@ -623,7 +647,7 @@
 
                 if(els.wrappers.onlineVocab) els.wrappers.onlineVocab.classList.add('hidden');
                 if(els.wrappers.offlineVocab) els.wrappers.offlineVocab.classList.remove('hidden');
-
+                
                 // Show Select for Reading when offline
                 if(els.wrappers.readingInput) els.wrappers.readingInput.classList.add('hidden');
                 if(els.wrappers.readingSelect) els.wrappers.readingSelect.classList.remove('hidden');
@@ -731,7 +755,7 @@
             els.game.listeningDisplay.classList.add('hidden');
             els.game.subDisplay.classList.add('hidden');
             els.game.passageDisplay.classList.add('hidden'); // Hide reading passage by default
-
+            
             // RESET INPUT CONTAINER (Default state: visible input, small button)
             els.wrappers.inputWrapper.classList.remove('hidden');
             els.checkBtn.classList.remove('btn-expanded', 'w-full', 'rounded-3xl');
@@ -740,10 +764,10 @@
 
 
             if(gameState.mode === 'vocab') {
-                els.game.display.textContent = item.vi; els.game.instruction.textContent = "TRANSLATE TO ENGLISH";
+                els.game.display.textContent = item.vi; els.game.instruction.textContent = "TRANSLATE TO ENGLISH"; 
                 gameState.currentCorrect = item.en;
                 gameState.currentOthers = item.others ? item.others.split(',').map(s => s.trim().toLowerCase()) : [];
-            }
+            } 
             else if (gameState.mode === 'listening') {
                 els.game.display.classList.add('hidden');
                 els.game.listeningDisplay.classList.remove('hidden');
@@ -753,18 +777,18 @@
                 gameState.currentCorrect = item.en;
                 gameState.currentOthers = item.others ? item.others.split(',').map(s => s.trim().toLowerCase()) : [];
                 setTimeout(() => playTTS(), 500);
-            }
+            } 
             else if (gameState.mode === 'reading') {
                 // READING MODE UI
                 els.game.passageDisplay.textContent = item.passage;
                 els.game.passageDisplay.classList.remove('hidden');
-
+                
                 els.game.display.textContent = item.question; // Question goes in main display
                 els.game.display.classList.remove('text-2xl', 'sm:text-2xl');
                 els.game.display.classList.add('text-lg', 'sm:text-xl'); // Smaller font for question
 
                 els.game.instruction.textContent = item.type === 'tf' ? "TRUE OR FALSE?" : (item.type === 'cloze' ? "FILL IN THE BLANK" : "MULTIPLE CHOICE");
-
+                
                 gameState.currentCorrect = item.answer;
                 gameState.currentOthers = [];
 
@@ -800,14 +824,14 @@
             }
             else if (gameState.mode === 'grammar') {
                 els.game.display.textContent = item.question; els.game.instruction.textContent = "VERB CONJUGATION"; els.game.subDisplay.textContent = item.verb ? `Verb: (${item.verb})` : ""; els.game.subDisplay.classList.remove('hidden'); gameState.currentCorrect = item.answer; gameState.currentOthers = [];
-            }
+            } 
             else if (gameState.mode === 'forms') {
                 els.game.display.textContent = item.question; els.game.instruction.textContent = "WORD FORM"; els.game.subDisplay.classList.add('hidden'); gameState.currentCorrect = item.answer; gameState.currentOthers = [];
             }
         };
 
         const checkAnswer = () => {
-            const user = els.inputs.answer.value.trim().toLowerCase();
+            const user = els.inputs.answer.value.trim().toLowerCase(); 
             if(!user) {
                 // Shake button if empty (only visual feedback needed for no input)
                 if(els.checkBtn.classList.contains('btn-expanded')) {
@@ -873,7 +897,7 @@
             if(key) {
                 try {
                     let prompt = "", context = "";
-
+                    
                     if (type === 'vocab' || type === 'listening') {
                         context = els.inputs.vocabTopic.value || "General";
                         let levelInstruction = "";
@@ -912,34 +936,34 @@
                         prompt = `Generate ${qty} English grammar questions specifically about '${context}'.
                         LEVEL: ${level}.
                         Format: JSON Array of objects:
-                        [{"question": "Sentence with a ____ (verb)", "verb": "base_verb", "answer": "conjugated_verb", "explanation": "Grammar rule explanation"}]`;
+                        [{"question": "Sentence with a ____ (verb)", "verb": "base_verb", "answer": "conjugated_verb", "explanation": "Grammar rule explanation"}]`; 
                     }
-                    else if (type === 'forms') {
+                    else if (type === 'forms') { 
                         context = els.inputs.formsType.value;
                         const friendlyName = formReadableNames[context] || context;
                         prompt = `Generate ${qty} Word Form / Morphology exercises focusing on '${friendlyName}'.
                         LEVEL: ${level}.
                         Format: JSON Array of objects:
-                        [{"question": "Sentence with ____ (root_word)", "answer": "correct_form", "explanation": "Why this form?"}]`;
+                        [{"question": "Sentence with ____ (root_word)", "answer": "correct_form", "explanation": "Why this form?"}]`; 
                     }
 
                     const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${key}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ contents: [{ parts: [{ text: prompt + " RETURN PURE JSON ARRAY ONLY. NO MARKDOWN." }] }] }) });
                     const data = await res.json();
-
+                    
                     if(data.error) { throw new Error(data.error.message); }
-
+                    
                     let rawText = data.candidates[0].content.parts[0].text;
                     // Clean markdown
                     rawText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
-
+                    
                     gameState.data = JSON.parse(rawText);
-
+                    
                     let displayTitle = context;
                     if (type === 'forms') displayTitle = formReadableNames[context] || context;
                     els.game.title.textContent = `${type.toUpperCase()}: ${displayTitle} (AI)`;
                     startGame(); showLoading(false); return;
-                } catch(e) {
-                    console.error(e);
+                } catch(e) { 
+                    console.error(e); 
                     alert("Lỗi kết nối AI hoặc hết quota: " + e.message + ". Chuyển sang Offline mode.");
                     // Fallback handled below
                 }
@@ -967,14 +991,14 @@
             generateContent(mode);
         };
 
-        const playTTS = () => {
+        const playTTS = () => { 
             // Reading logic: Speak passage if needed? Or just answer? Let's speak answer for now or passage if user clicks specific button (not implemented).
             // Default behavior: Speak correct answer.
             if(gameState.currentCorrect) {
-                const u = new SpeechSynthesisUtterance(gameState.currentCorrect);
-                u.lang = 'en-US';
+                const u = new SpeechSynthesisUtterance(gameState.currentCorrect); 
+                u.lang = 'en-US'; 
                 u.rate = 0.9;
-                speechSynthesis.speak(u);
+                speechSynthesis.speak(u); 
             }
         };
 
