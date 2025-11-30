@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
-    <title>AI Tutor: v3.7.4 (Split Levels)</title>
+    <title>AI Tutor: v3.8.6 (Extra Compact)</title>
 
     <!-- PWA Setup -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -39,35 +39,86 @@
             background-color: #FFFBEB; overflow: hidden; z-index: 1; will-change: height, top;
         }
 
-        /* --- 3. LOGIC CSS THẦN TỐC (MEDIA QUERY) --- */
+        /* --- 3. LOGIC ULTRA COMPACT & KEYBOARD --- */
+
+        /* Mặc định cho màn hình rất thấp */
         @media (max-height: 550px) {
-            /* Ẩn Header ngay lập tức */
             #mainHeader { display: none !important; }
-
-            /* Compact Layout cho GameScreen */
-            #gameScreen { padding-top: 0.25rem !important; padding-bottom: 0 !important; }
-            #gameDisplayWrapper { flex-grow: 1; justify-content: center; min-height: 0; }
-            .game-content-box { padding-top: 0 !important; padding-bottom: 0 !important; }
-
-            /* Text resize */
-            #mainDisplay { font-size: 1.4rem !important; line-height: 1.2 !important; margin-bottom: 0.25rem !important; }
-            #instructionText { font-size: 0.65rem !important; margin-bottom: 0.25rem !important; }
-            #subDisplay { margin-top: 0.2rem !important; font-size: 0.8rem !important; padding: 0.1rem 0.5rem !important; }
-
-            /* Input Area Dính Đáy */
-            #inputContainer { padding: 0.5rem 1rem !important; border-top: 1px solid rgba(0,0,0,0.03); }
-            #answerInput { padding: 0.65rem !important; font-size: 1.1rem !important; border-radius: 1rem !important; }
-            #checkBtn { padding: 0.65rem !important; border-radius: 1rem !important; margin-top: 0.4rem !important; }
-
-            /* --- 4. ẨN THANH SCROLL (NO SCROLLBAR) --- */
-            .scrollable-content::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }
-            .scrollable-content { -ms-overflow-style: none; scrollbar-width: none; }
         }
 
-        /* Class hỗ trợ từ JS (Fallback cho các trường hợp Media Query không bắt được) */
-        .keyboard-mode #mainHeader { display: none !important; }
-        .keyboard-mode .scrollable-content::-webkit-scrollbar { display: none !important; }
-        .keyboard-mode .scrollable-content { -ms-overflow-style: none; scrollbar-width: none; }
+        /* Khi bàn phím hiện lên (class được JS thêm vào) */
+        body.keyboard-mode #mainHeader { display: none !important; }
+
+        /* Tinh chỉnh game screen khi có phím */
+        body.keyboard-mode #gameScreen { padding-top: 0 !important; }
+        body.keyboard-mode #gameDisplayWrapper {
+            justify-content: flex-end;
+            padding-bottom: 0 !important;
+        }
+
+        /* Font chữ siêu nhỏ khi gõ phím */
+        body.keyboard-mode #mainDisplay {
+            font-size: 0.85rem !important; /* Nhỏ hẳn lại (~13-14px) */
+            line-height: 1.15 !important;
+            margin-bottom: 0 !important;
+            padding: 0 0.5rem;
+        }
+
+        body.keyboard-mode #listeningDisplay button {
+            width: 2rem !important;
+            height: 2rem !important;
+            font-size: 0.9rem !important;
+            margin-bottom: 0 !important;
+        }
+
+        body.keyboard-mode #listeningDisplay p {
+            font-size: 0.5rem !important;
+            display: none; /* Ẩn text "Tap to listen" khi gõ phím */
+        }
+
+        body.keyboard-mode #instructionText {
+            font-size: 0.45rem !important;
+            margin-bottom: 0 !important;
+            padding: 0 0.3rem !important;
+            opacity: 0.6;
+            height: 14px;
+            display: flex;
+            align-items: center;
+        }
+
+        body.keyboard-mode .game-content-box {
+            min-height: 0 !important;
+            padding: 0.15rem 0 !important;
+            gap: 0.1rem !important;
+        }
+
+        body.keyboard-mode #subDisplay {
+            font-size: 0.6rem !important;
+            padding: 0 0.3rem !important;
+            margin-top: 0 !important;
+        }
+
+        /* ULTRA COMPACT INPUT AREA */
+        body.keyboard-mode #inputContainer {
+            padding: 0.2rem 0.5rem !important; /* Siêu mỏng */
+            border-top: 1px solid rgba(0,0,0,0.03);
+        }
+
+        body.keyboard-mode #answerInput {
+            height: 1.85rem !important; /* ~30px */
+            padding: 0 0.6rem !important;
+            font-size: 0.85rem !important;
+            border-radius: 0.4rem !important;
+            border-width: 1px !important;
+        }
+
+        body.keyboard-mode #checkBtn {
+            width: 1.85rem !important; /* ~30px */
+            height: 1.85rem !important;
+            border-radius: 0.4rem !important;
+            font-size: 0.7rem !important;
+        }
+
 
         /* --- UTILS --- */
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid #F59E0B; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
@@ -86,12 +137,19 @@
         .no-shrink { flex-shrink: 0; }
         .scrollable-content { flex-grow: 1; flex-shrink: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
 
-        /* Custom Scrollbar cho chế độ bình thường */
         .custom-scroll::-webkit-scrollbar { width: 4px; }
         .custom-scroll::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
 
         .input-focus:focus-within { border-color: #FBBF24; box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.2); }
         select { background-image: none !important; }
+
+        .speaker-pulse { animation: speakerPulse 1.5s infinite; }
+        @keyframes speakerPulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); } 70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(245, 158, 11, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); } }
+
+        /* Indicator Styles */
+        .ai-status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+        .status-online { background-color: #10B981; box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2); }
+        .status-offline { background-color: #9CA3AF; box-shadow: 0 0 0 2px rgba(156, 163, 175, 0.2); }
     </style>
 </head>
 <body>
@@ -100,7 +158,14 @@
         <div id="mainHeader" class="no-shrink px-4 pb-3 pt-[calc(env(safe-area-inset-top)+0.75rem)] bg-[#FFFBEB] flex justify-between items-center z-30 border-b border-yellow-100/50">
             <div class="flex items-center gap-3">
                 <button onclick="resetGame()" class="w-10 h-10 flex items-center justify-center text-yellow-800 bg-white rounded-full shadow-sm active:scale-90 transition-transform"><i class="fas fa-home"></i></button>
-                <h1 class="text-xl font-extrabold text-yellow-900 tracking-tight flex items-center gap-2 cursor-pointer" onclick="resetGame()"><span class="text-2xl filter drop-shadow-sm">🥑</span> AI Tutor</h1>
+                <div class="flex flex-col cursor-pointer" onclick="resetGame()">
+                    <h1 class="text-xl font-extrabold text-yellow-900 tracking-tight flex items-center gap-2"><span class="text-2xl filter drop-shadow-sm">🥑</span> AI Tutor</h1>
+                    <!-- AI STATUS INDICATOR -->
+                    <div id="aiStatusBadge" class="flex items-center text-[10px] font-bold text-gray-400 leading-none mt-0.5 ml-1">
+                        <span id="aiStatusDot" class="ai-status-dot status-offline"></span>
+                        <span id="aiStatusText">OFFLINE</span>
+                    </div>
+                </div>
             </div>
             <div class="flex gap-2">
                 <button onclick="openDictModal()" class="w-10 h-10 flex items-center justify-center text-yellow-700 bg-white rounded-full shadow-sm active:scale-90 transition-transform"><i class="fas fa-search"></i></button>
@@ -113,95 +178,121 @@
         <div id="mainContent" class="flex-1 flex flex-col relative overflow-hidden w-full bg-[#FFFBEB]">
 
             <!-- START SCREEN -->
-            <div id="startScreen" class="flex-1 flex flex-col h-full scrollable-content custom-scroll p-5 w-full screen-fade">
-                <div class="flex bg-gray-100/80 p-1.5 rounded-2xl mb-6 no-shrink shadow-inner">
-                    <button onclick="setMode('vocab')" id="tabVocab" class="tab-btn flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition tab-active">Từ Vựng</button>
-                    <button onclick="setMode('grammar')" id="tabGrammar" class="tab-btn flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition tab-inactive">Ngữ Pháp</button>
-                    <button onclick="setMode('forms')" id="tabForms" class="tab-btn flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition tab-inactive">Biến Thể</button>
+            <div id="startScreen" class="flex-1 flex flex-col h-full scrollable-content custom-scroll p-4 w-full screen-fade">
+                <div class="flex bg-gray-100/80 p-1 rounded-xl mb-4 no-shrink shadow-inner overflow-x-auto">
+                    <button onclick="setMode('vocab')" id="tabVocab" class="tab-btn flex-1 py-2 px-2 rounded-lg text-[10px] sm:text-xs font-bold transition tab-active whitespace-nowrap">TỪ VỰNG</button>
+                    <button onclick="setMode('listening')" id="tabListening" class="tab-btn flex-1 py-2 px-2 rounded-lg text-[10px] sm:text-xs font-bold transition tab-inactive whitespace-nowrap"><i class="fas fa-headphones-alt mr-1"></i>NGHE</button>
+                    <button onclick="setMode('grammar')" id="tabGrammar" class="tab-btn flex-1 py-2 px-2 rounded-lg text-[10px] sm:text-xs font-bold transition tab-inactive whitespace-nowrap">NGỮ PHÁP</button>
+                    <button onclick="setMode('forms')" id="tabForms" class="tab-btn flex-1 py-2 px-2 rounded-lg text-[10px] sm:text-xs font-bold transition tab-inactive whitespace-nowrap">BIẾN THỂ</button>
                 </div>
 
-                <div id="startScreenContent" class="w-full max-w-md mx-auto flex-1 flex flex-col justify-center pb-20">
+                <div id="startScreenContent" class="w-full max-w-md mx-auto flex-1 flex flex-col pb-20">
                     <!-- Vocab View -->
-                    <div id="viewVocab" class="flex flex-col items-center w-full animate-fadeIn">
-                        <div class="w-24 h-24 bg-gradient-to-tr from-yellow-200 to-yellow-400 rounded-3xl flex items-center justify-center text-5xl shadow-lg mb-4 text-white transform rotate-3">🥑</div>
-                        <h2 class="text-2xl font-black text-gray-800 mb-1">Học Từ Vựng</h2>
-                        <p class="text-sm text-gray-500 mb-6 font-medium">Nhập chủ đề để AI tạo từ vựng</p>
-                        <div id="onlineVocabInput" class="w-full input-focus rounded-2xl transition-all duration-200">
-                            <input type="text" id="vocabTopicInput" placeholder="VD: Travel, Business, Food..." class="w-full p-5 bg-white border-2 border-transparent text-center text-lg font-bold text-gray-800 rounded-2xl shadow-sm focus:outline-none placeholder-gray-300">
+                    <div id="viewVocab" class="flex flex-col items-center w-full animate-fadeIn mb-4">
+                        <div class="w-16 h-16 bg-gradient-to-tr from-yellow-200 to-yellow-400 rounded-2xl flex items-center justify-center text-3xl shadow-md mb-2 text-white transform rotate-3">🥑</div>
+                        <h2 class="text-xl font-black text-gray-800 mb-0.5">Học Từ Vựng</h2>
+                        <p class="text-xs text-gray-500 mb-3 font-medium">Nhập chủ đề để AI tạo từ vựng</p>
+                        <div id="onlineVocabInput" class="w-full input-focus rounded-xl transition-all duration-200">
+                            <input type="text" id="vocabTopicInput" placeholder="VD: Travel, Business, Food..." class="w-full p-3 bg-white border-2 border-transparent text-center text-base font-bold text-gray-800 rounded-xl shadow-sm focus:outline-none placeholder-gray-300">
                         </div>
-                        <div id="offlineVocabSelect" class="w-full hidden mt-2"><div class="relative w-full"><select id="vocabTopicSelect" class="w-full p-5 bg-white border-none rounded-2xl text-base font-bold text-center text-gray-700 shadow-sm appearance-none focus:ring-0"></select><div class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"><i class="fas fa-chevron-down"></i></div></div></div>
+                        <div id="offlineVocabSelect" class="w-full hidden"><div class="relative w-full"><select id="vocabTopicSelect" class="w-full p-3 bg-white border-none rounded-xl text-sm font-bold text-center text-gray-700 shadow-sm appearance-none focus:ring-0"></select><div class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-xs"><i class="fas fa-chevron-down"></i></div></div></div>
+                    </div>
+
+                    <!-- Listening View -->
+                    <div id="viewListening" class="hidden flex flex-col items-center w-full animate-fadeIn mb-4">
+                        <div class="w-16 h-16 bg-gradient-to-tr from-pink-300 to-rose-400 rounded-2xl flex items-center justify-center text-3xl shadow-md mb-2 text-white transform -rotate-2">🎧</div>
+                        <h2 class="text-xl font-black text-gray-800 mb-0.5">Luyện Nghe</h2>
+                        <p class="text-xs text-gray-500 mb-3 font-medium">Nghe & chép chính tả</p>
+                        <div class="w-full input-focus rounded-xl transition-all duration-200 bg-white p-3 text-center border border-gray-100 shadow-sm">
+                            <p class="text-[10px] text-gray-400 font-bold uppercase mb-1">CHỦ ĐỀ NGHE</p>
+                            <p class="text-gray-600 italic text-xs">Sử dụng ô nhập liệu ở trên</p>
+                        </div>
                     </div>
 
                     <!-- Grammar View -->
-                    <div id="viewGrammar" class="hidden flex flex-col items-center w-full animate-fadeIn">
-                        <div class="w-24 h-24 bg-gradient-to-tr from-indigo-300 to-indigo-500 rounded-3xl flex items-center justify-center text-5xl shadow-lg mb-4 text-white transform -rotate-3">📝</div>
-                        <h2 class="text-2xl font-black text-gray-800 mb-1">Luyện 12 Thì</h2>
-                        <p class="text-sm text-gray-500 mb-6 font-medium">Chọn thì bạn muốn ôn tập</p>
-                        <div class="relative w-full"><select id="grammarTenseSelect" class="w-full p-5 bg-white border-none rounded-2xl text-base font-bold text-center text-indigo-900 shadow-sm appearance-none focus:outline-none"></select><div class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"><i class="fas fa-chevron-down"></i></div></div>
+                    <div id="viewGrammar" class="hidden flex flex-col items-center w-full animate-fadeIn mb-4">
+                        <div class="w-16 h-16 bg-gradient-to-tr from-indigo-300 to-indigo-500 rounded-2xl flex items-center justify-center text-3xl shadow-md mb-2 text-white transform -rotate-3">📝</div>
+                        <h2 class="text-xl font-black text-gray-800 mb-0.5">Luyện 12 Thì</h2>
+                        <p class="text-xs text-gray-500 mb-3 font-medium">Chọn thì bạn muốn ôn tập</p>
+                        <div class="relative w-full"><select id="grammarTenseSelect" class="w-full p-3 bg-white border-none rounded-xl text-sm font-bold text-center text-indigo-900 shadow-sm appearance-none focus:outline-none"></select><div class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-xs"><i class="fas fa-chevron-down"></i></div></div>
                     </div>
 
                     <!-- Forms View -->
-                    <div id="viewForms" class="hidden flex flex-col items-center w-full animate-fadeIn">
-                        <div class="w-24 h-24 bg-gradient-to-tr from-green-300 to-green-500 rounded-3xl flex items-center justify-center text-5xl shadow-lg mb-4 text-white transform rotate-3">🔀</div>
-                        <h2 class="text-2xl font-black text-gray-800 mb-1">Biến Thể Từ</h2>
-                        <p class="text-sm text-gray-500 mb-6 font-medium">Luyện tập Word Forms</p>
-                        <div class="relative w-full"><select id="formsTypeSelect" class="w-full p-5 bg-white border-none rounded-2xl text-base font-bold text-center text-green-900 shadow-sm appearance-none focus:outline-none"></select><div class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"><i class="fas fa-chevron-down"></i></div></div>
+                    <div id="viewForms" class="hidden flex flex-col items-center w-full animate-fadeIn mb-4">
+                        <div class="w-16 h-16 bg-gradient-to-tr from-green-300 to-green-500 rounded-2xl flex items-center justify-center text-3xl shadow-md mb-2 text-white transform rotate-3">🔀</div>
+                        <h2 class="text-xl font-black text-gray-800 mb-0.5">Biến Thể Từ</h2>
+                        <p class="text-xs text-gray-500 mb-3 font-medium">Luyện tập Word Forms</p>
+                        <div class="relative w-full"><select id="formsTypeSelect" class="w-full p-3 bg-white border-none rounded-xl text-sm font-bold text-center text-green-900 shadow-sm appearance-none focus:outline-none"></select><div class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-xs"><i class="fas fa-chevron-down"></i></div></div>
                     </div>
 
-                    <!-- Config - SPLIT LEVELS -->
-                    <div id="configSection" class="w-full mt-8 mb-6 bg-white p-6 rounded-3xl shadow-sm border border-gray-100 transition-all">
-                        <input type="hidden" id="levelSelect" value="Level A">
-                        <div class="flex justify-between items-center mb-3"><label class="text-xs font-bold text-gray-400 tracking-wider">TRÌNH ĐỘ</label></div>
-                        
-                        <!-- Row 1: A, B, C -->
-                        <div class="grid grid-cols-3 gap-2 mb-2">
-                            <div onclick="updateLevel('Level A', this)" class="level-card selected cursor-pointer py-3 rounded-2xl bg-gray-50 text-center"><div class="text-xl mb-0.5">🌱</div><div class="text-[10px] font-bold text-gray-600">Level A</div></div>
-                            <div onclick="updateLevel('Level B', this)" class="level-card cursor-pointer py-3 rounded-2xl bg-gray-50 text-center"><div class="text-xl mb-0.5">🌿</div><div class="text-[10px] font-bold text-gray-600">Level B</div></div>
-                            <div onclick="updateLevel('Level C', this)" class="level-card cursor-pointer py-3 rounded-2xl bg-gray-50 text-center"><div class="text-xl mb-0.5">🌳</div><div class="text-[10px] font-bold text-gray-600">Level C</div></div>
-                        </div>
-                        
-                        <!-- Row 2: TOEIC, IELTS -->
-                        <div class="grid grid-cols-2 gap-2 mb-6">
-                            <div onclick="updateLevel('TOEIC', this)" class="level-card cursor-pointer py-3 rounded-2xl bg-gray-50 text-center"><div class="text-xl mb-0.5">💼</div><div class="text-[10px] font-bold text-gray-600">TOEIC</div></div>
-                            <div onclick="updateLevel('IELTS', this)" class="level-card cursor-pointer py-3 rounded-2xl bg-gray-50 text-center"><div class="text-xl mb-0.5">🎓</div><div class="text-[10px] font-bold text-gray-600">IELTS</div></div>
-                        </div>
-
-                        <div class="flex justify-between items-center mb-3"><label class="text-xs font-bold text-gray-400 tracking-wider">SỐ LƯỢNG</label><span id="qtyDisplay" class="text-xs font-bold text-white bg-gray-900 px-2 py-1 rounded-lg">10 câu</span></div>
-                        <input type="range" id="quantityRange" min="5" max="30" step="5" value="10" class="w-full h-2 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-yellow-500 hover:accent-yellow-400">
-                    </div>
-
-                    <button onclick="startGeneration()" id="startBtn" class="w-full bg-gray-900 text-white font-bold text-lg py-4 rounded-3xl shadow-xl shadow-gray-300/50 active:scale-[0.98] transition-all flex items-center justify-center gap-3 mt-2">
+                    <!-- MOVED START BUTTON UP HERE -->
+                    <button onclick="startGeneration()" id="startBtn" class="w-full bg-gray-900 text-white font-bold text-base py-3 rounded-2xl shadow-lg shadow-gray-300/50 active:scale-[0.98] transition-all flex items-center justify-center gap-2 mb-6">
                         <i class="fas fa-play text-yellow-400"></i> Bắt Đầu
                     </button>
+
+                    <!-- COMPACT CONFIG SECTION -->
+                    <div id="configSection" class="w-full bg-white p-4 rounded-2xl shadow-sm border border-gray-100 transition-all">
+                        <input type="hidden" id="levelSelect" value="Level A">
+                        <div class="flex justify-between items-center mb-2"><label class="text-[10px] font-bold text-gray-400 tracking-wider uppercase">Cài đặt bài tập</label></div>
+
+                        <!-- Level Grid Compact -->
+                        <div class="grid grid-cols-3 gap-1.5 mb-1.5">
+                            <div onclick="updateLevel('Level A', this)" class="level-card selected cursor-pointer py-2 rounded-xl bg-gray-50 text-center"><div class="text-base mb-0.5">🌱</div><div class="text-[9px] font-bold text-gray-600">Level A</div></div>
+                            <div onclick="updateLevel('Level B', this)" class="level-card cursor-pointer py-2 rounded-xl bg-gray-50 text-center"><div class="text-base mb-0.5">🌿</div><div class="text-[9px] font-bold text-gray-600">Level B</div></div>
+                            <div onclick="updateLevel('Level C', this)" class="level-card cursor-pointer py-2 rounded-xl bg-gray-50 text-center"><div class="text-base mb-0.5">🌳</div><div class="text-[9px] font-bold text-gray-600">Level C</div></div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-1.5 mb-4">
+                            <div onclick="updateLevel('TOEIC', this)" class="level-card cursor-pointer py-2 rounded-xl bg-gray-50 text-center"><div class="text-base mb-0.5">💼</div><div class="text-[9px] font-bold text-gray-600">TOEIC</div></div>
+                            <div onclick="updateLevel('IELTS', this)" class="level-card cursor-pointer py-2 rounded-xl bg-gray-50 text-center"><div class="text-base mb-0.5">🎓</div><div class="text-[9px] font-bold text-gray-600">IELTS</div></div>
+                        </div>
+
+                        <!-- Quantity Slider Compact -->
+                        <div class="flex justify-between items-center mb-1"><label class="text-[10px] font-bold text-gray-400 tracking-wider">SỐ LƯỢNG</label><span id="qtyDisplay" class="text-[10px] font-bold text-white bg-gray-800 px-1.5 py-0.5 rounded">10</span></div>
+                        <input type="range" id="quantityRange" min="5" max="30" step="5" value="10" class="w-full h-1.5 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-yellow-500 hover:accent-yellow-400">
+                    </div>
+
                 </div>
             </div>
 
-            <!-- GAME SCREEN -->
+            <!-- GAME SCREEN (UPDATED COMPACT UI) -->
             <div id="gameScreen" class="hidden flex-1 flex flex-col h-full w-full screen-fade bg-white">
-                <div class="no-shrink px-5 pt-4 pb-2 bg-white z-10 transition-all">
-                    <div id="gameHeader" class="flex justify-between items-center mb-3 transition-all">
-                        <span class="font-bold text-gray-400 text-xs uppercase tracking-wider truncate max-w-[60%]" id="gameTitle">General</span>
-                        <div class="bg-gray-100 px-3 py-1 rounded-full text-xs font-bold text-gray-600 flex items-center gap-1">
+                <div class="no-shrink px-4 pt-2 pb-1 bg-white z-10 transition-all border-b border-gray-50">
+                    <div id="gameHeader" class="flex justify-between items-center mb-1.5 transition-all">
+                        <span class="font-bold text-gray-400 text-[10px] uppercase tracking-wider truncate max-w-[60%]" id="gameTitle">General</span>
+                        <div class="bg-gray-100 px-2 py-0.5 rounded-full text-[10px] font-bold text-gray-600 flex items-center gap-1">
                             <i class="fas fa-flag text-yellow-500"></i> <span id="currentQ">1</span>/<span id="totalQ">10</span>
                         </div>
                     </div>
-                    <div id="progressBarContainer" class="w-full bg-gray-100 rounded-full h-2 overflow-hidden transition-all"><div id="progressBar" class="bg-yellow-400 h-full rounded-full transition-all duration-500 ease-out shadow-[0_0_10px_rgba(250,204,21,0.5)]" style="width: 10%"></div></div>
+                    <div id="progressBarContainer" class="w-full bg-gray-100 rounded-full h-1 overflow-hidden transition-all"><div id="progressBar" class="bg-yellow-400 h-full rounded-full transition-all duration-500 ease-out shadow-[0_0_10px_rgba(250,204,21,0.5)]" style="width: 10%"></div></div>
                 </div>
 
-                <div id="gameDisplayWrapper" class="scrollable-content px-5 w-full flex items-center justify-center">
-                    <div class="game-content-box w-full flex flex-col items-center py-6 justify-center min-h-[150px] transition-all">
-                        <span id="instructionText" class="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-4 bg-gray-50 px-4 py-1.5 rounded-full border border-gray-100 transition-all">Translate</span>
-                        <h2 id="mainDisplay" class="text-3xl sm:text-4xl font-black text-center text-gray-800 mb-3 leading-tight break-words max-w-full drop-shadow-sm transition-all">Loading...</h2>
-                        <p id="subDisplay" class="text-indigo-500 font-bold text-sm hidden bg-indigo-50 px-4 py-2 rounded-xl mt-2 animate-bounce-slow border border-indigo-100 transition-all">(hint)</p>
+                <div id="gameDisplayWrapper" class="scrollable-content px-4 w-full flex items-center justify-center">
+                    <div class="game-content-box w-full flex flex-col items-center py-4 justify-center min-h-[100px] transition-all">
+                        <span id="instructionText" class="text-[9px] font-bold text-gray-300 uppercase tracking-[0.2em] mb-2 bg-gray-50 px-3 py-1 rounded-full transition-all">Translate</span>
+
+                        <!-- Extra Compact Main Display -->
+                        <h2 id="mainDisplay" class="text-xl sm:text-2xl font-black text-center text-gray-800 mb-2 leading-tight break-words max-w-full drop-shadow-sm transition-all">Loading...</h2>
+
+                        <!-- Smaller Listening Icon -->
+                        <div id="listeningDisplay" class="hidden flex flex-col items-center">
+                            <button onclick="playTTS()" class="w-16 h-16 rounded-full bg-pink-100 text-pink-500 flex items-center justify-center text-2xl shadow-md active:scale-95 transition-transform mb-2 speaker-pulse"><i class="fas fa-volume-up"></i></button>
+                            <p class="text-gray-400 text-[10px] font-bold">Tap to listen</p>
+                        </div>
+
+                        <p id="subDisplay" class="text-indigo-500 font-bold text-xs hidden bg-indigo-50 px-3 py-1 rounded-lg mt-1 animate-bounce-slow border border-indigo-100 transition-all">(hint)</p>
                     </div>
                 </div>
 
-                <div id="inputContainer" class="no-shrink p-5 bg-white border-t border-gray-50 w-full z-10 shadow-[0_-5px_20px_rgba(0,0,0,0.02)] transition-all">
-                    <div class="relative w-full mb-3 group">
-                        <input type="text" id="answerInput" class="w-full bg-gray-50 border-2 border-transparent text-center text-xl font-bold p-4 rounded-3xl focus:outline-none focus:bg-white focus:border-yellow-400 transition-all shadow-inner placeholder-gray-300" placeholder="Nhập đáp án..." autocomplete="off">
-                        <div class="absolute inset-y-0 right-4 flex items-center pointer-events-none text-gray-300 group-focus-within:text-yellow-400 transition-colors"><i class="fas fa-pen"></i></div>
+                <!-- COMPACT INPUT ROW (Size decreased) -->
+                <div id="inputContainer" class="no-shrink p-2 bg-white border-t border-gray-50 w-full z-10 shadow-[0_-5px_20px_rgba(0,0,0,0.02)] transition-all">
+                    <div class="flex items-center gap-2 w-full">
+                        <div class="relative flex-1 group">
+                            <input type="text" id="answerInput" class="w-full bg-gray-50 border-2 border-transparent text-base font-bold py-2.5 px-4 rounded-xl focus:outline-none focus:bg-white focus:border-yellow-400 transition-all shadow-inner placeholder-gray-300" placeholder="Nhập đáp án..." autocomplete="off">
+                        </div>
+                        <button id="checkBtn" onclick="checkAnswer()" class="no-shrink w-11 h-11 bg-gray-900 text-white text-base rounded-xl shadow-lg shadow-gray-400/30 active:scale-[0.9] transition-all flex items-center justify-center hover:bg-black">
+                            <i class="fas fa-check"></i>
+                        </button>
                     </div>
-                    <button id="checkBtn" onclick="checkAnswer()" class="w-full bg-gray-900 text-white font-bold text-lg py-4 rounded-3xl shadow-xl shadow-gray-400/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2"><span>Kiểm tra</span> <i class="fas fa-arrow-up transform rotate-45"></i></button>
                 </div>
             </div>
 
@@ -401,17 +492,18 @@
         const els = {
             app: document.getElementById('app'),
             screens: { start: document.getElementById('startScreen'), game: document.getElementById('gameScreen'), result: document.getElementById('resultScreen') },
-            tabs: { vocab: document.getElementById('tabVocab'), grammar: document.getElementById('tabGrammar'), forms: document.getElementById('tabForms') },
-            views: { vocab: document.getElementById('viewVocab'), grammar: document.getElementById('viewGrammar'), forms: document.getElementById('viewForms') },
+            tabs: { vocab: document.getElementById('tabVocab'), listening: document.getElementById('tabListening'), grammar: document.getElementById('tabGrammar'), forms: document.getElementById('tabForms') },
+            views: { vocab: document.getElementById('viewVocab'), listening: document.getElementById('viewListening'), grammar: document.getElementById('viewGrammar'), forms: document.getElementById('viewForms') },
             inputs: { vocabTopic: document.getElementById('vocabTopicInput'), vocabSelect: document.getElementById('vocabTopicSelect'), grammarTense: document.getElementById('grammarTenseSelect'), formsType: document.getElementById('formsTypeSelect'), answer: document.getElementById('answerInput'), apiKey: document.getElementById('userApiKeyInput'), dict: document.getElementById('dictInput') },
-            game: { title: document.getElementById('gameTitle'), qNum: document.getElementById('currentQ'), totalQ: document.getElementById('totalQ'), progress: document.getElementById('progressBar'), display: document.getElementById('mainDisplay'), subDisplay: document.getElementById('subDisplay'), instruction: document.getElementById('instructionText') },
+            game: { title: document.getElementById('gameTitle'), qNum: document.getElementById('currentQ'), totalQ: document.getElementById('totalQ'), progress: document.getElementById('progressBar'), display: document.getElementById('mainDisplay'), listeningDisplay: document.getElementById('listeningDisplay'), subDisplay: document.getElementById('subDisplay'), instruction: document.getElementById('instructionText') },
             feedback: { overlay: document.getElementById('feedbackOverlay'), title: document.getElementById('feedbackTitle'), correctText: document.getElementById('correctAnswerText'), explanation: document.getElementById('grammarExplanation'), synonym: document.getElementById('synonymText'), border: document.getElementById('feedbackBorder') },
             settings: { panel: document.getElementById('settingsPanel'), content: document.getElementById('settingsContent'), backdrop: document.getElementById('settingsBackdrop'), keyStatus: document.getElementById('keyStatus') },
             dict: { modal: document.getElementById('dictModal'), content: document.getElementById('dictContent'), backdrop: document.getElementById('dictBackdrop'), result: document.getElementById('dictResultArea'), input: document.getElementById('dictInput') },
             theory: { modal: document.getElementById('theoryModal'), content: document.getElementById('theoryContentPanel'), backdrop: document.getElementById('theoryBackdrop'), listGrammar: document.getElementById('theoryListGrammar'), listForms: document.getElementById('theoryListForms'), detail: document.getElementById('theoryDetail'), contentText: document.getElementById('theoryDetailContent'), tabs: { grammar: document.getElementById('btnTheoryGrammar'), forms: document.getElementById('btnTheoryForms') } },
             wrappers: { onlineVocab: document.getElementById('onlineVocabInput'), offlineVocab: document.getElementById('offlineVocabSelect') },
             config: { level: document.getElementById('levelSelect'), qtyInput: document.getElementById('quantityRange'), qtyDisplay: document.getElementById('qtyDisplay'), section: document.getElementById('configSection'), startBtn: document.getElementById('startBtn') },
-            loading: { overlay: document.getElementById('loadingOverlay'), text: document.getElementById('loadingText') }
+            loading: { overlay: document.getElementById('loadingOverlay'), text: document.getElementById('loadingText') },
+            aiStatus: { dot: document.getElementById('aiStatusDot'), text: document.getElementById('aiStatusText') } // Added for new indicator
         };
 
         const formReadableNames = { "irregular": "Động từ Bất quy tắc", "irregular_v3": "Quá khứ phân từ", "noun_suffix": "Hậu tố Danh từ", "adj_suffix": "Hậu tố Tính từ", "prefixes": "Tiền tố", "verb_noun": "Động từ → Danh từ", "noun_adj": "Danh từ → Tính từ", "adj_adv": "Tính từ → Trạng từ", "ing": "Đuôi -ING", "ed": "Đuôi -ED", "classify": "Phân loại từ" };
@@ -441,11 +533,32 @@
         const checkKeyStatus = () => {
             const key = getApiKey();
             if(key) {
-                els.settings.keyStatus.textContent = "✅ Đã kết nối AI"; els.settings.keyStatus.className = "text-xs mt-4 text-center font-bold text-green-600"; els.inputs.apiKey.value = key;
+                // Settings Panel Status
+                els.settings.keyStatus.textContent = "✅ Đã kết nối AI";
+                els.settings.keyStatus.className = "text-xs mt-4 text-center font-bold text-green-600";
+                els.inputs.apiKey.value = key;
+
+                // Header Indicator Status
+                if(els.aiStatus.dot) {
+                    els.aiStatus.dot.className = "ai-status-dot status-online";
+                    els.aiStatus.text.textContent = "ONLINE (AI)";
+                    els.aiStatus.text.className = "text-green-600";
+                }
+
                 if(els.wrappers.onlineVocab) els.wrappers.onlineVocab.classList.remove('hidden');
                 if(els.wrappers.offlineVocab) els.wrappers.offlineVocab.classList.add('hidden');
             } else {
-                els.settings.keyStatus.textContent = "⚠️ Chế độ Offline"; els.settings.keyStatus.className = "text-xs mt-4 text-center font-medium text-gray-400";
+                // Settings Panel Status
+                els.settings.keyStatus.textContent = "⚠️ Chế độ Offline";
+                els.settings.keyStatus.className = "text-xs mt-4 text-center font-medium text-gray-400";
+
+                // Header Indicator Status
+                if(els.aiStatus.dot) {
+                    els.aiStatus.dot.className = "ai-status-dot status-offline";
+                    els.aiStatus.text.textContent = "OFFLINE";
+                    els.aiStatus.text.className = "text-gray-400";
+                }
+
                 if(els.wrappers.onlineVocab) els.wrappers.onlineVocab.classList.add('hidden');
                 if(els.wrappers.offlineVocab) els.wrappers.offlineVocab.classList.remove('hidden');
             }
@@ -526,8 +639,9 @@
         const updateLevel = (val, el) => { document.getElementById('levelSelect').value = val; document.querySelectorAll('.level-card').forEach(c => { c.classList.remove('selected', 'bg-yellow-50', 'border-yellow-400'); c.classList.add('bg-gray-50', 'border-transparent'); }); el.classList.add('selected'); };
 
         const setMode = (m) => {
-            ['vocab', 'grammar', 'forms'].forEach(x => {
-                els.tabs[x].className = `tab-btn flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition ${x===m ? 'tab-active' : 'tab-inactive'}`;
+            // Include listening mode in tab reset
+            ['vocab', 'listening', 'grammar', 'forms'].forEach(x => {
+                els.tabs[x].className = `tab-btn flex-1 py-2 px-2 rounded-lg text-[10px] sm:text-xs font-bold transition whitespace-nowrap ${x===m ? 'tab-active' : 'tab-inactive'}`;
                 els.views[x].classList.toggle('hidden', x !== m);
             });
             els.config.section.classList.remove('hidden');
@@ -545,11 +659,29 @@
             els.game.progress.style.width = `${((gameState.currentIdx + 1) / gameState.data.length) * 100}%`;
             els.inputs.answer.value = "";
 
+            // Reset displays
+            els.game.display.classList.remove('hidden');
+            els.game.listeningDisplay.classList.add('hidden');
+            els.game.subDisplay.classList.add('hidden');
+
             if(gameState.mode === 'vocab') {
-                els.game.display.textContent = item.vi; els.game.instruction.textContent = "TRANSLATE TO ENGLISH"; els.game.subDisplay.classList.add('hidden');
+                els.game.display.textContent = item.vi; els.game.instruction.textContent = "TRANSLATE TO ENGLISH";
                 gameState.currentCorrect = item.en;
-                // Parse synonyms safely
                 gameState.currentOthers = item.others ? item.others.split(',').map(s => s.trim().toLowerCase()) : [];
+            } else if (gameState.mode === 'listening') {
+                // LISTENING MODE UI
+                els.game.display.classList.add('hidden');
+                els.game.listeningDisplay.classList.remove('hidden');
+                els.game.instruction.textContent = "LISTEN & WRITE";
+                els.game.subDisplay.textContent = `(Nghĩa: ${item.vi})`; // Show hint by default or on toggle
+                els.game.subDisplay.classList.remove('hidden');
+
+                gameState.currentCorrect = item.en;
+                gameState.currentOthers = item.others ? item.others.split(',').map(s => s.trim().toLowerCase()) : [];
+
+                // Play audio automatically after short delay
+                setTimeout(() => playTTS(), 500);
+
             } else if (gameState.mode === 'grammar') {
                 els.game.display.textContent = item.question; els.game.instruction.textContent = "VERB CONJUGATION"; els.game.subDisplay.textContent = item.verb ? `Verb: (${item.verb})` : ""; els.game.subDisplay.classList.remove('hidden'); gameState.currentCorrect = item.answer; gameState.currentOthers = [];
             } else if (gameState.mode === 'forms') {
@@ -566,7 +698,7 @@
             // Check against main answer AND synonyms
             const isCorrect = user === mainCorrect || gameState.currentOthers.includes(user);
 
-            gameState.history.push({ q: els.game.display.textContent, a: gameState.currentCorrect, u: els.inputs.answer.value, ok: isCorrect });
+            gameState.history.push({ q: gameState.mode === 'listening' ? `🔊 ${item.en}` : els.game.display.textContent, a: gameState.currentCorrect, u: els.inputs.answer.value, ok: isCorrect });
             if(isCorrect) gameState.score++;
 
             els.feedback.title.textContent = isCorrect ? "Tuyệt vời!" : "Sai rồi!";
@@ -576,7 +708,7 @@
             els.feedback.correctText.textContent = gameState.currentCorrect;
 
             // Show synonyms if available
-            if (gameState.mode === 'vocab' && item.others) {
+            if ((gameState.mode === 'vocab' || gameState.mode === 'listening') && item.others) {
                  els.feedback.synonym.textContent = `Synonyms: ${item.others}`;
                  els.feedback.synonym.classList.remove('hidden');
             } else {
@@ -616,30 +748,19 @@
             if(key) {
                 try {
                     let prompt = "", context = "";
-                    if (type === 'vocab') {
+                    // VOCAB & LISTENING share the same generation prompt structure
+                    if (type === 'vocab' || type === 'listening') {
                         context = els.inputs.vocabTopic.value || "General";
-                        // --- UPDATED PROMPT LOGIC FOR PRECISE LEVELS ---
                         let levelInstruction = "";
                         switch(level) {
-                            case 'Level A':
-                                levelInstruction = "EXTREMELY BASIC, common daily words for beginners (CEFR A1-A2). Avoid complex or abstract words. Focus on concrete nouns and simple verbs.";
-                                break;
-                            case 'Level B':
-                                levelInstruction = "Intermediate vocabulary (CEFR B1-B2) used in daily conversation, work, and travel. Common phrasal verbs.";
-                                break;
-                            case 'Level C':
-                                levelInstruction = "Advanced, sophisticated vocabulary (CEFR C1-C2). Nuanced meanings, idioms, and formal expressions.";
-                                break;
-                            case 'TOEIC':
-                                levelInstruction = "Business English, workplace communication, office settings, economics, and administration.";
-                                break;
-                            case 'IELTS':
-                                levelInstruction = "Academic, formal vocabulary suitable for IELTS Writing Task 2 and Reading. High-scoring words.";
-                                break;
-                            default:
-                                levelInstruction = "Common vocabulary.";
+                            case 'Level A': levelInstruction = "EXTREMELY BASIC, common daily words for beginners (CEFR A1-A2). Focus on concrete nouns and simple verbs."; break;
+                            case 'Level B': levelInstruction = "Intermediate vocabulary (CEFR B1-B2). Common phrasal verbs."; break;
+                            case 'Level C': levelInstruction = "Advanced, sophisticated vocabulary (CEFR C1-C2)."; break;
+                            case 'TOEIC': levelInstruction = "Business English, workplace communication, office settings."; break;
+                            case 'IELTS': levelInstruction = "Academic, formal vocabulary."; break;
+                            default: levelInstruction = "Common vocabulary.";
                         }
-
+                        // Reuse same structure for both
                         prompt = `Generate ${qty} English vocabulary pairs for topic '${context}'.
                         LEVEL REQUIREMENT: ${levelInstruction}
                         OUTPUT FORMAT: JSON Array of objects with keys: "vi" (Vietnamese), "en" (English word/phrase), "others" (2-3 synonyms separated by comma).
@@ -659,7 +780,8 @@
 
             // 2. OFFLINE FALLBACK
             let source = []; let displayTitle = "";
-            if(type === 'vocab') { displayTitle = els.inputs.vocabSelect.value; source = offlineData.vocab[displayTitle] || []; }
+            // Reuse Vocab data for Listening mode in offline
+            if(type === 'vocab' || type === 'listening') { displayTitle = els.inputs.vocabSelect.value; source = offlineData.vocab[displayTitle] || []; }
             if(type === 'grammar') { displayTitle = els.inputs.grammarTense.value; source = offlineData.grammar[displayTitle] || []; }
             if(type === 'forms') { const rawType = els.inputs.formsType.value; displayTitle = formReadableNames[rawType] || rawType; source = offlineData.forms[rawType] || []; }
 
@@ -670,18 +792,29 @@
 
         const startGeneration = () => {
             let mode = 'vocab';
-            if (!els.views.vocab.classList.contains('hidden')) mode = 'vocab'; else if (!els.views.grammar.classList.contains('hidden')) mode = 'grammar'; else if (!els.views.forms.classList.contains('hidden')) mode = 'forms';
+            if (!els.views.vocab.classList.contains('hidden')) mode = 'vocab';
+            else if (!els.views.listening.classList.contains('hidden')) mode = 'listening'; // Check new mode
+            else if (!els.views.grammar.classList.contains('hidden')) mode = 'grammar';
+            else if (!els.views.forms.classList.contains('hidden')) mode = 'forms';
             generateContent(mode);
         };
 
-        const playTTS = () => { const u = new SpeechSynthesisUtterance(gameState.currentCorrect); u.lang = 'en-US'; speechSynthesis.speak(u); };
+        const playTTS = () => {
+            // Only speak if we have data
+            if(gameState.currentCorrect) {
+                const u = new SpeechSynthesisUtterance(gameState.currentCorrect);
+                u.lang = 'en-US';
+                u.rate = 0.9; // Slightly slower for listening mode clarity
+                speechSynthesis.speak(u);
+            }
+        };
 
         Object.assign(window, { saveApiKey, openDictModal, closeDictModal, lookupDictionary, switchTheoryTab, openTheoryModal, closeTheoryModal, backToTheoryList, loadTheory, showLoading, toggleSettings, updateLevel, setMode, switchScreen, resetGame, checkAnswer, nextQuestion, startGeneration, playTTS });
 
         checkKeyStatus();
         els.dict.input.addEventListener('keypress', (e) => { if(e.key === 'Enter') lookupDictionary(); });
         els.inputs.answer.addEventListener('keypress', (e) => { if(e.key === 'Enter') checkAnswer(); });
-        els.config.qtyInput.addEventListener('input', (e) => { els.config.qtyDisplay.textContent = `${e.target.value} câu`; });
+        els.config.qtyInput.addEventListener('input', (e) => { els.config.qtyDisplay.textContent = `${e.target.value}`; });
 
         setMode('vocab');
     </script>
