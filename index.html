@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
-    <title>AI Tutor: v1.1.5</title>
+    <title>AI Tutor: v1.2.0 (Smart Levels)</title>
 
     <!-- PWA Setup -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -302,7 +302,7 @@
 
                     <!-- SUBTLE VERSION INDICATOR -->
                     <div class="w-full flex justify-end mt-1 pr-1">
-                        <span class="text-[0.5rem] text-gray-300 font-mono select-none">v1.1.5</span>
+                        <span class="text-[0.5rem] text-gray-300 font-mono select-none">v1.2.0 (Smart Levels)</span>
                     </div>
 
                 </div>
@@ -462,7 +462,6 @@
 
     <script type="module">
         (function setupPWA() {
-            // HIGH QUALITY ICON GENERATION
             const canvas = document.createElement('canvas'); canvas.width = 1024; canvas.height = 1024; const ctx = canvas.getContext('2d');
             const grd = ctx.createLinearGradient(0, 0, 1024, 1024); grd.addColorStop(0, '#FCD34D'); grd.addColorStop(1, '#D97706');
             ctx.fillStyle = grd; ctx.fillRect(0, 0, 1024, 1024); ctx.beginPath(); ctx.arc(512, 512, 400, 0, 2 * Math.PI); ctx.fillStyle = 'rgba(255, 255, 255, 0.2)'; ctx.fill();
@@ -494,7 +493,7 @@
             handleVisualResize();
         }
 
-        // --- FULL OFFLINE DATA ---
+        // --- FULL OFFLINE DATA (REALLY RESTORED) ---
         const offlineData = {
             vocab: { "Daily Life": [{vi: "Cà phê", en: "coffee", others: "java, joe"}, {vi: "Máy tính", en: "computer", others: "pc, laptop"}, {vi: "Sách", en: "book", others: "volume, novel"}, {vi: "Bút", en: "pen", others: "biro, marker"}, {vi: "Trường học", en: "school", others: "academy, institution"}, {vi: "Bạn bè", en: "friend", others: "pal, mate"}, {vi: "Gia đình", en: "family", others: "kin, relatives"}, {vi: "Nước", en: "water", others: "h2o, liquid"}, {vi: "Thức ăn", en: "food", others: "meal, dish"}, {vi: "Tiền", en: "money", others: "cash, fund"}, {vi: "Cửa", en: "door", others: "gate, entrance"}, {vi: "Ghế", en: "chair", others: "seat, stool"}, {vi: "Bàn", en: "table", others: "desk, counter"}, {vi: "Thành phố", en: "city", others: "town, urban"}, {vi: "Công việc", en: "job", others: "work, career"}, {vi: "Giường ngủ", en: "bed", others: "bunk, cot"}, {vi: "Bếp", en: "kitchen", others: "cookhouse, galley"}, {vi: "Điện thoại", en: "phone", others: "mobile, cell"}, {vi: "Xe buýt", en: "bus", others: "coach, transit"}, {vi: "Bữa sáng", en: "breakfast", others: "morning meal"}], "Work & Business": [{vi: "Phát triển", en: "develop", others: "grow, expand"}, {vi: "Thành tựu", en: "achievement", others: "success, feat"}, {vi: "Thử thách", en: "challenge", others: "test, trial"}, {vi: "Môi trường", en: "environment", others: "surroundings, setting"}, {vi: "Xã hội", en: "society", others: "community, public"}, {vi: "Kinh tế", en: "economy", others: "wealth, market"}, {vi: "Văn hóa", en: "culture", others: "tradition, custom"}, {vi: "Giải pháp", en: "solution", others: "answer, fix"}, {vi: "Cơ hội", en: "opportunity", others: "chance, break"}, {vi: "Kiến thức", en: "knowledge", others: "learning, wisdom"}, {vi: "Kinh nghiệm", en: "experience", others: "skill, practice"}, {vi: "Quyết định", en: "decision", others: "choice, ruling"}, {vi: "Ảnh hưởng", en: "influence", others: "effect, impact"}, {vi: "Công nghệ", en: "technology", others: "tech, gear"}, {vi: "Sáng tạo", en: "creative", others: "inventive, artistic"}, {vi: "Thị trường", en: "market", others: "bazaar, mart"}, {vi: "Khách hàng", en: "customer", others: "client, buyer"}, {vi: "Đầu tư", en: "investment", others: "funding, stake"}, {vi: "Lợi nhuận", en: "profit", others: "gain, return"}, {vi: "Quản lý", en: "management", others: "admin, control"}], "Academic & IELTS": [{vi: "Toàn diện", en: "comprehensive", others: "complete, thorough"}, {vi: "Đáng kể", en: "significant", others: "notable, major"}, {vi: "Sâu sắc", en: "profound", others: "deep, intense"}, {vi: "Mơ hồ", en: "ambiguous", others: "vague, unclear"}, {vi: "Tỉ mỉ", en: "meticulous", others: "detailed, exact"}, {vi: "Bền vững", en: "sustainable", others: "viable, green"}, {vi: "Thiết yếu", en: "indispensable", others: "crucial, vital"}, {vi: "Lỗi thời", en: "obsolete", others: "outdated, old"}, {vi: "Thịnh vượng", en: "prosperous", others: "rich, wealthy"}, {vi: "Bất lợi", en: "detrimental", others: "harmful, bad"}, {vi: "Thuyết phục", en: "persuasive", others: "convincing, strong"}, {vi: "Nhất quán", en: "consistent", others: "steady, constant"}, {vi: "Khó nắm bắt", en: "elusive", others: "tricky, slippery"}, {vi: "Tinh tế", en: "exquisite", others: "delicate, fine"}, {vi: "Kiên cường", en: "resilient", others: "tough, strong"}, {vi: "Giảm nhẹ", en: "mitigate", others: "lessen, ease"}, {vi: "Làm trầm trọng", en: "exacerbate", others: "worsen, aggravate"}, {vi: "Phổ biến", en: "prevalent", others: "common, widespread"}, {vi: "Bất bình đẳng", en: "inequality", others: "unfairness, bias"}, {vi: "Đô thị hóa", en: "urbanization", others: "development, growth"}], "Travel & Food": [{vi: "Hành lý", en: "luggage", others: "baggage, cases"}, {vi: "Hộ chiếu", en: "passport", others: "id, pass"}, {vi: "Đặt phòng", en: "reservation", others: "booking, order"}, {vi: "Thực đơn", en: "menu", others: "card, list"}, {vi: "Ngon", en: "delicious", others: "tasty, yummy"}, {vi: "Sân bay", en: "airport", others: "airfield, strip"}, {vi: "Khách sạn", en: "hotel", others: "inn, lodge"}, {vi: "Bản đồ", en: "map", others: "chart, plan"}, {vi: "Du khách", en: "tourist", others: "visitor, traveler"}, {vi: "Chuyến bay", en: "flight", others: "trip, air travel"}, {vi: "Đặc sản", en: "specialty", others: "delicacy, treat"}, {vi: "Cay", en: "spicy", others: "hot, piquant"}, {vi: "Mặn", en: "salty", others: "briny, savory"}, {vi: "Ngọt", en: "sweet", others: "sugary, honeyed"}, {vi: "Chua", en: "sour", others: "acid, tart"}] },
             phrases: { "General": [{vi: "Bỏ cuộc", en: "give up", others: "quit, surrender"}, {vi: "Chăm sóc", en: "look after", others: "take care of"}, {vi: "Tìm kiếm", en: "look for", others: "search, seek"}, {vi: "Tiếp tục", en: "carry on", others: "continue"}, {vi: "Hủy bỏ", en: "call off", others: "cancel"}] },
@@ -527,102 +526,44 @@
                 "classify": [{question: "She runs [fast]. (Type?)", answer: "adverb", explanation: "Bổ nghĩa cho động từ runs."}, {question: "It is a [fast] car. (Type?)", "answer": "adjective", explanation: "Bổ nghĩa cho danh từ car."}]
             },
             reading: {
-                "Daily Life": [
-                    {passage: "My name is John. I wake up at 6 AM every day. I brush my teeth and have breakfast. I usually eat bread and drink coffee. Then, I go to work by bus.", question: "What time does John wake up?", answer: "6 AM", options: ["6 AM", "7 AM", "8 AM"], type: "mc", explanation: "Text says: 'I wake up at 6 AM'."},
-                    {passage: "Sarah loves to read books. Her favorite genre is fantasy. She reads about dragons and magic castles. Every weekend, she visits the local library to borrow new books.", question: "Sarah hates reading books.", answer: "False", options: ["True", "False"], type: "tf", explanation: "Text says: 'Sarah loves to read books'."},
-                    {passage: "Tom has a dog named Max. Max is a golden retriever. He is very friendly and loves to play fetch in the park.", question: "Max is a ___ retriever.", answer: "golden", options: ["golden", "black", "white"], type: "cloze", explanation: "Text says: 'Max is a golden retriever'."}
-                ],
-                "Technology": [
-                    {passage: "The internet has changed how we communicate. We can send emails instantly. Video calls allow us to see friends far away. However, too much screen time can be bad for our eyes.", question: "Video calls allow us to see friends ___.", answer: "far away", options: ["nearby", "far away", "next door"], type: "mc", explanation: "Text says: 'Video calls allow us to see friends far away'."},
-                    {passage: "Artificial Intelligence (AI) is becoming popular. It helps machines learn from data. Some people worry about AI taking jobs, while others think it will create new opportunities.", question: "AI stands for Artificial Intelligence.", answer: "True", options: ["True", "False"], type: "tf", explanation: "Common knowledge/Context implies AI = Artificial Intelligence."}
-                ],
-                "Tenses (Mixed)": [
-                    {passage: "Last summer, I visited Paris. It was amazing. I ate croissants every morning. Now, I am back home, but I am planning to go again next year.", question: "When did the author visit Paris?", answer: "Last summer", options: ["Next year", "Last summer", "Now"], type: "mc", explanation: "Sentence 1: 'Last summer, I visited Paris'."},
-                    {passage: "John usually walks to work, but yesterday he drove because it was raining heavily. Today, the sun is shining, so he is walking again.", question: "Why did John drive yesterday?", answer: "It was raining", options: ["It was sunny", "He was tired", "It was raining"], type: "mc", explanation: "Text says: 'he drove because it was raining heavily'."},
-                    {passage: "She has lived here for ten years. She moved here in 2014. She still loves this city.", question: "She ___ here for ten years.", answer: "has lived", options: ["lives", "has lived", "lived"], type: "cloze", explanation: "Present Perfect for duration: 'has lived'."}
-                ],
-                "Vocab (Context)": [
-                    {passage: "The room was incredibly [cluttered]. There were books, clothes, and toys everywhere. It was hard to find a place to sit.", question: "What is the closest meaning to 'cluttered'?", answer: "messy", options: ["clean", "messy", "empty"], type: "mc", explanation: "Context: 'books, clothes... everywhere' implies messy."},
-                    {passage: "The movie was [hilarious]. I laughed so hard that I cried. It was the best comedy I have seen in years.", question: "'Hilarious' means very ___.", answer: "funny", options: ["sad", "funny", "scary"], type: "cloze", explanation: "Context: 'laughed so hard' -> funny."},
-                    {passage: "He felt [exhausted] after running the marathon. He could barely walk and needed to sleep immediately.", question: "True or False: He felt full of energy.", answer: "False", options: ["True", "False"], type: "tf", explanation: "'Exhausted' means very tired, not energetic."}
-                ],
-                "Grammar (Cloze)": [
-                    {passage: "London is famous ___ its red buses and black taxis. Many tourists visit the city every year.", question: "famous ___", answer: "for", options: ["of", "for", "with"], type: "cloze", explanation: "Collocation: 'famous for'."},
-                    {passage: "I enjoy ___ music in my free time. It helps me relax after a long day at work.", question: "I enjoy ___", answer: "listening to", options: ["listen to", "listening to", "listened to"], type: "mc", explanation: "Enjoy + V-ing."},
-                    {passage: "If it ___ tomorrow, we will stay at home and watch movies.", question: "If it ___", answer: "rains", options: ["rain", "rains", "will rain"], type: "cloze", explanation: "First Conditional: If + Present Simple."}
-                ]
+                "Daily Life": [{passage: "My name is John. I wake up at 6 AM every day...", question: "What time does John wake up?", answer: "6 AM", options: ["6 AM", "7 AM", "8 AM"], type: "mc", explanation: "Text says: 'I wake up at 6 AM'."}, {passage: "Sarah loves to read books...", question: "Sarah hates reading books.", answer: "False", options: ["True", "False"], type: "tf", explanation: "Text says: 'Sarah loves to read books'."}],
+                "Technology": [{passage: "The internet has changed how we communicate...", question: "Video calls allow us to see friends ___.", answer: "far away", options: ["nearby", "far away"], type: "mc", explanation: "Text says: 'Video calls allow us to see friends far away'."}],
+                "Tenses (Mixed)": [{passage: "Last summer, I visited Paris...", question: "When did the author visit Paris?", answer: "Last summer", options: ["Next year", "Last summer"], type: "mc", explanation: "Text says: 'Last summer'."}],
+                "Vocab (Context)": [{passage: "The room was incredibly [cluttered]...", question: "What is the closest meaning to 'cluttered'?", answer: "messy", options: ["clean", "messy"], type: "mc", explanation: "Context implies messy."}],
+                "Grammar (Cloze)": [{passage: "London is famous ___ its red buses...", question: "famous ___", answer: "for", options: ["of", "for"], type: "cloze", explanation: "Collocation: 'famous for'."}]
             },
             theory: {
-                "Present Simple": { title: "Thì Hiện Tại Đơn (Present Simple)", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Công thức</h3><div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm font-mono"><div class="mb-1"><span class="text-green-600 font-bold">(+)</span> S + V(s/es)</div><div class="mb-1"><span class="text-red-500 font-bold">(-)</span> S + do/does + not + V</div><div><span class="text-blue-500 font-bold">(?)</span> Do/Does + S + V?</div></div><h3 class="font-bold text-indigo-700 mb-2">2. Cách dùng</h3><ul class="list-disc list-inside space-y-1 mb-4 text-gray-700"><li>Diễn tả thói quen, hành động lặp đi lặp lại.</li><li>Diễn tả sự thật hiển nhiên.</li><li>Lịch trình cố định.</li></ul><h3 class="font-bold text-indigo-700 mb-2">3. Dấu hiệu</h3><p class="text-gray-700 italic">Always, usually, often, every day...</p>` },
-                "Present Continuous": { title: "Thì Hiện Tại Tiếp Diễn", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Công thức</h3><div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm font-mono"><div class="mb-1"><span class="text-green-600 font-bold">(+)</span> S + am/is/are + V-ing</div></div><h3 class="font-bold text-indigo-700 mb-2">2. Cách dùng</h3><ul class="list-disc list-inside space-y-1 mb-4 text-gray-700"><li>Hành động đang xảy ra lúc nói.</li><li>Hành động đang diễn ra xung quanh thời điểm nói.</li></ul><h3 class="font-bold text-indigo-700 mb-2">3. Dấu hiệu</h3><p class="text-gray-700 italic">Now, at the moment, Look!...</p>` },
-                "Present Perfect": { title: "Thì Hiện Tại Hoàn Thành", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Công thức</h3><div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm font-mono"><div class="mb-1"><span class="text-green-600 font-bold">(+)</span> S + have/has + V3/ed</div></div><h3 class="font-bold text-indigo-700 mb-2">2. Cách dùng</h3><ul class="list-disc list-inside space-y-1 mb-4 text-gray-700"><li>Hành động bắt đầu trong QK kéo dài đến HT.</li><li>Vừa mới xảy ra.</li><li>Kinh nghiệm.</li></ul><h3 class="font-bold text-indigo-700 mb-2">3. Dấu hiệu</h3><p class="text-gray-700 italic">Just, recently, since, for, already, yet, so far...</p>` },
-                "Present Perfect Continuous": { title: "HT Hoàn Thành Tiếp Diễn", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Công thức</h3><div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm font-mono">S + have/has + been + V-ing</div><p class="text-gray-700">Nhấn mạnh tính liên tục của hành động từ QK đến HT.</p>` },
-                "Past Simple": { title: "Thì Quá Khứ Đơn", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Công thức</h3><div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm font-mono">S + V2/ed</div><p class="text-gray-700">Hành động đã kết thúc trong quá khứ. <br>DH: Yesterday, last week, ago.</p>` },
-                "Past Continuous": { title: "Thì Quá Khứ Tiếp Diễn", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Công thức</h3><div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm font-mono">S + was/were + V-ing</div><p class="text-gray-700">Hành động đang xảy ra tại 1 thời điểm trong QK.</p>` },
-                "Past Perfect": { title: "Thì Quá Khứ Hoàn Thành", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Công thức</h3><div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm font-mono">S + had + V3/ed</div><p class="text-gray-700">Xảy ra trước một hành động khác trong QK.</p>` },
-                "Past Perfect Continuous": { title: "QK Hoàn Thành Tiếp Diễn", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Công thức</h3><div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm font-mono">S + had + been + V-ing</div><p class="text-gray-700">Nhấn mạnh quá trình xảy ra trước 1 hành động khác trong QK.</p>` },
-                "Future Simple": { title: "Thì Tương Lai Đơn", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Công thức</h3><div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm font-mono">S + will + V</div><p class="text-gray-700">Dự đoán, quyết định tức thời. <br>DH: Tomorrow, next week.</p>` },
-                "Future Continuous": { title: "Thì Tương Lai Tiếp Diễn", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Công thức</h3><div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm font-mono">S + will + be + V-ing</div><p class="text-gray-700">Sẽ đang xảy ra tại 1 thời điểm trong TL.</p>` },
-                "Future Perfect": { title: "Thì Tương Lai Hoàn Thành", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Công thức</h3><div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm font-mono">S + will + have + V3/ed</div><p class="text-gray-700">Sẽ hoàn thành trước 1 thời điểm trong TL.</p>` },
-                "Future Perfect Continuous": { title: "TL Hoàn Thành Tiếp Diễn", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Công thức</h3><div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm font-mono">S + will + have + been + V-ing</div><p class="text-gray-700">Nhấn mạnh quá trình tính đến 1 thời điểm trong TL.</p>` },
-                "irregular": { title: "Động từ Bất Quy Tắc (V2)", content: `<p class="mb-2 text-gray-600">Đây là các động từ không tuân theo quy tắc thêm -ed khi chuyển sang quá khứ đơn.</p><table class="w-full text-sm text-left border rounded-lg overflow-hidden"><thead><tr class="bg-gray-100"><th class="p-2 border">V1 (Hiện tại)</th><th class="p-2 border">V2 (Quá khứ)</th></tr></thead><tbody><tr><td class="p-2 border">Go</td><td class="p-2 border">Went</td></tr><tr><td class="p-2 border">Buy</td><td class="p-2 border">Bought</td></tr><tr><td class="p-2 border">See</td><td class="p-2 border">Saw</td></tr><tr><td class="p-2 border">Do</td><td class="p-2 border">Did</td></tr><tr><td class="p-2 border">Have</td><td class="p-2 border">Had</td></tr></tbody></table>` },
-                "irregular_v3": { title: "Quá khứ phân từ (V3)", content: `<p class="mb-2 text-gray-600">Dùng trong các thì Hoàn thành (Perfect tenses) và Câu bị động.</p><table class="w-full text-sm text-left border rounded-lg overflow-hidden"><thead><tr class="bg-gray-100"><th class="p-2 border">V1</th><th class="p-2 border">V2</th><th class="p-2 border text-red-600 font-bold">V3</th></tr></thead><tbody><tr><td class="p-2 border">Go</td><td class="p-2 border">Went</td><td class="p-2 border text-red-600">Gone</td></tr><tr><td class="p-2 border">Eat</td><td class="p-2 border">Ate</td><td class="p-2 border text-red-600">Eaten</td></tr><tr><td class="p-2 border">Write</td><td class="p-2 border">Wrote</td><td class="p-2 border text-red-600">Written</td></tr><tr><td class="p-2 border">Take</td><td class="p-2 border">Took</td><td class="p-2 border text-red-600">Taken</td></tr></tbody></table>` },
-                "noun_suffix": { title: "Hậu tố Danh từ", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Chỉ người</h3><ul class="list-disc ml-5 mb-2 text-sm"><li><b>-er/or:</b> teacher, actor, worker</li><li><b>-ist:</b> artist, scientist</li><li><b>-ee:</b> employee, trainee</li></ul><h3 class="font-bold text-indigo-700 mb-2">2. Chỉ vật/trừu tượng</h3><ul class="list-disc ml-5 text-sm"><li><b>-tion/sion:</b> information, decision</li><li><b>-ment:</b> development, government</li><li><b>-ness:</b> happiness, sadness</li><li><b>-ity:</b> ability, activity</li></ul>` },
-                "adj_suffix": { title: "Hậu tố Tính từ", content: `<ul class="list-disc ml-5 text-sm space-y-1"><li><b>-ful (đầy):</b> helpful, beautiful</li><li><b>-less (không):</b> careless, homeless</li><li><b>-able/ible (có thể):</b> comfortable, visible</li><li><b>-ive:</b> active, creative</li><li><b>-ous:</b> dangerous, famous</li><li><b>-y:</b> sunny, rainy, windy</li><li><b>-al:</b> national, traditional</li></ul>` },
-                "prefixes": { title: "Tiền tố phổ biến", content: `<p class="mb-2 text-sm">Thêm vào trước từ gốc để đổi nghĩa (thường là nghĩa phủ định).</p><ul class="list-disc ml-5 text-sm space-y-1"><li><b>un-:</b> unhappy, unsafe</li><li><b>-im (trước p, m):</b> impossible, impolite</li><li><b>in-:</b> incorrect, informal</li><li><b>dis-:</b> disagree, dislike</li><li><b>re- (làm lại):</b> rewrite, replay</li><li><b>pre- (trước):</b> preview, pretest</li></ul>` },
-                "verb_noun": { title: "Chuyển Động từ thành Danh từ", content: `<div class="bg-green-50 p-3 rounded mb-2 border border-green-200"><span class="font-bold">Quy tắc chung:</span> Thêm hậu tố danh từ vào động từ.</div><ul class="text-sm space-y-2"><li><b>Decide</b> (v) -> <b>Decision</b> (n)</li><li><b>Solve</b> (v) -> <b>Solution</b> (n)</li><li><b>Arrive</b> (v) -> <b>Arrival</b> (n)</li><li><b>Perform</b> (v) -> <b>Performance</b> (n)</li></ul>` },
-                "noun_adj": { title: "Chuyển Danh từ thành Tính từ", content: `<div class="bg-blue-50 p-3 rounded mb-2 border border-blue-200"><span class="font-bold">Quy tắc:</span> Thêm hậu tố tính từ.</div><ul class="text-sm space-y-2"><li><b>Danger</b> (n) -> <b>Dangerous</b> (adj)</li><li><b>Care</b> (n) -> <b>Careful/Careless</b> (adj)</li><li><b>Nature</b> (n) -> <b>Natural</b> (adj)</li><li><b>Sun</b> (n) -> <b>Sunny</b> (adj)</li></ul>` },
-                "adj_adv": { title: "Tính từ & Trạng từ", content: `<div class="bg-yellow-50 p-3 rounded mb-2 border border-yellow-200"><span class="font-bold">Công thức:</span> Adj + ly = Adv</div><ul class="text-sm space-y-1 mb-2"><li>Quick -> Quickly</li><li>Bad -> Badly</li><li>Happy -> Happily (y -> i + ly)</li></ul><p class="font-bold text-red-500 text-sm">Ngoại lệ:</p><ul class="text-sm"><li>Good -> Well</li><li>Fast -> Fast (giữ nguyên)</li><li>Hard -> Hard</li></ul>` },
-                "ing": { title: "Quy tắc thêm đuôi -ING", content: `<ol class="list-decimal ml-5 text-sm space-y-2"><li><b>Thông thường:</b> Thêm -ing (walk -> walking)</li><li><b>Tận cùng là e:</b> Bỏ e thêm ing (write -> writing)</li><li><b>Tận cùng là ie:</b> Đổi ie thành y (lie -> lying)</li><li><b>1 âm tiết, tận cùng 1 phụ âm, trước là 1 nguyên âm:</b> Gấp đôi phụ âm (run -> running, sit -> sitting)</li></ol>` },
-                "ed": { title: "Quy tắc thêm đuôi -ED", content: `<ol class="list-decimal ml-5 text-sm space-y-2"><li><b>Thông thường:</b> Thêm -ed (watch -> watched)</li><li><b>Tận cùng là e:</b> Thêm d (live -> lived)</li><li><b>Tận cùng là y (trước là phụ âm):</b> Đổi y thành i + ed (study -> studied)</li><li><b>Gấp đôi phụ âm cuối:</b> stop -> stopped, plan -> planned</li></ol>` },
-                "classify": { title: "Phân loại từ", content: `<div class="space-y-3 text-sm"><div><span class="font-bold text-blue-600">Noun (Danh từ):</span> Chỉ người, vật, nơi chốn.<br>Vị trí: Đầu câu (Chủ ngữ), sau động từ (Tân ngữ).</div><div><span class="font-bold text-red-600">Verb (Động từ):</span> Chỉ hành động, trạng thái.<br>Vị trí: Sau chủ ngữ.</div><div><span class="font-bold text-green-600">Adjective (Tính từ):</span> Chỉ tính chất.<br>Vị trí: Trước danh từ, sau tobe.</div><div><span class="font-bold text-purple-600">Adverb (Trạng từ):</span> Bổ nghĩa cho động từ/tính từ.<br>Vị trí: Sau động từ thường, cuối câu.</div></div>` }
+                // TENSES
+                "Present Simple": { title: "Thì Hiện Tại Đơn (Present Simple)", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Công thức</h3><div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm font-mono"><div class="mb-1"><span class="text-green-600 font-bold">(+)</span> S + V(s/es)</div><div class="mb-1"><span class="text-red-500 font-bold">(-)</span> S + do/does + not + V</div><div><span class="text-blue-500 font-bold">(?)</span> Do/Does + S + V?</div></div><h3 class="font-bold text-indigo-700 mb-2">2. Cách dùng</h3><ul class="list-disc list-inside space-y-1 mb-4 text-gray-700"><li>Thói quen ở hiện tại.</li><li>Sự thật hiển nhiên.</li><li>Lịch trình cố định.</li></ul>` },
+                "Present Continuous": { title: "Thì Hiện Tại Tiếp Diễn", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Công thức</h3><div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm font-mono">S + am/is/are + V-ing</div><h3 class="font-bold text-indigo-700 mb-2">2. Cách dùng</h3><ul class="list-disc list-inside space-y-1 mb-4 text-gray-700"><li>Đang xảy ra lúc nói.</li><li>Đang diễn ra xung quanh thời điểm nói.</li></ul>` },
+                "Present Perfect": { title: "Thì Hiện Tại Hoàn Thành", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Công thức</h3><div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm font-mono">S + have/has + V3/ed</div><h3 class="font-bold text-indigo-700 mb-2">2. Cách dùng</h3><ul class="list-disc list-inside space-y-1 mb-4 text-gray-700"><li>Hành động bắt đầu trong QK, còn tiếp diễn.</li><li>Vừa mới xảy ra.</li><li>Kinh nghiệm.</li></ul>` },
+                "Present Perfect Continuous": { title: "HT Hoàn Thành Tiếp Diễn", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Công thức</h3><div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm font-mono">S + have/has + been + V-ing</div><p>Nhấn mạnh tính liên tục của hành động từ QK đến HT.</p>` },
+                "Past Simple": { title: "Thì Quá Khứ Đơn", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Công thức</h3><div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm font-mono">S + V2/ed</div><p>Hành động đã kết thúc trong quá khứ.</p>` },
+                "Past Continuous": { title: "Thì Quá Khứ Tiếp Diễn", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Công thức</h3><div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm font-mono">S + was/were + V-ing</div><p>Đang xảy ra tại 1 thời điểm trong QK.</p>` },
+                "Past Perfect": { title: "Thì Quá Khứ Hoàn Thành", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Công thức</h3><div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm font-mono">S + had + V3/ed</div><p>Xảy ra trước 1 hành động khác trong QK.</p>` },
+                "Past Perfect Continuous": { title: "QK Hoàn Thành Tiếp Diễn", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Công thức</h3><div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm font-mono">S + had + been + V-ing</div><p>Nhấn mạnh quá trình trước 1 hđ trong QK.</p>` },
+                "Future Simple": { title: "Thì Tương Lai Đơn", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Công thức</h3><div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm font-mono">S + will + V</div><p>Dự đoán, quyết định tức thời.</p>` },
+                "Future Continuous": { title: "Thì Tương Lai Tiếp Diễn", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Công thức</h3><div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm font-mono">S + will + be + V-ing</div><p>Sẽ đang xảy ra tại 1 thời điểm cụ thể trong TL.</p>` },
+                "Future Perfect": { title: "Thì Tương Lai Hoàn Thành", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Công thức</h3><div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm font-mono">S + will + have + V3/ed</div><p>Sẽ hoàn thành trước 1 thời điểm trong TL.</p>` },
+                "Future Perfect Continuous": { title: "TL Hoàn Thành Tiếp Diễn", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Công thức</h3><div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm font-mono">S + will + have + been + V-ing</div><p>Nhấn mạnh quá trình tính đến TL.</p>` },
+                // WORD FORMS
+                "irregular": { title: "Động từ Bất Quy Tắc (V2)", content: `<p>Không thêm -ed. <br>VD: Go -> Went, Buy -> Bought.</p>` },
+                "irregular_v3": { title: "Quá khứ phân từ (V3)", content: `<p>Dùng cho thì Hoàn thành/Bị động. <br>VD: Go -> Gone, Write -> Written.</p>` },
+                "noun_suffix": { title: "Hậu tố Danh từ", content: `<p>Chỉ người: -er, -or, -ist. <br>Chỉ vật: -tion, -ment, -ness.</p>` },
+                "adj_suffix": { title: "Hậu tố Tính từ", content: `<p>VD: -ful (đầy), -less (không), -able (có thể), -ous.</p>` },
+                "prefixes": { title: "Tiền tố (Prefixes)", content: `<p>Phủ định: un-, dis-, im-, in-. <br>VD: unhappy, dislike.</p>` },
+                "verb_noun": { title: "Động từ → Danh từ", content: `<p>VD: decide -> decision, arrive -> arrival.</p>` },
+                "noun_adj": { title: "Danh từ → Tính từ", content: `<p>VD: danger -> dangerous, beauty -> beautiful.</p>` },
+                "adj_adv": { title: "Tính từ → Trạng từ", content: `<p>Thường thêm -ly. <br>VD: quick -> quickly.</p>` },
+                "ing": { title: "Quy tắc thêm -ING", content: `<p>Bỏ 'e' cuối (write->writing). Gấp đôi phụ âm (run->running).</p>` },
+                "ed": { title: "Quy tắc thêm -ED", content: `<p>Tận cùng 'y' -> 'ied' (study->studied). Gấp đôi phụ âm (stop->stopped).</p>` },
+                "classify": { title: "Phân loại từ", content: `<p>Noun (Danh từ), Verb (Động từ), Adjective (Tính từ), Adverb (Trạng từ).</p>` }
             }
         };
 
-        // --- NEW: BILINGUAL TRANSLATIONS ---
-        const tenseTranslations = {
-            "Present Simple": "Hiện tại đơn",
-            "Present Continuous": "Hiện tại tiếp diễn",
-            "Present Perfect": "Hiện tại hoàn thành",
-            "Present Perfect Continuous": "HT hoàn thành tiếp diễn",
-            "Past Simple": "Quá khứ đơn",
-            "Past Continuous": "Quá khứ tiếp diễn",
-            "Past Perfect": "Quá khứ hoàn thành",
-            "Past Perfect Continuous": "QK hoàn thành tiếp diễn",
-            "Future Simple": "Tương lai đơn",
-            "Future Continuous": "Tương lai tiếp diễn",
-            "Future Perfect": "Tương lai hoàn thành",
-            "Future Perfect Continuous": "TL hoàn thành tiếp diễn"
-        };
-
-        const topicTranslations = {
-            "Daily Life": "Cuộc sống hàng ngày",
-            "Work & Business": "Công việc & Kinh doanh",
-            "Academic & IELTS": "Học thuật & IELTS",
-            "Travel & Food": "Du lịch & Ẩm thực",
-            "Technology": "Công nghệ",
-            "Health": "Sức khỏe",
-            "Education": "Giáo dục",
-            "Entertainment": "Giải trí",
-            "Environment": "Môi trường",
-            "Tenses (Mixed)": "Các thì (Tổng hợp)",
-            "Vocab (Context)": "Từ vựng (Theo ngữ cảnh)",
-            "Grammar (Cloze)": "Ngữ pháp (Điền từ)"
-        };
-
-        const formReadableNames = {
-            "irregular": "Irregular Verbs (Bất quy tắc)",
-            "irregular_v3": "Past Participle (Quá khứ phân từ)",
-            "noun_suffix": "Noun Suffixes (Hậu tố Danh từ)",
-            "adj_suffix": "Adjective Suffixes (Hậu tố Tính từ)",
-            "prefixes": "Prefixes (Tiền tố)",
-            "verb_noun": "Verb to Noun (Động từ → Danh từ)",
-            "noun_adj": "Noun to Adjective (Danh từ → Tính từ)",
-            "adj_adv": "Adjective to Adverb (Tính từ → Trạng từ)",
-            "ing": "-ING Ending (Đuôi -ING)",
-            "ed": "-ED Ending (Đuôi -ED)",
-            "classify": "Word Class (Phân loại từ)"
-        };
+        const tenseTranslations = { "Present Simple": "Hiện tại đơn", "Present Continuous": "Hiện tại tiếp diễn", "Present Perfect": "Hiện tại hoàn thành", "Present Perfect Continuous": "HT hoàn thành tiếp diễn", "Past Simple": "Quá khứ đơn", "Past Continuous": "Quá khứ tiếp diễn", "Past Perfect": "Quá khứ hoàn thành", "Past Perfect Continuous": "QK hoàn thành tiếp diễn", "Future Simple": "Tương lai đơn", "Future Continuous": "Tương lai tiếp diễn", "Future Perfect": "Tương lai hoàn thành", "Future Perfect Continuous": "TL hoàn thành tiếp diễn" };
+        const topicTranslations = { "Daily Life": "Cuộc sống hàng ngày", "Work & Business": "Công việc & Kinh doanh", "Academic & IELTS": "Học thuật & IELTS", "Travel & Food": "Du lịch & Ẩm thực", "Technology": "Công nghệ", "Tenses (Mixed)": "Các thì (Tổng hợp)", "Vocab (Context)": "Từ vựng (Theo ngữ cảnh)", "Grammar (Cloze)": "Ngữ pháp (Điền từ)" };
+        const formReadableNames = { "irregular": "Irregular Verbs (Bất quy tắc)", "irregular_v3": "Past Participle (Quá khứ phân từ)", "noun_suffix": "Noun Suffixes (Hậu tố Danh từ)", "adj_suffix": "Adjective Suffixes (Hậu tố Tính từ)", "prefixes": "Prefixes (Tiền tố)", "verb_noun": "Verb to Noun (Động từ → Danh từ)", "noun_adj": "Noun to Adjective (Danh từ → Tính từ)", "adj_adv": "Adjective to Adverb (Tính từ → Trạng từ)", "ing": "-ING Ending (Đuôi -ING)", "ed": "-ED Ending (Đuôi -ED)", "classify": "Word Class (Phân loại từ)" };
 
         let gameState = { mode: 'vocab', data: [], currentIdx: 0, score: 0, history: [], currentCorrect: "", currentOthers: [] };
         let theoryTab = 'grammar';
@@ -644,7 +585,6 @@
             modeCards: { vocab: document.getElementById('mode-vocab'), phrases: document.getElementById('mode-phrases'), idioms: document.getElementById('mode-idioms'), listening: document.getElementById('mode-listening'), reading: document.getElementById('mode-reading'), grammar: document.getElementById('mode-grammar'), forms: document.getElementById('mode-forms') }
         };
 
-        // --- UPDATED POPULATION LOGIC FOR DROPDOWNS ---
         if (els.inputs.grammarTense && offlineData.grammar) els.inputs.grammarTense.innerHTML = Object.keys(offlineData.grammar).map(t => `<option value="${t}">${t} (${tenseTranslations[t] || ''})</option>`).join('');
         if (els.inputs.vocabSelect && offlineData.vocab) els.inputs.vocabSelect.innerHTML = Object.keys(offlineData.vocab).map(t => `<option value="${t}">${t} (${topicTranslations[t] || ''})</option>`).join('');
         if (els.inputs.readingSelect && offlineData.reading) els.inputs.readingSelect.innerHTML = Object.keys(offlineData.reading).map(t => `<option value="${t}">${t} (${topicTranslations[t] || ''})</option>`).join('');
@@ -660,22 +600,62 @@
         const openTheoryModal = () => { toggleModal(els.theory.modal, els.theory.content, els.theory.backdrop, true); switchTheoryTab('grammar'); };
         const closeTheoryModal = () => toggleModal(els.theory.modal, els.theory.content, els.theory.backdrop, false);
 
-        function isVietnamese(str) { return /[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]/i.test(str); }
+        // --- ROBUST FETCH HELPERS ---
+        async function robustFetch(url, retries = 3) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const res = await fetch(url);
+                    if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
+                    return await res.json();
+                } catch (e) {
+                    if (i === retries - 1) throw e;
+                    await new Promise(r => setTimeout(r, 1000 * (i + 1)));
+                }
+            }
+        }
 
-        // --- FIXED: DICTIONARY LOGIC ---
+        async function callGeminiWithRetry(payload, key, retries = 3) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${key}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    const data = await res.json();
+
+                    if (data.error) throw new Error(data.error.message);
+                    if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) throw new Error("AI returned empty content");
+
+                    let rawText = data.candidates[0].content.parts[0].text;
+                    rawText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
+                    const parsed = JSON.parse(rawText);
+                    return parsed;
+
+                } catch (e) {
+                    console.warn(`AI Attempt ${i + 1} failed: ${e.message}`);
+                    if (i === retries - 1) throw e;
+                    const loadingText = document.getElementById('loadingText');
+                    if(loadingText && !loadingText.parentElement.classList.contains('hidden')) {
+                        loadingText.textContent = `ĐANG THỬ LẠI (${i+1}/${retries})...`;
+                    }
+                    await new Promise(r => setTimeout(r, 1500 * (i + 1)));
+                }
+            }
+        }
+
+        function isVietnamese(str) {
+            return /[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]/i.test(str);
+        }
+
         const lookupDictionary = async () => {
             const word = els.dict.input.value.trim();
             if (!word) return;
-
             els.dict.result.innerHTML = '<div class="flex flex-col items-center justify-center h-48"><div class="loader mb-2"></div><p class="text-xs text-gray-500 font-bold">Đang tra cứu...</p></div>';
 
             try {
-                // Logic 1: Vietnamese -> English
                 if (isVietnamese(word)) {
-                    const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(word)}&langpair=vi|en`;
-                    const res = await fetch(url);
-                    const data = await res.json();
-
+                    const data = await robustFetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(word)}&langpair=vi|en`);
                     if (data.responseStatus === 200) {
                         els.dict.result.innerHTML = `
                             <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 animate-fadeIn">
@@ -689,80 +669,30 @@
                     } else {
                         els.dict.result.innerHTML = `<div class="p-4 text-center text-red-400 font-bold">Không tìm thấy bản dịch.</div>`;
                     }
-                }
-                // Logic 2: English -> Vietnamese + Definition
-                else {
+                } else {
                     let freeApiData = null;
                     let translation = null;
 
-                    // 2a. Fetch Definition (English)
-                    try {
-                        const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
-                        if (res.ok) {
-                            const data = await res.json();
-                            freeApiData = data[0];
-                        }
-                    } catch (e) {}
-
-                    // 2b. Fetch Translation (En -> Vi)
-                    try {
-                        const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(word)}&langpair=en|vi`;
-                        const res = await fetch(url);
-                        const data = await res.json();
-                        if (data.responseStatus === 200) {
-                            translation = data.responseData.translatedText;
-                        }
-                    } catch (e) {}
+                    try { const dictData = await robustFetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`); freeApiData = dictData[0]; } catch (e) {}
+                    try { const transData = await robustFetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(word)}&langpair=en|vi`); if (transData.responseStatus === 200) translation = transData.responseData.translatedText; } catch (e) {}
 
                     if (!freeApiData && !translation) {
                         els.dict.result.innerHTML = `<div class="text-center p-4 text-gray-400 font-medium">Không tìm thấy từ này.</div>`;
                         return;
                     }
 
-                    let html = `<div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 animate-fadeIn">
-                        <div class="flex items-center justify-between mb-2">
-                            <h2 class="text-3xl font-black text-gray-800 capitalize">${freeApiData ? freeApiData.word : word}</h2>`;
-
-                    if (freeApiData) {
-                        const audioSrc = freeApiData.phonetics.find(p => p.audio)?.audio;
-                        if (audioSrc) {
-                            html += `<button onclick="new Audio('${audioSrc}').play()" class="w-10 h-10 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center hover:bg-orange-200 transition-colors"><i class="fas fa-volume-up"></i></button>`;
-                        }
-                    }
+                    let html = `<div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 animate-fadeIn"><div class="flex items-center justify-between mb-2"><h2 class="text-3xl font-black text-gray-800 capitalize">${freeApiData ? freeApiData.word : word}</h2>`;
+                    if (freeApiData) { const audioSrc = freeApiData.phonetics.find(p => p.audio)?.audio; if (audioSrc) { html += `<button onclick="new Audio('${audioSrc}').play()" class="w-10 h-10 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center hover:bg-orange-200 transition-colors"><i class="fas fa-volume-up"></i></button>`; } }
                     html += `</div>`;
-
-                    if (freeApiData) {
-                        const phonetic = freeApiData.phonetic || (freeApiData.phonetics.find(p => p.text)?.text) || "";
-                        html += `<p class="text-orange-500 font-mono text-sm mb-6 font-bold">${phonetic}</p>`;
-                    }
-
-                    if (translation) {
-                        html += `<div class="mb-6 bg-green-50 p-4 rounded-2xl border border-green-100">
-                            <p class="text-[10px] text-green-800 font-black uppercase tracking-widest mb-1">NGHĨA TIẾNG VIỆT</p>
-                            <p class="text-xl font-bold text-gray-800">${translation}</p>
-                        </div>`;
-                    }
-
-                    if (freeApiData && freeApiData.meanings) {
-                        html += `<div class="mb-2">
-                            <h3 class="font-bold text-gray-700 text-sm uppercase tracking-wider border-b border-gray-100 pb-2 mb-3">Định nghĩa (Anh-Anh)</h3>
-                            <ul class="list-disc pl-5 text-sm text-gray-600 space-y-2 leading-relaxed">`;
-
-                        // Limit to first 3 definitions of the first meaning to keep it compact
-                        const defs = freeApiData.meanings[0].definitions.slice(0, 3);
-                        defs.forEach(d => {
-                            html += `<li>${d.definition}</li>`;
-                        });
-
-                        html += `</ul></div>`;
-                    }
-
+                    if (freeApiData) { const phonetic = freeApiData.phonetic || (freeApiData.phonetics.find(p => p.text)?.text) || ""; html += `<p class="text-orange-500 font-mono text-sm mb-6 font-bold">${phonetic}</p>`; }
+                    if (translation) { html += `<div class="mb-6 bg-green-50 p-4 rounded-2xl border border-green-100"><p class="text-[10px] text-green-800 font-black uppercase tracking-widest mb-1">NGHĨA TIẾNG VIỆT</p><p class="text-xl font-bold text-gray-800">${translation}</p></div>`; }
+                    if (freeApiData && freeApiData.meanings) { html += `<div class="mb-2"><h3 class="font-bold text-gray-700 text-sm uppercase tracking-wider border-b border-gray-100 pb-2 mb-3">Định nghĩa (Anh-Anh)</h3><ul class="list-disc pl-5 text-sm text-gray-600 space-y-2 leading-relaxed">`; const defs = freeApiData.meanings[0].definitions.slice(0, 3); defs.forEach(d => { html += `<li>${d.definition}</li>`; }); html += `</ul></div>`; }
                     html += `</div>`;
                     els.dict.result.innerHTML = html;
                 }
             } catch (e) {
                 console.error(e);
-                els.dict.result.innerHTML = `<div class="text-center p-4 text-red-500 font-bold">Lỗi kết nối hoặc hết lượt tra cứu miễn phí.</div>`;
+                els.dict.result.innerHTML = `<div class="text-center p-4 text-red-500 font-bold">Lỗi kết nối hoặc API quá tải.</div>`;
             }
         };
 
@@ -775,159 +705,59 @@
             els.theory.detail.classList.add('hidden');
             const dataSrc = tab === 'grammar' ? offlineData.grammar : offlineData.forms;
             const container = tab === 'grammar' ? els.theory.listGrammar : els.theory.listForms;
-            container.innerHTML = Object.keys(dataSrc).map(t =>
-                `<div onclick="loadTheory('${t}', '${tab}')" class="p-4 bg-white rounded-2xl shadow-sm border border-gray-100 cursor-pointer hover:bg-gray-50 active:scale-[0.98] transition-all flex justify-between items-center group">
-                    <span class="font-bold text-gray-700 group-hover:text-indigo-600 transition-colors">
-                        ${tab === 'forms' ? (formReadableNames[t] || t) : `${t} <span class="text-xs font-normal text-gray-500 ml-1">(${tenseTranslations[t] || ''})</span>`}
-                    </span>
-                    <i class="fas fa-chevron-right text-gray-300 text-xs"></i>
-                </div>`
-            ).join('');
+            container.innerHTML = Object.keys(dataSrc).map(t => `<div onclick="loadTheory('${t}', '${tab}')" class="p-4 bg-white rounded-2xl shadow-sm border border-gray-100 cursor-pointer hover:bg-gray-50 active:scale-[0.98] transition-all flex justify-between items-center group"><span class="font-bold text-gray-700 group-hover:text-indigo-600 transition-colors">${tab === 'forms' ? (formReadableNames[t] || t) : `${t} <span class="text-xs font-normal text-gray-500 ml-1">(${tenseTranslations[t] || ''})</span>`}</span><i class="fas fa-chevron-right text-gray-300 text-xs"></i></div>`).join('');
         };
         const backToTheoryList = () => { els.theory.detail.classList.add('hidden'); if(theoryTab === 'grammar') els.theory.listGrammar.classList.remove('hidden'); else els.theory.listForms.classList.remove('hidden'); };
 
-        // --- NEW: RENDER FUNCTION FOR AI THEORY ---
         const renderTheoryAI = (data) => {
-            // data is JSON object: { title, definition, formulas: [], usages: [], signs: "", examples: [] }
-            let html = `
-                <div class="animate-fadeIn">
-                    <h2 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-500 mb-4 border-b pb-4">${data.title || "Lý thuyết"}</h2>
-            `;
-
-            if(data.definition) {
-                html += `
-                    <div class="mb-6">
-                        <p class="text-gray-700 text-sm leading-relaxed font-medium">${data.definition}</p>
-                    </div>
-                `;
-            }
-
-            if(data.formulas && data.formulas.length > 0) {
-                html += `<h3 class="text-sm font-bold text-indigo-800 mb-3 flex items-center gap-2"><i class="fas fa-flask text-indigo-500"></i> Công thức</h3>`;
-                html += `<div class="space-y-2 mb-6">`;
-                data.formulas.forEach(f => {
-                    let icon = '•';
-                    let color = 'text-gray-700';
-                    if(f.type === 'affirmative' || f.type.includes('+')) { icon = '(+)'; color = 'text-green-600'; }
-                    else if(f.type === 'negative' || f.type.includes('-')) { icon = '(-)'; color = 'text-red-500'; }
-                    else if(f.type === 'question' || f.type.includes('?')) { icon = '(?)'; color = 'text-blue-500'; }
-
-                    html += `
-                        <div class="bg-indigo-50/50 p-3 rounded-xl border border-indigo-100 flex items-start gap-3">
-                            <span class="${color} font-black text-sm pt-0.5 whitespace-nowrap">${icon}</span>
-                            <span class="font-mono text-sm text-indigo-900 font-bold">${f.formula || f.structure}</span>
-                        </div>
-                    `;
-                });
-                html += `</div>`;
-            }
-
-            if(data.rules && data.rules.length > 0) { // For Word Forms
-                 html += `<h3 class="text-sm font-bold text-green-800 mb-3 flex items-center gap-2"><i class="fas fa-gavel text-green-500"></i> Quy tắc</h3>`;
-                 html += `<div class="space-y-2 mb-6">`;
-                 data.rules.forEach(r => {
-                     html += `
-                        <div class="bg-green-50 p-3 rounded-xl border border-green-100">
-                             <div class="font-bold text-gray-800 text-sm mb-1">${r.rule}</div>
-                             ${r.example ? `<div class="text-xs text-gray-500 italic">VD: ${r.example}</div>` : ''}
-                        </div>
-                     `;
-                 });
-                 html += `</div>`;
-            }
-
-            if(data.usages && data.usages.length > 0) {
-                html += `<h3 class="text-sm font-bold text-orange-800 mb-3 flex items-center gap-2"><i class="fas fa-list-ul text-orange-500"></i> Cách dùng</h3>`;
-                html += `<ul class="space-y-2 mb-6">`;
-                data.usages.forEach(u => {
-                    html += `<li class="flex items-start gap-2 text-sm text-gray-700 bg-orange-50/50 p-2 rounded-lg border border-orange-100"><i class="fas fa-check-circle text-orange-400 mt-0.5 text-xs"></i> <span>${u}</span></li>`;
-                });
-                html += `</ul>`;
-            }
-
-            if(data.signs) {
-                html += `<h3 class="text-sm font-bold text-purple-800 mb-3 flex items-center gap-2"><i class="fas fa-eye text-purple-500"></i> Dấu hiệu nhận biết</h3>`;
-                html += `<div class="bg-purple-50 p-3 rounded-xl border border-purple-100 text-sm text-purple-900 font-medium italic mb-6">${data.signs}</div>`;
-            }
-
-            if(data.examples && data.examples.length > 0) {
-                 html += `<h3 class="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2"><i class="fas fa-quote-left text-gray-400"></i> Ví dụ</h3>`;
-                 html += `<div class="grid gap-2">`;
-                 data.examples.forEach(ex => {
-                     html += `
-                        <div class="border-l-4 border-gray-200 pl-3 py-1">
-                            <div class="text-sm font-bold text-gray-800">${ex.en}</div>
-                            <div class="text-xs text-gray-500">${ex.vi}</div>
-                        </div>
-                     `;
-                 });
-                 html += `</div>`;
-            }
-
-            html += `</div>`;
-            return html;
+            let html = `<div class="animate-fadeIn"><h2 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-500 mb-4 border-b pb-4">${data.title || "Lý thuyết"}</h2>`;
+            if(data.definition) { html += `<div class="mb-6"><p class="text-gray-700 text-sm leading-relaxed font-medium">${data.definition}</p></div>`; }
+            if(data.formulas && data.formulas.length > 0) { html += `<h3 class="text-sm font-bold text-indigo-800 mb-3 flex items-center gap-2"><i class="fas fa-flask text-indigo-500"></i> Công thức</h3><div class="space-y-2 mb-6">`; data.formulas.forEach(f => { let icon = '•'; let color = 'text-gray-700'; if(f.type === 'affirmative' || f.type.includes('+')) { icon = '(+)'; color = 'text-green-600'; } else if(f.type === 'negative' || f.type.includes('-')) { icon = '(-)'; color = 'text-red-500'; } else if(f.type === 'question' || f.type.includes('?')) { icon = '(?)'; color = 'text-blue-500'; } html += `<div class="bg-indigo-50/50 p-3 rounded-xl border border-indigo-100 flex items-start gap-3"><span class="${color} font-black text-sm pt-0.5 whitespace-nowrap">${icon}</span><span class="font-mono text-sm text-indigo-900 font-bold">${f.formula || f.structure}</span></div>`; }); html += `</div>`; }
+            if(data.rules && data.rules.length > 0) { html += `<h3 class="text-sm font-bold text-green-800 mb-3 flex items-center gap-2"><i class="fas fa-gavel text-green-500"></i> Quy tắc</h3><div class="space-y-2 mb-6">`; data.rules.forEach(r => { html += `<div class="bg-green-50 p-3 rounded-xl border border-green-100"><div class="font-bold text-gray-800 text-sm mb-1">${r.rule}</div>${r.example ? `<div class="text-xs text-gray-500 italic">VD: ${r.example}</div>` : ''}</div>`; }); html += `</div>`; }
+            if(data.usages && data.usages.length > 0) { html += `<h3 class="text-sm font-bold text-orange-800 mb-3 flex items-center gap-2"><i class="fas fa-list-ul text-orange-500"></i> Cách dùng</h3><ul class="space-y-2 mb-6">`; data.usages.forEach(u => { html += `<li class="flex items-start gap-2 text-sm text-gray-700 bg-orange-50/50 p-2 rounded-lg border border-orange-100"><i class="fas fa-check-circle text-orange-400 mt-0.5 text-xs"></i> <span>${u}</span></li>`; }); html += `</ul>`; }
+            if(data.signs) { html += `<h3 class="text-sm font-bold text-purple-800 mb-3 flex items-center gap-2"><i class="fas fa-eye text-purple-500"></i> Dấu hiệu nhận biết</h3><div class="bg-purple-50 p-3 rounded-xl border border-purple-100 text-sm text-purple-900 font-medium italic mb-6">${data.signs}</div>`; }
+            if(data.examples && data.examples.length > 0) { html += `<h3 class="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2"><i class="fas fa-quote-left text-gray-400"></i> Ví dụ</h3><div class="grid gap-2">`; data.examples.forEach(ex => { html += `<div class="border-l-4 border-gray-200 pl-3 py-1"><div class="text-sm font-bold text-gray-800">${ex.en}</div><div class="text-xs text-gray-500">${ex.vi}</div></div>`; }); html += `</div>`; }
+            html += `</div>`; return html;
         }
-
 
         const loadTheory = async (topic, type) => {
             els.theory.listGrammar.classList.add('hidden'); els.theory.listForms.classList.add('hidden'); els.theory.detail.classList.remove('hidden');
             els.theory.contentText.innerHTML = '<div class="flex flex-col items-center justify-center h-48"><div class="loader mb-2"></div><p class="text-xs text-gray-500 font-bold">Đang tải kiến thức...</p></div>';
             const key = getApiKey(); const friendlyName = formReadableNames[topic] || topic;
+
+            // Artificial delay for UX
             setTimeout(async () => {
                 if (key) {
                     try {
                         let prompt = "";
                         if (type === 'forms') {
-                            prompt = `Generate theory for Word Forms: "${friendlyName}".
-                            Return ONLY Valid JSON. No Markdown. Structure:
-                            {
-                                "title": "${friendlyName}",
-                                "definition": "Short definition in Vietnamese",
-                                "rules": [{"rule": "Rule description in Vietnamese", "example": "English example"}],
-                                "examples": [{"en": "Sentence example", "vi": "Vietnamese meaning"}]
-                            }`;
+                            prompt = `Generate theory for Word Forms: "${friendlyName}". Return ONLY Valid JSON. Structure: { "title": "${friendlyName}", "definition": "...", "rules": [{"rule": "...", "example": "..."}], "examples": [{"en": "...", "vi": "..."}] }`;
                         } else {
-                            prompt = `Generate theory for English Grammar: "${topic}".
-                            Return ONLY Valid JSON. No Markdown. Structure:
-                            {
-                                "title": "Vietnamese Title",
-                                "definition": "Short definition in Vietnamese",
-                                "formulas": [{"type": "affirmative(+)/negative(-)/question(?)", "formula": "S + ..."}],
-                                "usages": ["Usage 1 in Vietnamese", "Usage 2..."],
-                                "signs": "Signal words (e.g. always, yesterday)",
-                                "examples": [{"en": "Sentence", "vi": "Meaning"}]
-                            }`;
+                            prompt = `Generate theory for English Grammar: "${topic}". Return ONLY Valid JSON. Structure: { "title": "Vietnamese Title", "definition": "...", "formulas": [{"type": "affirmative(+)/negative(-)/question(?)", "formula": "..."}], "usages": ["..."], "signs": "...", "examples": [{"en": "...", "vi": "..."}] }`;
                         }
 
-                        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${key}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }) });
-                        const data = await res.json();
-                        let raw = data.candidates[0].content.parts[0].text.replace(/```json|```/g, '').trim();
-                        const jsonData = JSON.parse(raw);
-
-                        // Use the new Renderer
+                        const jsonData = await callGeminiWithRetry({ contents: [{ parts: [{ text: prompt }] }] }, key);
                         els.theory.contentText.innerHTML = renderTheoryAI(jsonData);
-                        return;
+
                     } catch(e) {
                         console.error(e);
-                        els.theory.contentText.innerHTML = `<div class="text-center p-4 text-red-500">Lỗi khi tải dữ liệu. <br><span class="text-xs text-gray-400">${e.message}</span></div>`;
+                        els.theory.contentText.innerHTML = `<div class="text-center p-4 text-red-500 font-bold">Lỗi khi tải dữ liệu từ AI.<br><span class="text-xs font-normal text-gray-500">${e.message}</span><br><button onclick="loadTheory('${topic}', '${type}')" class="mt-4 bg-indigo-100 text-indigo-700 px-4 py-2 rounded-lg text-xs font-bold">Thử lại</button></div>`;
                     }
                 } else {
-                    // Fallback Offline
                     const offlineContent = offlineData.theory[topic];
-                    els.theory.contentText.innerHTML = offlineContent ? `<h2 class="text-2xl font-black text-indigo-900 mb-6 border-b pb-4">${offlineContent.title}</h2>${offlineContent.content}` : `<div class="text-center p-8"><h2 class="text-xl font-bold text-gray-400 mb-2">${friendlyName}</h2><p class="text-gray-400 text-sm">Nội dung offline chưa cập nhật. Vui lòng nhập API Key để tải từ AI.</p></div>`;
+                    els.theory.contentText.innerHTML = offlineContent ? `<h2 class="text-2xl font-black text-indigo-900 mb-6 border-b pb-4">${offlineContent.title}</h2>${offlineContent.content}` : `<div class="text-center p-8"><h2 class="text-xl font-bold text-gray-400 mb-2">${friendlyName}</h2><p class="text-gray-400 text-sm">Nội dung offline chưa cập nhật đầy đủ cho phần này.</p></div>`;
                 }
             }, 300);
         };
 
-        const showLoading = (b) => els.loading.overlay.classList.toggle('hidden', !b);
+        const showLoading = (b) => {
+            els.loading.overlay.classList.toggle('hidden', !b);
+            if(b) els.loading.text.textContent = "ĐANG XỬ LÝ...";
+        };
         const updateLevel = (val, el) => { document.getElementById('levelSelect').value = val; document.querySelectorAll('.level-card').forEach(c => { c.classList.remove('selected', 'bg-yellow-50', 'border-yellow-400'); c.classList.add('bg-gray-50', 'border-transparent'); }); el.classList.add('selected'); };
 
-        const setMode = (m) => { /* ... existing setMode code ... */
-             // 1. Update Mode Cards UI (Grid)
-            Object.keys(els.modeCards).forEach(key => {
-                if (key === m) els.modeCards[key].classList.add('active');
-                else els.modeCards[key].classList.remove('active');
-            });
+        const setMode = (m) => { /* ... existing setMode ... */
+            Object.keys(els.modeCards).forEach(key => { if (key === m) els.modeCards[key].classList.add('active'); else els.modeCards[key].classList.remove('active'); });
             els.views.sharedInput.classList.add('hidden'); els.views.reading.classList.add('hidden'); els.views.grammar.classList.add('hidden'); els.views.forms.classList.add('hidden');
             if (m === 'vocab' || m === 'listening' || m === 'phrases' || m === 'idioms') {
                 els.views.sharedInput.classList.remove('hidden');
@@ -943,8 +773,8 @@
         const switchScreen = (s) => { Object.values(els.screens).forEach(e => e.classList.add('hidden')); els.screens[s].classList.remove('hidden'); };
         const resetGame = () => { document.body.classList.remove('keyboard-active'); switchScreen('start'); };
 
-        const updateUI = () => { /* ... existing updateUI code ... */
-            const item = gameState.data[gameState.currentIdx];
+        const updateUI = () => { /* ... existing updateUI ... */
+             const item = gameState.data[gameState.currentIdx];
             els.game.qNum.textContent = gameState.currentIdx + 1;
             els.game.progress.style.width = `${((gameState.currentIdx + 1) / gameState.data.length) * 100}%`;
             els.inputs.answer.value = "";
@@ -976,9 +806,9 @@
             }
             else if (gameState.mode === 'grammar') { els.game.display.textContent = item.question; els.game.instruction.textContent = "TYPE THE CONJUGATED VERB"; els.game.subDisplay.textContent = item.verb ? `Verb: (${item.verb})` : ""; els.game.subDisplay.classList.remove('hidden'); gameState.currentCorrect = item.answer; gameState.currentOthers = item.others ? item.others.split(',').map(s => s.trim().toLowerCase()) : []; }
             else if (gameState.mode === 'forms') { els.game.display.textContent = item.question; els.game.instruction.textContent = "WORD FORM"; els.game.subDisplay.classList.add('hidden'); gameState.currentCorrect = item.answer; gameState.currentOthers = []; }
-         };
+        };
 
-        const checkAnswer = () => { /* ... existing checkAnswer code ... */
+        const checkAnswer = () => { /* ... existing checkAnswer ... */
             const user = els.inputs.answer.value.trim().toLowerCase();
             if(!user) { if(els.checkBtn.classList.contains('btn-expanded')) { els.checkBtn.classList.add('animate-pulse'); setTimeout(()=>els.checkBtn.classList.remove('animate-pulse'), 200); } return; }
             if (gameState.currentIdx >= gameState.data.length) return;
@@ -995,7 +825,7 @@
             els.feedback.overlay.classList.remove('hidden'); document.activeElement?.blur();
         };
 
-        const finishGame = () => { /* ... existing finishGame code ... */
+        const finishGame = () => { /* ... existing finishGame ... */
              document.getElementById('finalScore').textContent = gameState.score;
             document.getElementById('totalScoreQ').textContent = gameState.data.length;
             document.getElementById('resultList').innerHTML = gameState.history.map(h => `<div class="p-4 border-b border-gray-100 flex gap-4 items-center last:border-0"><div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${h.ok ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-500'} font-bold text-lg">${h.ok?'<i class="fas fa-check"></i>':'<i class="fas fa-times"></i>'}</div><div class="flex-1 min-w-0"><div class="text-xs font-bold text-gray-400 mb-1 truncate">${h.q}</div><div class="font-black text-gray-800 text-base">${h.a}</div>${!h.ok ? `<div class="text-sm font-medium text-red-400 line-through mt-0.5">${h.u}</div>` : ''}</div></div>`).join('');
@@ -1004,24 +834,21 @@
 
         const nextQuestion = () => { els.feedback.overlay.classList.add('hidden'); gameState.currentIdx++; if(gameState.currentIdx >= gameState.data.length) finishGame(); else updateUI(); };
         const startGame = () => { gameState.currentIdx = 0; gameState.score = 0; gameState.history = []; els.game.totalQ.textContent = gameState.data.length; switchScreen('game'); updateUI(); };
-
         const getRandomTopic = () => { const topics = ['Daily Life', 'Travel', 'Work', 'Technology', 'Health', 'Education', 'Entertainment', 'Environment', 'Food & Drink']; return topics[Math.floor(Math.random() * topics.length)]; };
-        const fetchAIWithRetry = async (payload, key, retries = 3) => { /* ... existing fetchAIWithRetry ... */
-            for (let i = 0; i < retries; i++) {
-                try {
-                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${key}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
-                    const data = await res.json(); if(data.error) throw new Error(data.error.message);
-                    let rawText = data.candidates[0].content.parts[0].text; rawText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
-                    const parsed = JSON.parse(rawText); if(!Array.isArray(parsed) || parsed.length === 0) throw new Error("Invalid JSON Array Structure");
-                    return parsed;
-                } catch (e) { console.warn(`Attempt ${i+1}/${retries} failed: ${e.message}`); if (i === retries - 1) throw e; await new Promise(resolve => setTimeout(resolve, 800)); }
-            }
-        };
 
-        const generateContent = async (type) => { /* ... existing generateContent ... */
-             const key = getApiKey(); const qty = parseInt(els.config.qtyInput.value); const level = els.config.level.value;
+        const generateContent = async (type) => {
+             const key = getApiKey(); const qty = parseInt(els.config.qtyInput.value); const rawLevel = els.config.level.value;
             showLoading(true); gameState.mode = type;
             let displayTitle = "Offline Data";
+
+            // IMPROVED LEVEL MAPPING FOR AI
+            let levelPrompt = "";
+            if (rawLevel === 'Level A') levelPrompt = "CEFR A1-A2 (Beginner). Very basic words, simple sentences.";
+            else if (rawLevel === 'Level B') levelPrompt = "CEFR B1-B2 (Intermediate). Conversational, standard vocabulary.";
+            else if (rawLevel === 'Level C') levelPrompt = "CEFR C1-C2 (Advanced). Sophisticated vocabulary, complex sentence structures.";
+            else if (rawLevel === 'TOEIC') levelPrompt = "TOEIC Business English. Workplace context, formal tone. Focus on office scenarios.";
+            else if (rawLevel === 'IELTS') levelPrompt = "IELTS Academic Band 7.5+. Advanced/Academic vocabulary (C1-C2). Complex grammatical structures. Avoid common/simple words. Focus on formal/academic context.";
+            else levelPrompt = `Level ${rawLevel}`;
 
             if(key) {
                 try {
@@ -1029,36 +856,29 @@
                     let rawInput = (els.inputs.vocabTopic.value || els.inputs.readingTopic.value || els.inputs.readingSelect.value || "").trim();
                     context = rawInput || getRandomTopic();
 
-                    if (type === 'vocab') { prompt = `Generate ${qty} SINGLE English vocabulary words...`; } // Simplified for brevity
-                    else if (type === 'phrases') { prompt = `Generate ${qty} English PHRASAL VERBS...`; }
-                    else if (type === 'idioms') { prompt = `Generate ${qty} English IDIOMS...`; }
-                    else if (type === 'listening') { prompt = `Generate ${qty} English vocabulary words...`; }
-                    else if (type === 'reading') { prompt = `Generate ${qty} SHORT reading comprehension...`; }
-                    else if (type === 'grammar') { context = els.inputs.grammarTense.value; prompt = `Generate ${qty} grammar questions...`; }
-                    else if (type === 'forms') { context = els.inputs.formsType.value; const friendlyName = formReadableNames[context] || context; prompt = `Generate ${qty} Word Form questions...`; }
-
-                    // Actual Full Prompts Restore (Crucial for functionality)
-                     if (type === 'vocab') prompt = `Generate ${qty} SINGLE English vocabulary words (no phrases, no idioms) for topic '${context}'. IMPORTANT: 'en' MUST be a single word. 'vi' is Vietnamese meaning. LEVEL: ${level}. Format: JSON Array [{"vi": "...", "en": "...", "others": "synonyms"}]`;
-                    if (type === 'phrases') prompt = `Generate ${qty} English PHRASAL VERBS or COLLOCATIONS for topic '${context}'. IMPORTANT: 'en' MUST be a phrase. 'vi' is Vietnamese meaning. LEVEL: ${level}. Format: JSON Array [{"vi": "...", "en": "...", "others": "synonyms"}]`;
+                     if (type === 'vocab') prompt = `Generate ${qty} SINGLE English vocabulary words (no phrases, no idioms) for topic '${context}'. IMPORTANT: 'en' MUST be a single word. 'vi' is Vietnamese meaning. LEVEL INSTRUCTION: ${levelPrompt}. Format: JSON Array [{"vi": "...", "en": "...", "others": "synonyms"}]`;
+                    if (type === 'phrases') prompt = `Generate ${qty} English PHRASAL VERBS or COLLOCATIONS for topic '${context}'. IMPORTANT: 'en' MUST be a phrase. 'vi' is Vietnamese meaning. LEVEL INSTRUCTION: ${levelPrompt}. Format: JSON Array [{"vi": "...", "en": "...", "others": "synonyms"}]`;
                     if (type === 'idioms') prompt = `Generate ${qty} English IDIOMS or PROVERBS for topic '${context}' or general use. IMPORTANT: 'en' is the idiom. 'vi' is the Vietnamese meaning. Format: JSON Array [{"vi": "...", "en": "...", "others": "literal meaning if needed"}]`;
-                    if (type === 'listening') prompt = `Generate ${qty} English vocabulary words/phrases for listening practice on topic '${context}'. LEVEL: ${level}. Format: JSON Array [{"vi": "...", "en": "...", "others": "..."}]`;
-                    if (type === 'reading') prompt = `Generate ${qty} SHORT reading comprehension questions for topic '${context}'. IMPORTANT: Passage, Question, Answers, Options MUST be in English. IMPORTANT: 'explanation' MUST be in VIETNAMESE. LEVEL: ${level}. Mix types: mc, tf, cloze. Format: JSON Array [{"passage": "...", "question": "...", "answer": "...", "options": ["..."], "type": "mc", "explanation": "..."}]`;
-                    if (type === 'grammar') { context = els.inputs.grammarTense.value; prompt = `Generate ${qty} English grammar questions specifically about '${context}'. LEVEL: ${level}. RULES: 1. 'question' has blank '___' and base verb in parens. 2. 'answer' is ONLY conjugated verb. 3. 'explanation' in VIETNAMESE. Format: JSON Array [{"question": "...", "verb": "...", "answer": "...", "others": "...", "explanation": "..."}]`; }
-                    if (type === 'forms') { context = els.inputs.formsType.value; const friendlyName = formReadableNames[context] || context; prompt = `Generate ${qty} Word Form exercises for '${friendlyName}'. LEVEL: ${level}. 'explanation' in VIETNAMESE. Format: JSON Array [{"question": "...", "answer": "...", "explanation": "..."}]`; }
+                    if (type === 'listening') prompt = `Generate ${qty} English vocabulary words/phrases for listening practice on topic '${context}'. LEVEL INSTRUCTION: ${levelPrompt}. Format: JSON Array [{"vi": "...", "en": "...", "others": "..."}]`;
+                    if (type === 'reading') prompt = `Generate ${qty} SHORT reading comprehension questions for topic '${context}'. IMPORTANT: Passage, Question, Answers, Options MUST be in English. IMPORTANT: 'explanation' MUST be in VIETNAMESE. LEVEL INSTRUCTION: ${levelPrompt}. If IELTS/Advanced, use inference questions, not just finding text. Format: JSON Array [{"passage": "...", "question": "...", "answer": "...", "options": ["..."], "type": "mc", "explanation": "..."}]`;
+                    if (type === 'grammar') { context = els.inputs.grammarTense.value; prompt = `Generate ${qty} English grammar questions specifically about '${context}'. LEVEL INSTRUCTION: ${levelPrompt}. RULES: 1. 'question' has blank '___' and base verb in parens. 2. 'answer' is ONLY conjugated verb. 3. 'explanation' in VIETNAMESE. Format: JSON Array [{"question": "...", "verb": "...", "answer": "...", "others": "...", "explanation": "..."}]`; }
+                    if (type === 'forms') { context = els.inputs.formsType.value; const friendlyName = formReadableNames[context] || context; prompt = `Generate ${qty} Word Form exercises for '${friendlyName}'. LEVEL INSTRUCTION: ${levelPrompt}. 'explanation' in VIETNAMESE. Format: JSON Array [{"question": "...", "answer": "...", "explanation": "..."}]`; }
 
-                    gameState.data = await fetchAIWithRetry({ contents: [{ parts: [{ text: prompt + " RETURN PURE JSON ARRAY ONLY. NO MARKDOWN." }] }] }, key);
+                    const payload = { contents: [{ parts: [{ text: prompt + " RETURN PURE JSON ARRAY ONLY. NO MARKDOWN." }] }] };
+                    gameState.data = await callGeminiWithRetry(payload, key);
 
-                    // --- NEW: TRANSLATE GAME TITLE ---
                     if (type === 'forms') displayTitle = formReadableNames[context] || context;
                     else if (type === 'grammar') displayTitle = `${context} (${tenseTranslations[context] || ''})`;
                     else if (type === 'reading' || type === 'vocab') displayTitle = `${context} (${topicTranslations[context] || ''})`;
                     else displayTitle = context;
 
-                    // Clean up title (remove double parens if any)
                     displayTitle = displayTitle.replace(/\(\)/g, '').trim();
 
                     els.game.title.textContent = `${type.toUpperCase()}: ${displayTitle} (AI)`; startGame(); showLoading(false); return;
-                } catch(e) { console.error("Online generation failed:", e); }
+                } catch(e) {
+                    console.error("Online generation failed:", e);
+                    alert(`Không thể tải dữ liệu từ AI sau nhiều lần thử. \nLỗi: ${e.message}\nĐang chuyển sang chế độ Offline.`);
+                }
             }
 
             // Offline Fallback
