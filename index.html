@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
-    <title>AI Tutor: v1.2.1 (Server Mode)</title>
+    <title>AI Tutor: v1.2.6 (Server Logic Fixed)</title>
 
     <!-- PWA Setup -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -14,6 +14,7 @@
     <link rel="apple-touch-icon" id="apple-icon" href="">
     <link rel="icon" id="fav-icon" type="image/png" href="">
 
+    <!-- FIX: Removed Markdown formatting from URLs -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -112,7 +113,7 @@
         .speaker-pulse { animation: speakerPulse 1.5s infinite; }
         @keyframes speakerPulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); } 70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(245, 158, 11, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); } }
 
-        .ai-status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+        .ai-status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
         .status-online { background-color: #10B981; box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2); }
         .status-offline { background-color: #9CA3AF; box-shadow: 0 0 0 2px rgba(156, 163, 175, 0.2); }
 
@@ -180,9 +181,9 @@
                     <div class="flex items-baseline gap-1">
                         <h1 class="text-xl font-extrabold text-yellow-900 tracking-tight flex items-center gap-1"><span class="text-2xl filter drop-shadow-sm">🥑</span> AI Tutor</h1>
                     </div>
-                    <div id="aiStatusBadge" class="flex items-center text-[10px] font-bold text-gray-400 leading-none mt-0.5 ml-1">
-                        <span id="aiStatusDot" class="ai-status-dot status-online"></span>
-                        <span id="aiStatusText">ONLINE (SERVER)</span>
+                    <!-- Minimalist Status: Just the Dot -->
+                    <div id="aiStatusBadge" class="flex items-center mt-1 ml-1" title="Server Status">
+                        <span id="aiStatusDot" class="ai-status-dot status-offline"></span>
                     </div>
                 </div>
             </div>
@@ -300,9 +301,10 @@
                         <input type="range" id="quantityRange" min="5" max="30" step="5" value="10" class="w-full h-1.5 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-yellow-500 hover:accent-yellow-400">
                     </div>
 
-                    <!-- SUBTLE VERSION INDICATOR -->
-                    <div class="w-full flex justify-end mt-1 pr-1">
-                        <span class="text-[0.5rem] text-gray-300 font-mono select-none">v1.2.1 (Server)</span>
+                    <!-- FOOTER: COPYRIGHT & VERSION -->
+                    <div class="w-full flex justify-between mt-4 px-2 items-end">
+                        <span class="text-[0.6rem] text-gray-400 font-bold">© nguyenbachtoan</span>
+                        <span class="text-[0.5rem] text-gray-300 font-mono select-none">v1.2.6 (Server Logic Fixed)</span>
                     </div>
 
                 </div>
@@ -393,10 +395,13 @@
 
                 <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100 mb-4">
                     <p class="text-sm text-indigo-800 font-bold mb-1">Server Connection</p>
-                    <p class="text-xs text-indigo-600">Ứng dụng đang kết nối tới server</p>
+                    <p class="text-xs text-indigo-600">Ứng dụng tự động kết nối tới Server để bảo mật API Key.</p>
                 </div>
 
                 <p id="keyStatus" class="text-xs mt-4 text-center text-green-600 font-bold">✅ Đã kết nối Server</p>
+                <div class="mt-4 text-center">
+                    <p class="text-[0.6rem] text-gray-400 font-bold">© nguyenbachtoan</p>
+                </div>
             </div>
         </div>
 
@@ -493,7 +498,8 @@
             handleVisualResize();
         }
 
-        const SERVER_URL = 'https://english-tutor-grammar-server.onrender.com'; // ĐỊA CHỈ SERVER CỦA BẠN
+        // FIX: Reverted Markdown URL artifacts to plain strings
+        const SERVER_URL = 'https://english-tutor-grammar-server.onrender.com';
 
         // --- FULL OFFLINE DATA ---
         const offlineData = {
@@ -594,12 +600,9 @@
 
         const toggleModal = (modal, content, backdrop, show) => { if (show) { modal.classList.remove('hidden'); setTimeout(() => { backdrop.classList.remove('opacity-0'); content.classList.remove('translate-y-full'); }, 10); } else { backdrop.classList.add('opacity-0'); content.classList.add('translate-y-full'); setTimeout(() => { modal.classList.add('hidden'); }, 300); } };
 
-        // --- NEW CHECK STATUS (ALWAYS SERVER MODE IF AVAILABLE) ---
+        // --- CHECK STATUS ---
         const checkKeyStatus = () => {
-             // We now assume server is the "Online Mode".
-             // Ideally we could ping the server here, but for simplicity we set UI to "Connected"
-             // and let the fetch fail gracefully to offline if needed.
-             if(els.aiStatus.dot) { els.aiStatus.dot.className = "ai-status-dot status-online"; els.aiStatus.text.textContent = "ONLINE (SERVER)"; els.aiStatus.text.className = "text-green-600"; }
+             if(els.aiStatus.dot) { els.aiStatus.dot.className = "ai-status-dot status-online"; }
              if(els.wrappers.onlineVocab) els.wrappers.onlineVocab.classList.remove('hidden');
              if(els.wrappers.offlineVocab) els.wrappers.offlineVocab.classList.add('hidden');
              if(els.wrappers.readingInput) els.wrappers.readingInput.classList.remove('hidden');
@@ -626,7 +629,7 @@
             }
         }
 
-        // --- NEW SERVER CALL FUNCTION ---
+        // --- SERVER CALL FUNCTION ---
         async function callServerAI(promptText, jsonMode = true, retries = 3) {
             for (let i = 0; i < retries; i++) {
                 try {
@@ -643,21 +646,47 @@
 
                     if (data.error) throw new Error(data.error);
 
-                    // The server returns { result: string, raw: object }
-                    // If jsonMode is true, 'result' is a stringified JSON that we need to parse.
                     if (jsonMode) {
-                        return JSON.parse(data.result);
+                        let cleanText = data.result.replace(/```json/g, '').replace(/```/g, '').trim();
+                        const parsed = JSON.parse(cleanText);
+
+                        // --- NEW LOGIC: SMART PARSING ---
+                        // Case 1: If it is an Array, return it immediately (Quiz)
+                        if (Array.isArray(parsed)) {
+                            if (parsed.length === 0) throw new Error("Empty Array Returned");
+                            return parsed;
+                        }
+
+                        // Case 2: If it is an Object
+                        if (typeof parsed === 'object' && parsed !== null) {
+                            // 2a. If it's a Theory object (has title/definition), return the Object itself
+                            if (parsed.title || parsed.definition) {
+                                return parsed;
+                            }
+
+                            // 2b. If it's a wrapped Quiz array (e.g. { "questions": [...] }), extract the array
+                            const values = Object.values(parsed);
+                            const foundArray = values.find(v => Array.isArray(v));
+                            if (foundArray && foundArray.length > 0) {
+                                return foundArray;
+                            }
+
+                            // 2c. Fallback: Return the object if it seems valid
+                            if (Object.keys(parsed).length > 0) return parsed;
+                        }
+
+                        throw new Error("AI returned unrecognized data structure.");
                     } else {
                         return data.result;
                     }
 
                 } catch (e) {
                     console.warn(`Server Attempt ${i + 1} failed: ${e.message}`);
-                    if (i === retries - 1) throw e;
                     const loadingText = document.getElementById('loadingText');
                     if(loadingText && !loadingText.parentElement.classList.contains('hidden')) {
                         loadingText.textContent = `ĐANG THỬ LẠI (${i+1}/${retries})...`;
                     }
+                    if (i === retries - 1) throw e;
                     await new Promise(r => setTimeout(r, 1500 * (i + 1)));
                 }
             }
@@ -793,7 +822,13 @@
         const switchScreen = (s) => { Object.values(els.screens).forEach(e => e.classList.add('hidden')); els.screens[s].classList.remove('hidden'); };
         const resetGame = () => { document.body.classList.remove('keyboard-active'); switchScreen('start'); };
 
-        const updateUI = () => { /* ... existing updateUI ... */
+        const updateUI = () => {
+             // Safety Check: Avoid access if no data
+             if (!gameState.data || gameState.data.length === 0 || !gameState.data[gameState.currentIdx]) {
+                 console.warn("UpdateUI Skipped: No Valid Data.");
+                 return;
+             }
+
              const item = gameState.data[gameState.currentIdx];
             els.game.qNum.textContent = gameState.currentIdx + 1;
             els.game.progress.style.width = `${((gameState.currentIdx + 1) / gameState.data.length) * 100}%`;
@@ -884,7 +919,17 @@
                 if (type === 'forms') { context = els.inputs.formsType.value; const friendlyName = formReadableNames[context] || context; prompt = `Generate ${qty} Word Form exercises for '${friendlyName}'. LEVEL INSTRUCTION: ${levelPrompt}. 'explanation' in VIETNAMESE. Format: JSON Array [{"question": "...", "answer": "...", "explanation": "..."}]`; }
 
                 // CALL SERVER
-                gameState.data = await callServerAI(prompt);
+                const aiResult = await callServerAI(prompt);
+
+                // --- FIX: Check for empty data ---
+                if (!Array.isArray(aiResult)) {
+                     throw new Error("AI trả về định dạng không đúng (Cần danh sách câu hỏi).");
+                }
+                if (aiResult.length === 0) {
+                     throw new Error("AI trả về danh sách rỗng.");
+                }
+
+                gameState.data = aiResult;
 
                 if (type === 'forms') displayTitle = formReadableNames[context] || context;
                 else if (type === 'grammar') displayTitle = `${context} (${tenseTranslations[context] || ''})`;
@@ -896,7 +941,7 @@
                 els.game.title.textContent = `${type.toUpperCase()}: ${displayTitle} (AI)`; startGame(); showLoading(false); return;
             } catch(e) {
                 console.error("Online generation failed:", e);
-                alert(`Không thể kết nối Server. \nLỗi: ${e.message}\nĐang chuyển sang chế độ Offline.`);
+                alert(`Không thể kết nối Server hoặc dữ liệu lỗi. \nLỗi: ${e.message}\nĐang chuyển sang chế độ Offline.`);
 
                 // Fallback to Offline
                 let source = [];
