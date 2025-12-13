@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
-    <title>AI Tutor: v2.1 (Smooth Chat Fix)</title>
+    <title>AI Tutor: v2.1 (Fix Inline Vocab)</title>
 
     <!-- PWA Setup -->
     <meta name="mobile-web-app-capable" content="yes">
@@ -102,39 +102,25 @@
         .mode-icon { transition: all 0.2s; }
 
         /* --- ENHANCED ROLEPLAY STYLES --- */
-        .chat-container { width: 100%; display: flex; flex-direction: column; gap: 12px; padding-bottom: 10px; scroll-behavior: smooth; }
+        .chat-container { width: 100%; display: flex; flex-direction: column; gap: 12px; padding-bottom: 10px; }
         .chat-bubble { max-width: 85%; padding: 12px 16px; border-radius: 18px; font-size: 0.95rem; line-height: 1.6; position: relative; word-wrap: break-word; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
         .chat-bubble.ai { align-self: flex-start; background-color: #ffffff; color: #374151; border-bottom-left-radius: 4px; border: 1px solid #f3f4f6; }
         .chat-bubble.user { align-self: flex-end; background-color: #3b82f6; color: white; border-bottom-right-radius: 4px; box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2); }
         
-        /* Layout Tweaks for Smooth Chat */
-        #gameDisplayWrapper.rp-mode {
-            align-items: stretch !important; /* Stretch to fill height */
-            justify-content: flex-start !important;
-            padding-bottom: 0 !important; /* Remove bottom padding in RP mode */
-        }
-        .game-content-box.rp-mode {
-            height: 100% !important;
-            min-height: 100% !important;
-            justify-content: flex-start !important; /* Align content to top */
-            padding-top: 1rem;
-            padding-bottom: 0 !important; /* Touch the input bar */
-        }
-
         /* New Minimal Vocab Note */
         .vocab-note {
-            font-size: 0.75rem;
-            color: #9ca3af; /* gray-400 */
-            font-weight: 500;
-            margin-left: 3px;
-            font-style: italic;
-            background-color: #f9fafb;
-            padding: 0 4px;
-            border-radius: 4px;
-            border: 1px solid #f3f4f6;
-            vertical-align: middle;
+            font-size: 0.8rem;
+            color: #d97706; /* amber-600 */
+            font-weight: 700;
+            margin-left: 2px;
+            background-color: #fffbeb; /* amber-50 */
+            padding: 0 6px;
+            border-radius: 6px;
+            border: 1px solid #fcd34d;
+            vertical-align: text-top;
             display: inline-block;
             line-height: 1.2;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
 
         /* Enhanced Correction Card */
@@ -403,7 +389,7 @@
                 <div id="gameDisplayWrapper" class="scrollable-content px-4 w-full flex items-center justify-center relative">
                     <div id="floatingComboContainer" class="absolute inset-0 pointer-events-none flex justify-center items-center z-50"></div>
 
-                    <div id="gameContentBox" class="game-content-box w-full flex flex-col items-center py-4 justify-center min-h-[100px] transition-all">
+                    <div class="game-content-box w-full flex flex-col items-center py-4 justify-center min-h-[100px] transition-all">
                         <span id="instructionText" class="text-[9px] font-bold text-gray-300 uppercase tracking-[0.2em] mb-2 bg-gray-50 px-3 py-1 rounded-full transition-all">Translate</span>
 
                         <!-- READING PASSAGE AREA -->
@@ -738,7 +724,7 @@
             screens: { start: document.getElementById('startScreen'), game: document.getElementById('gameScreen'), result: document.getElementById('resultScreen') },
             views: { sharedInput: document.getElementById('sharedInputArea'), reading: document.getElementById('viewReading'), grammar: document.getElementById('viewGrammar'), forms: document.getElementById('viewForms') },
             inputs: { vocabTopic: document.getElementById('vocabTopicInput'), vocabSelect: document.getElementById('vocabTopicSelect'), readingTopic: document.getElementById('readingTopicInput'), readingSelect: document.getElementById('readingTopicSelect'), grammarTense: document.getElementById('grammarTenseSelect'), formsType: document.getElementById('formsTypeSelect'), answer: document.getElementById('answerInput'), dict: document.getElementById('dictInput') },
-            game: { title: document.getElementById('gameTitle'), qNum: document.getElementById('currentQ'), totalQ: document.getElementById('totalQ'), progress: document.getElementById('progressBar'), display: document.getElementById('mainDisplay'), passageDisplay: document.getElementById('readingPassageDisplay'), listeningDisplay: document.getElementById('listeningDisplay'), subDisplay: document.getElementById('subDisplay'), instruction: document.getElementById('instructionText'), quickOptions: document.getElementById('quickOptions'), comboBadge: document.getElementById('comboBadge'), comboText: document.getElementById('comboCountText'), floatingCombo: document.getElementById('floatingComboContainer'), scrambleContainer: document.getElementById('scrambleContainer'), scrambleBank: document.getElementById('scrambleBank'), scrambleResult: document.getElementById('scrambleResult'), roleplayContainer: document.getElementById('roleplayContainer'), chatHistory: document.getElementById('chatHistory'), wrapper: document.getElementById('gameDisplayWrapper'), contentBox: document.getElementById('gameContentBox') },
+            game: { title: document.getElementById('gameTitle'), qNum: document.getElementById('currentQ'), totalQ: document.getElementById('totalQ'), progress: document.getElementById('progressBar'), display: document.getElementById('mainDisplay'), passageDisplay: document.getElementById('readingPassageDisplay'), listeningDisplay: document.getElementById('listeningDisplay'), subDisplay: document.getElementById('subDisplay'), instruction: document.getElementById('instructionText'), quickOptions: document.getElementById('quickOptions'), comboBadge: document.getElementById('comboBadge'), comboText: document.getElementById('comboCountText'), floatingCombo: document.getElementById('floatingComboContainer'), scrambleContainer: document.getElementById('scrambleContainer'), scrambleBank: document.getElementById('scrambleBank'), scrambleResult: document.getElementById('scrambleResult'), roleplayContainer: document.getElementById('roleplayContainer'), chatHistory: document.getElementById('chatHistory') },
             feedback: { overlay: document.getElementById('feedbackOverlay'), title: document.getElementById('feedbackTitle'), correctText: document.getElementById('correctAnswerText'), explanation: document.getElementById('grammarExplanation'), synonym: document.getElementById('synonymText'), border: document.getElementById('feedbackBorder') },
             settings: { panel: document.getElementById('settingsPanel'), content: document.getElementById('settingsContent'), backdrop: document.getElementById('settingsBackdrop'), keyStatus: document.getElementById('keyStatus') },
             dict: { modal: document.getElementById('dictModal'), content: document.getElementById('dictContent'), backdrop: document.getElementById('dictBackdrop'), result: document.getElementById('dictResultArea'), input: document.getElementById('dictInput') },
@@ -898,6 +884,8 @@
 
                 // If starting fresh
                 if(gameState.currentIdx === 0 && els.game.chatHistory.children.length === 0) {
+                     // Add initial bubble with optional vocabulary marking if context provided it
+                     // But usually context just has string.
                      addChatBubble('ai', gameState.roleplayContext.aiFirstMessage);
                 }
             }
@@ -908,12 +896,22 @@
             if (!vocabList || !Array.isArray(vocabList) || vocabList.length === 0) return text;
             
             let formattedText = text;
+            // Sort by length (descending) to avoid partial replacement issues
             vocabList.sort((a, b) => b.word.length - a.word.length);
 
             vocabList.forEach(item => {
+                // Use a simple regex to replace matching words with HTML
+                // Note: This is client-side simple replacement.
+                // We escape special chars in the word just in case
                 const escapedWord = item.word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                const regex = new RegExp(`\\b(${escapedWord})\\b`, 'gi');
+                
+                // FIXED REGEX: No word boundaries (\b) if it causes issues, but ideally \b is good.
+                // However, matching case insensitive 'gi' is key.
+                const regex = new RegExp(`(${escapedWord})`, 'gi');
+                
+                // Only replace if it exists (check once to avoid complex replacement logic if possible)
                 if (regex.test(formattedText)) {
+                    // $1 retains the original casing
                     formattedText = formattedText.replace(regex, `$1<span class="vocab-note">(${item.meaning})</span>`);
                 }
             });
@@ -931,17 +929,11 @@
 
             if (feedbackHtml) {
                 const fb = document.createElement('div');
+                // Removed chat-feedback class for custom card style
                 fb.innerHTML = feedbackHtml;
                 els.game.chatHistory.appendChild(fb);
             }
-            
-            // Use smooth scroll
-            setTimeout(() => {
-                els.game.chatHistory.scrollTo({
-                    top: els.game.chatHistory.scrollHeight,
-                    behavior: 'smooth'
-                });
-            }, 50);
+            els.game.chatHistory.scrollTop = els.game.chatHistory.scrollHeight;
         }
 
         async function handleRoleplaySubmit() {
@@ -957,10 +949,11 @@
             typingDiv.innerHTML = '<span></span><span></span><span></span>';
             typingDiv.id = 'typingIndicator';
             els.game.chatHistory.appendChild(typingDiv);
-            els.game.chatHistory.scrollTo({ top: els.game.chatHistory.scrollHeight, behavior: 'smooth' });
+            els.game.chatHistory.scrollTop = els.game.chatHistory.scrollHeight;
 
             // Generate AI Response
             try {
+                // Enhanced Prompt asking for Vocabulary Extraction + Detailed Correction
                 const prompt = `
 Context: English learning roleplay.
 Scenario: "${gameState.roleplayContext.scenario}"
@@ -977,12 +970,12 @@ Instructions:
 
 2.  **Reply**: Respond naturally to continue the conversation.
     - **Vocabulary Extraction**: Identify 1-3 useful/difficult words/phrases in YOUR reply. Provide their Vietnamese meaning.
-    - NOTE: The words MUST exist exactly in your 'reply' string.
+    - IMPORTANT: The 'word' field MUST be the EXACT STRING found in your 'reply' (e.g. if reply has "running", 'word' must be "running", not "run").
 
 Output JSON:
 {
   "reply": "Your response string...",
-  "vocabulary": [ { "word": "exact_word_in_reply", "meaning": "vietnamese_meaning" } ],
+  "vocabulary": [ { "word": "exact_substring_from_reply", "meaning": "vietnamese_meaning" } ],
   "analysis": {
     "isCorrect": boolean,
     "correction": "Full corrected sentence OR null",
@@ -996,8 +989,10 @@ Output JSON:
 
                 if(document.getElementById('typingIndicator')) document.getElementById('typingIndicator').remove();
 
+                // Logic to handle feedback display (Enhanced Correction Card)
                 let feedbackHtml = null;
                 if (response.analysis && !response.analysis.isCorrect && response.analysis.correction) {
+                    // Double check to prevent hallucinated corrections
                     const uClean = userText.trim().replace(/[.,!?;]/g, '').toLowerCase();
                     const cClean = response.analysis.correction.trim().replace(/[.,!?;]/g, '').toLowerCase();
 
@@ -1020,8 +1015,10 @@ Output JSON:
                     }
                 }
 
+                // Apply Vocabulary Notes to the Reply
                 const richReply = applyVocabulary(response.reply, response.vocabulary);
-                addChatBubble('ai', richReply, feedbackHtml, true);
+
+                addChatBubble('ai', richReply, feedbackHtml, true); // true = render as HTML
 
                 if (response.isFinished) {
                     setTimeout(() => {
@@ -1030,8 +1027,8 @@ Output JSON:
                          finishGame();
                     }, 3000);
                 } else {
-                    gameState.currentIdx++;
-                    if(gameState.currentIdx > 15) {
+                    gameState.currentIdx++; // Increment turn count
+                    if(gameState.currentIdx > 15) { // Limit turns
                         setTimeout(() => { alert("Great conversation! You survived 15 turns."); finishGame(); }, 1000);
                     }
                 }
@@ -1248,15 +1245,6 @@ Output JSON:
              else if(mode === 'grammar') els.views.grammar.classList.remove('hidden');
              else if(mode === 'forms') els.views.forms.classList.remove('hidden');
              else els.views.sharedInput.classList.remove('hidden');
-
-             // Handle Roleplay Layout Toggles
-             if(mode === 'roleplay') {
-                els.game.wrapper.classList.add('rp-mode');
-                els.game.contentBox.classList.add('rp-mode');
-             } else {
-                els.game.wrapper.classList.remove('rp-mode');
-                els.game.contentBox.classList.remove('rp-mode');
-             }
         };
 
         const startGeneration = () => { const activeCard = document.querySelector('.mode-card.active'); let mode = 'vocab'; if (activeCard) { mode = activeCard.id.replace('mode-', ''); } generateContent(mode); };
