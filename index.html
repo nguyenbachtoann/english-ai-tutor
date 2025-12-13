@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
-    <title>AI Tutor: v1.7.3 (Mixed Mode)</title>
+    <title>AI Tutor: v2.1 (Smooth Chat Fix)</title>
 
-    <!-- PWA Setup (Fixed Meta Tag) -->
+    <!-- PWA Setup -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -20,218 +20,178 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        :root {
-            --app-height: 100%;
-            --sat: env(safe-area-inset-top);
-            --sab: env(safe-area-inset-bottom);
-        }
+        :root { --app-height: 100%; --sat: env(safe-area-inset-top); --sab: env(safe-area-inset-bottom); }
 
         /* 1. KHÓA CHẶT BODY & HTML */
         html { height: 100%; width: 100%; overflow: hidden; overscroll-behavior: none; position: fixed; }
-        body {
-            height: 100%; width: 100%; position: fixed; top: 0; left: 0;
-            overflow: hidden; font-family: 'Quicksand', sans-serif;
-            background-color: #FFFBEB; -webkit-tap-highlight-color: transparent; touch-action: none;
-        }
+        body { height: 100%; width: 100%; position: fixed; top: 0; left: 0; overflow: hidden; font-family: 'Quicksand', sans-serif; background-color: #FFFBEB; -webkit-tap-highlight-color: transparent; touch-action: none; }
 
         /* 2. APP SHELL */
-        #app-viewport {
-            position: absolute; left: 0; width: 100%; height: 100%; top: 0;
-            display: flex; flex-direction: column;
-            background-color: #FFFBEB; overflow: hidden; z-index: 1; will-change: height, top;
-        }
-
-        /* CONFETTI CANVAS */
-        #confetti-canvas {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; z-index: 100;
-        }
+        #app-viewport { position: absolute; left: 0; width: 100%; height: 100%; top: 0; display: flex; flex-direction: column; background-color: #FFFBEB; overflow: hidden; z-index: 1; will-change: height, top; }
+        #confetti-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 100; }
 
         /* --- 3. GAMIFICATION ANIMATIONS --- */
-        @keyframes popIn {
-            0% { transform: scale(0.8); opacity: 0; }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); opacity: 1; }
-        }
+        @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 50% { transform: scale(1.1); } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        @keyframes firePulse { 0% { transform: scale(1); filter: drop-shadow(0 0 2px orange); } 50% { transform: scale(1.1); filter: drop-shadow(0 0 10px red); } 100% { transform: scale(1); filter: drop-shadow(0 0 2px orange); } }
+        @keyframes floatUp { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-50px) scale(1.5); opacity: 0; } }
 
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
-        }
-
-        @keyframes firePulse {
-            0% { transform: scale(1); filter: drop-shadow(0 0 2px orange); }
-            50% { transform: scale(1.1); filter: drop-shadow(0 0 10px red); }
-            100% { transform: scale(1); filter: drop-shadow(0 0 2px orange); }
-        }
-
-        @keyframes floatUp {
-            0% { transform: translateY(0) scale(1); opacity: 1; }
-            100% { transform: translateY(-50px) scale(1.5); opacity: 0; }
-        }
-
-        .combo-text {
-            position: absolute;
-            font-weight: 900;
-            color: #ff4500;
-            text-shadow: 2px 2px 0px #fff, 0 0 10px rgba(255, 69, 0, 0.5);
-            pointer-events: none;
-            z-index: 50;
-            animation: floatUp 1s ease-out forwards;
-        }
-
+        .pop-in { animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .combo-text { position: absolute; font-weight: 900; color: #ff4500; text-shadow: 2px 2px 0px #fff, 0 0 10px rgba(255, 69, 0, 0.5); pointer-events: none; z-index: 50; animation: floatUp 1s ease-out forwards; }
         .shake-element { animation: shake 0.3s ease-in-out; }
-
-        .fire-badge {
-            background: linear-gradient(to bottom, #fcd34d, #ef4444);
-            color: white;
-            animation: firePulse 1s infinite;
-            border: 2px solid white;
-            box-shadow: 0 4px 6px rgba(239, 68, 68, 0.4);
-        }
-
-        /* NEW: Daily Streak Badge Style */
-        .streak-badge-container {
-            background: linear-gradient(135deg, #fff 0%, #fff7ed 100%);
-            border: 1px solid #fed7aa;
-            box-shadow: 0 2px 4px rgba(251, 146, 60, 0.1);
-        }
+        .fire-badge { background: linear-gradient(to bottom, #fcd34d, #ef4444); color: white; animation: firePulse 1s infinite; border: 2px solid white; box-shadow: 0 4px 6px rgba(239, 68, 68, 0.4); }
+        .streak-badge-container { background: linear-gradient(135deg, #fff 0%, #fff7ed 100%); border: 1px solid #fed7aa; box-shadow: 0 2px 4px rgba(251, 146, 60, 0.1); }
 
         /* --- LOGIC ULTRA COMPACT & KEYBOARD --- */
-
-        @media (max-height: 550px) {
-            #mainHeader { display: none !important; }
-        }
-
+        @media (max-height: 550px) { #mainHeader { display: none !important; } }
         body.keyboard-mode #mainHeader { display: none !important; }
         body.keyboard-mode #gameScreen { padding-top: 0 !important; }
-        body.keyboard-mode #gameDisplayWrapper {
-            justify-content: flex-end;
-            padding-bottom: 0 !important;
-        }
-
-        /* Font chữ siêu nhỏ khi gõ phím */
-        body.keyboard-mode #mainDisplay {
-            font-size: 0.85rem !important;
-            line-height: 1.15 !important;
-            margin-bottom: 0 !important;
-            padding: 0 0.5rem;
-        }
-
-        /* Reading Passage Compact Mode */
-        body.keyboard-mode #readingPassageDisplay {
-            max-height: 80px !important; /* Thu nhỏ đoạn văn khi hiện phím */
-            font-size: 0.75rem !important;
-            padding: 0.5rem !important;
-        }
-
+        body.keyboard-mode #gameDisplayWrapper { justify-content: flex-end; padding-bottom: 0 !important; }
+        body.keyboard-mode #mainDisplay { font-size: 0.85rem !important; line-height: 1.15 !important; margin-bottom: 0 !important; padding: 0 0.5rem; }
+        body.keyboard-mode #readingPassageDisplay { max-height: 80px !important; font-size: 0.75rem !important; padding: 0.5rem !important; }
         body.keyboard-mode #listeningDisplay button { width: 2rem !important; height: 2rem !important; font-size: 0.9rem !important; margin-bottom: 0 !important; }
         body.keyboard-mode #listeningDisplay p { display: none; }
-
-        body.keyboard-mode #instructionText {
-            font-size: 0.45rem !important;
-            margin-bottom: 0 !important;
-            padding: 0 0.3rem !important;
-            opacity: 0.6;
-            height: 14px; display: flex; align-items: center;
-        }
-
+        body.keyboard-mode #instructionText { font-size: 0.45rem !important; margin-bottom: 0 !important; padding: 0 0.3rem !important; opacity: 0.6; height: 14px; display: flex; align-items: center; }
         body.keyboard-mode .game-content-box { min-height: 0 !important; padding: 0.15rem 0 !important; gap: 0.1rem !important; }
         body.keyboard-mode #subDisplay { font-size: 0.6rem !important; padding: 0 0.3rem !important; margin-top: 0 !important; }
-
-        /* ULTRA COMPACT INPUT AREA */
         body.keyboard-mode #inputContainer { padding: 0.2rem 0.5rem !important; border-top: 1px solid rgba(0,0,0,0.03); }
         body.keyboard-mode #answerInput { height: 1.85rem !important; padding: 0 0.6rem !important; font-size: 0.85rem !important; border-radius: 0.4rem !important; border-width: 1px !important; }
         body.keyboard-mode #checkBtn { width: 1.85rem !important; height: 1.85rem !important; border-radius: 0.4rem !important; font-size: 0.7rem !important; }
-
-        /* Reading Options Buttons (hidden in keyboard mode usually, or made tiny) */
         body.keyboard-mode #quickOptions { display: none !important; }
+
+        /* --- SCRAMBLE MODE STYLES --- */
+        .scramble-box { min-height: 150px; width: 100%; display: flex; flex-direction: column; gap: 1rem; }
+        .word-chip { display: inline-flex; align-items: center; justify-content: center; background-color: white; border: 2px solid #e5e7eb; border-bottom-width: 4px; color: #374151; font-weight: 700; font-size: 0.9rem; padding: 0.5rem 0.75rem; border-radius: 0.75rem; cursor: pointer; transition: all 0.1s; user-select: none; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin: 0.2rem; }
+        .word-chip:active { transform: translateY(2px); border-bottom-width: 2px; box-shadow: none; }
+        .word-chip.used { opacity: 0.3; pointer-events: none; border-color: transparent; background: #f3f4f6; border-bottom-width: 0; box-shadow: none; transform: scale(0.9); }
+        .word-chip.selected { background-color: #eff6ff; border-color: #3b82f6; color: #1d4ed8; }
+        .result-zone { min-height: 3.5rem; background-color: #f9fafb; border: 2px dashed #d1d5db; border-radius: 1rem; display: flex; flex-wrap: wrap; align-items: center; padding: 0.5rem; gap: 0.25rem; transition: all 0.2s; }
+        .result-zone.has-items { background-color: #fff; border-style: solid; border-color: #bfdbfe; }
 
         /* --- UTILS --- */
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid #F59E0B; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
         .level-card { transition: all 0.2s; border: 2px solid transparent; }
         .level-card.selected { border-color: #F59E0B; background-color: #FFFBEB; transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgba(245, 158, 11, 0.1); }
-
         .screen-fade { animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-
         .no-shrink { flex-shrink: 0; }
         .scrollable-content { flex-grow: 1; flex-shrink: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
-
         .custom-scroll::-webkit-scrollbar { width: 4px; }
         .custom-scroll::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
-
         .input-focus:focus-within { border-color: #FBBF24; box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.2); }
         select { background-image: none !important; }
-
-        .speaker-pulse { animation: speakerPulse 1.5s infinite; }
-        @keyframes speakerPulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); } 70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(245, 158, 11, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); } }
-
         .ai-status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
         .status-online { background-color: #10B981; box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2); }
         .status-offline { background-color: #9CA3AF; box-shadow: 0 0 0 2px rgba(156, 163, 175, 0.2); }
+        .speaker-pulse { animation: speakerPulse 1.5s infinite; }
+        @keyframes speakerPulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); } 70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(245, 158, 11, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); } }
 
         /* Reading Passage Styles */
-        .reading-passage-box {
-            background-color: #fffbeb;
-            border: 2px solid #fde68a;
+        .reading-passage-box { background-color: #fffbeb; border: 2px solid #fde68a; border-radius: 12px; padding: 12px; font-size: 0.9rem; color: #4b5563; max-height: 200px; overflow-y: auto; margin-bottom: 10px; text-align: left; line-height: 1.5; width: 100%; }
+        .option-chip { transition: all 0.2s; cursor: pointer; border: 2px solid #e5e7eb; }
+        .option-chip:active { transform: scale(0.95); }
+        .option-selected { background-color: #FEF3C7 !important; border-color: #F59E0B !important; color: #92400E !important; box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.3); font-weight: 800; }
+        .btn-expanded { width: 100% !important; border-radius: 1.5rem !important; }
+
+        /* MODE CARD STYLES */
+        .mode-card { transition: all 0.2s ease; cursor: pointer; border: 2px solid transparent; }
+        .mode-card:active { transform: scale(0.97); }
+        .mode-card.active { border-color: #F59E0B; background-color: #FFFBEB; box-shadow: 0 4px 6px -1px rgba(245, 158, 11, 0.15); }
+        .mode-card.active .mode-icon { background-color: #FEF3C7; color: #D97706; }
+        .mode-icon { transition: all 0.2s; }
+
+        /* --- ENHANCED ROLEPLAY STYLES --- */
+        .chat-container { width: 100%; display: flex; flex-direction: column; gap: 12px; padding-bottom: 10px; scroll-behavior: smooth; }
+        .chat-bubble { max-width: 85%; padding: 12px 16px; border-radius: 18px; font-size: 0.95rem; line-height: 1.6; position: relative; word-wrap: break-word; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .chat-bubble.ai { align-self: flex-start; background-color: #ffffff; color: #374151; border-bottom-left-radius: 4px; border: 1px solid #f3f4f6; }
+        .chat-bubble.user { align-self: flex-end; background-color: #3b82f6; color: white; border-bottom-right-radius: 4px; box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2); }
+        
+        /* Layout Tweaks for Smooth Chat */
+        #gameDisplayWrapper.rp-mode {
+            align-items: stretch !important; /* Stretch to fill height */
+            justify-content: flex-start !important;
+            padding-bottom: 0 !important; /* Remove bottom padding in RP mode */
+        }
+        .game-content-box.rp-mode {
+            height: 100% !important;
+            min-height: 100% !important;
+            justify-content: flex-start !important; /* Align content to top */
+            padding-top: 1rem;
+            padding-bottom: 0 !important; /* Touch the input bar */
+        }
+
+        /* New Minimal Vocab Note */
+        .vocab-note {
+            font-size: 0.75rem;
+            color: #9ca3af; /* gray-400 */
+            font-weight: 500;
+            margin-left: 3px;
+            font-style: italic;
+            background-color: #f9fafb;
+            padding: 0 4px;
+            border-radius: 4px;
+            border: 1px solid #f3f4f6;
+            vertical-align: middle;
+            display: inline-block;
+            line-height: 1.2;
+        }
+
+        /* Enhanced Correction Card */
+        .correction-card {
+            align-self: flex-end;
+            max-width: 90%;
+            background-color: #fff;
+            border: 1px solid #fee2e2;
+            border-left: 4px solid #ef4444;
             border-radius: 12px;
             padding: 12px;
-            font-size: 0.9rem;
-            color: #4b5563;
-            max-height: 200px;
-            overflow-y: auto;
-            margin-bottom: 10px;
-            text-align: left;
-            line-height: 1.5;
-            width: 100%;
+            margin-top: 4px;
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.05);
+            animation: fadeIn 0.4s ease;
         }
-        .option-chip {
-            transition: all 0.2s;
-            cursor: pointer;
-            border: 2px solid #e5e7eb;
-        }
-        .option-chip:active {
-            transform: scale(0.95);
-        }
-        .option-selected {
-            background-color: #FEF3C7 !important;
-            border-color: #F59E0B !important;
-            color: #92400E !important;
-            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.3);
+        .correction-header {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.7rem;
             font-weight: 800;
+            text-transform: uppercase;
+            color: #ef4444;
+            margin-bottom: 8px;
+            letter-spacing: 0.05em;
         }
-        .btn-expanded {
-            width: 100% !important;
-            border-radius: 1.5rem !important;
+        .correction-content {
+            font-size: 0.9rem;
+            color: #1f2937;
+        }
+        .correction-diff {
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed #f3f4f6;
+        }
+        .diff-wrong { text-decoration: line-through; color: #9ca3af; margin-right: 6px; font-size: 0.85em; }
+        .diff-right { color: #16a34a; font-weight: 700; background-color: #dcfce7; padding: 2px 6px; rounded: 4px; }
+        .correction-explanation {
+            font-size: 0.85rem;
+            color: #4b5563;
+            line-height: 1.5;
+        }
+        .correction-tag {
+            display: inline-block;
+            background-color: #f3f4f6;
+            color: #6b7280;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-right: 4px;
+            font-weight: 600;
         }
 
-        /* NEW MODE CARD STYLES */
-        .mode-card {
-            transition: all 0.2s ease;
-            cursor: pointer;
-            border: 2px solid transparent;
-        }
-        .mode-card:active { transform: scale(0.97); }
-        .mode-card.active {
-            border-color: #F59E0B;
-            background-color: #FFFBEB;
-            box-shadow: 0 4px 6px -1px rgba(245, 158, 11, 0.15);
-        }
-        .mode-card.active .mode-icon { background-color: #FEF3C7; color: #D97706; }
-
-        .mode-icon {
-            transition: all 0.2s;
-        }
-
-        /* TOPIC CARD STYLES */
-        .topic-cat-card {
-            transition: all 0.2s;
-        }
-        .topic-cat-card:active { transform: scale(0.98); }
+        .typing-indicator span { display: inline-block; width: 5px; height: 5px; background-color: #9ca3af; border-radius: 50%; animation: typing 1s infinite; margin: 0 1px; }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typing { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
     </style>
 </head>
 <body>
@@ -245,19 +205,16 @@
                     <div class="flex items-baseline gap-1">
                         <h1 class="text-xl font-extrabold text-yellow-900 tracking-tight flex items-center gap-1"><span class="text-2xl filter drop-shadow-sm">🥑</span> AI Tutor</h1>
                     </div>
-                    <!-- Status -->
                     <div id="aiStatusBadge" class="flex items-center mt-1 ml-1" title="Server Status">
                         <span id="aiStatusDot" class="ai-status-dot status-offline"></span>
                     </div>
                 </div>
             </div>
             <div class="flex gap-2">
-                <!-- STREAK BADGE (NEW) -->
                 <div class="streak-badge-container px-2.5 h-10 rounded-full flex items-center gap-1.5 transition-all" title="Chuỗi ngày học tập">
                     <i class="fas fa-fire text-orange-500 text-sm animate-pulse"></i>
                     <span id="streakCount" class="text-sm font-black text-orange-600">0</span>
                 </div>
-
                 <button onclick="openDictModal()" class="w-10 h-10 flex items-center justify-center text-yellow-700 bg-white rounded-full shadow-sm active:scale-90 transition-transform"><i class="fas fa-search"></i></button>
                 <button onclick="openTheoryModal()" class="w-10 h-10 flex items-center justify-center text-indigo-600 bg-white rounded-full shadow-sm active:scale-90 transition-transform"><i class="fas fa-book-open"></i></button>
                 <button onclick="toggleSettings()" class="w-10 h-10 flex items-center justify-center text-gray-600 bg-white rounded-full shadow-sm active:scale-90 transition-transform"><i class="fas fa-cog"></i></button>
@@ -269,10 +226,9 @@
 
             <!-- START SCREEN -->
             <div id="startScreen" class="flex-1 flex flex-col h-full scrollable-content custom-scroll p-4 w-full screen-fade">
-
                 <div id="startScreenContent" class="w-full max-w-md mx-auto flex-1 flex flex-col pb-20">
 
-                    <!-- NEW: DAILY WRONG ANSWER REVIEW BUTTON -->
+                    <!-- DAILY REVIEW BUTTON -->
                     <div id="dailyReviewContainer" class="hidden mb-4 animate-fadeIn">
                         <button onclick="startDailyReview()" class="w-full bg-red-50 text-red-600 p-3 rounded-2xl border border-red-100 shadow-sm active:scale-[0.98] transition-all flex items-center justify-between group">
                             <div class="flex items-center gap-3">
@@ -286,7 +242,7 @@
                         </button>
                     </div>
 
-                    <!-- 1. BIG TOPIC SELECTION BUTTON -->
+                    <!-- TOPIC SELECTION -->
                     <div class="mb-4">
                         <button onclick="openTopicModal()" class="w-full bg-gradient-to-r from-yellow-500 to-orange-500 text-white p-4 rounded-2xl shadow-lg shadow-orange-200 active:scale-[0.98] transition-all flex items-center justify-between group">
                             <div class="flex items-center gap-3">
@@ -300,7 +256,7 @@
                         </button>
                     </div>
 
-                    <!-- ACTIVE TOPIC BANNER (Hidden by default) -->
+                    <!-- ACTIVE TOPIC BANNER -->
                     <div id="activeTopicBanner" class="hidden mb-4 bg-indigo-600 text-white p-3 rounded-2xl shadow-md flex items-center justify-between animate-fadeIn">
                         <div class="flex items-center gap-2 overflow-hidden flex-1">
                             <div class="min-w-[16px]"><i class="fas fa-thumbtack text-indigo-200 text-sm"></i></div>
@@ -312,16 +268,26 @@
                                 </div>
                             </div>
                         </div>
-                        <button onclick="clearTopic()" class="bg-indigo-500 hover:bg-indigo-400 text-white text-[10px] font-bold px-3 py-1.5 rounded-lg ml-2 whitespace-nowrap border border-indigo-400 self-center">
-                            Thoát
-                        </button>
+                        <button onclick="clearTopic()" class="bg-indigo-500 hover:bg-indigo-400 text-white text-[10px] font-bold px-3 py-1.5 rounded-lg ml-2 whitespace-nowrap border border-indigo-400 self-center">Thoát</button>
                     </div>
 
                     <!-- MODE SELECTION GRID -->
                     <div class="mb-4">
                         <label class="text-[10px] font-bold text-gray-400 tracking-wider uppercase mb-2 block ml-1">CHỌN CHẾ ĐỘ HỌC</label>
                         <div class="grid grid-cols-2 gap-2" id="modeGrid">
-                            <!-- Words & Phrases -->
+
+                            <!-- AI ROLEPLAY MODE (KILLER FEATURE) -->
+                            <div onclick="setMode('roleplay')" id="mode-roleplay" class="mode-card bg-white p-3 rounded-2xl flex items-center gap-3 shadow-sm col-span-2 border-2 border-purple-100 relative overflow-hidden group">
+                                <div class="absolute right-0 top-0 p-1 bg-purple-600 text-white text-[8px] font-bold rounded-bl-lg z-10 animate-pulse">HOT</div>
+                                <div class="mode-icon w-10 h-10 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-lg"><i class="fas fa-comments"></i></div>
+                                <div><h3 class="text-sm font-bold text-gray-800">Thực Chiến (Roleplay)</h3><p class="text-[9px] text-gray-400 font-semibold">Giao tiếp tình huống thật</p></div>
+                            </div>
+
+                             <div onclick="setMode('scramble')" id="mode-scramble" class="mode-card bg-white p-3 rounded-2xl flex items-center gap-3 shadow-sm col-span-2 border-2 border-indigo-100 relative overflow-hidden group">
+                                <div class="mode-icon w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-lg"><i class="fas fa-puzzle-piece"></i></div>
+                                <div><h3 class="text-sm font-bold text-gray-800">Sắp Xếp Câu</h3><p class="text-[9px] text-gray-400 font-semibold">Sentence Building</p></div>
+                            </div>
+
                             <div onclick="setMode('vocab')" id="mode-vocab" class="mode-card bg-white p-3 rounded-2xl flex items-center gap-3 shadow-sm active">
                                 <div class="mode-icon w-10 h-10 rounded-full bg-yellow-100 text-yellow-600 flex items-center justify-center text-lg"><i class="fas fa-font"></i></div>
                                 <div><h3 class="text-sm font-bold text-gray-800">Từ Vựng</h3><p class="text-[9px] text-gray-400 font-semibold">Từ đơn</p></div>
@@ -330,7 +296,6 @@
                                 <div class="mode-icon w-10 h-10 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-lg"><i class="fas fa-quote-right"></i></div>
                                 <div><h3 class="text-sm font-bold text-gray-800">Cụm Từ</h3><p class="text-[9px] text-gray-400 font-semibold">Phrases</p></div>
                             </div>
-                            <!-- Idioms & Listening -->
                             <div onclick="setMode('idioms')" id="mode-idioms" class="mode-card bg-white p-3 rounded-2xl flex items-center gap-3 shadow-sm">
                                 <div class="mode-icon w-10 h-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-lg"><i class="fas fa-dragon"></i></div>
                                 <div><h3 class="text-sm font-bold text-gray-800">Tục Ngữ</h3><p class="text-[9px] text-gray-400 font-semibold">Proverbs</p></div>
@@ -339,7 +304,6 @@
                                 <div class="mode-icon w-10 h-10 rounded-full bg-pink-100 text-pink-600 flex items-center justify-center text-lg"><i class="fas fa-headphones"></i></div>
                                 <div><h3 class="text-sm font-bold text-gray-800">Luyện Nghe</h3><p class="text-[9px] text-gray-400 font-semibold">Dictation</p></div>
                             </div>
-                            <!-- Skills -->
                             <div onclick="setMode('reading')" id="mode-reading" class="mode-card bg-white p-3 rounded-2xl flex items-center gap-3 shadow-sm">
                                 <div class="mode-icon w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-lg"><i class="fas fa-book-open"></i></div>
                                 <div><h3 class="text-sm font-bold text-gray-800">Đọc Hiểu</h3><p class="text-[9px] text-gray-400 font-semibold">Reading</p></div>
@@ -348,7 +312,6 @@
                                 <div class="mode-icon w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-lg"><i class="fas fa-pen-nib"></i></div>
                                 <div><h3 class="text-sm font-bold text-gray-800">Ngữ Pháp</h3><p class="text-[9px] text-gray-400 font-semibold">Chia Động Từ</p></div>
                             </div>
-                            <!-- Forms (Full width) -->
                             <div onclick="setMode('forms')" id="mode-forms" class="mode-card bg-white p-3 rounded-2xl flex items-center gap-3 shadow-sm col-span-2">
                                 <div class="mode-icon w-10 h-10 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-lg"><i class="fas fa-random"></i></div>
                                 <div><h3 class="text-sm font-bold text-gray-800">Biến Thể Từ (Word Forms)</h3><p class="text-[9px] text-gray-400 font-semibold">Noun, Verb, Adjective...</p></div>
@@ -358,8 +321,6 @@
 
                     <!-- INPUT AREAS -->
                     <div id="inputAreaWrapper" class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 mb-4 transition-all relative overflow-hidden">
-
-                        <!-- Header for Input Area -->
                         <div class="flex items-center gap-2 mb-3">
                             <i id="inputIcon" class="fas fa-lightbulb text-yellow-500"></i>
                             <h3 id="inputTitle" class="text-sm font-bold text-gray-700">Chủ đề từ vựng</h3>
@@ -374,7 +335,7 @@
                              <button onclick="clearTopic()" class="text-[10px] font-bold text-red-500 underline">Đổi chủ đề</button>
                         </div>
 
-                        <!-- 1. Shared Input (Vocab, Phrases, Idioms, Listening) -->
+                        <!-- 1. Shared Input -->
                         <div id="sharedInputArea" class="w-full animate-fadeIn">
                             <div id="onlineVocabInput" class="w-full input-focus rounded-xl transition-all duration-200">
                                 <input type="text" id="vocabTopicInput" placeholder="Nhập chủ đề (hoặc để trống để Random)..." class="w-full p-3 bg-gray-50 border-2 border-transparent text-center text-sm font-bold text-gray-800 rounded-xl focus:bg-white focus:border-yellow-400 focus:outline-none placeholder-gray-400">
@@ -384,7 +345,6 @@
 
                         <!-- 2. Reading Input -->
                         <div id="viewReading" class="hidden w-full animate-fadeIn">
-                             <div class="relative w-full"><input type="text" id="readingTopicInput" placeholder="Chủ đề bài đọc..." class="w-full p-3 bg-gray-50 border-2 border-transparent text-center text-sm font-bold text-gray-800 rounded-xl focus:bg-white focus:border-blue-400 focus:outline-none placeholder-gray-400 hidden"></div>
                              <div class="relative w-full" id="readingSelectWrapper"><select id="readingTopicSelect" class="w-full p-3 bg-gray-50 border-none rounded-xl text-sm font-bold text-center text-gray-700 appearance-none focus:outline-none"></select><div class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-xs"><i class="fas fa-chevron-down"></i></div></div>
                         </div>
 
@@ -408,8 +368,6 @@
                     <div id="configSection" class="w-full bg-white p-4 rounded-2xl shadow-sm border border-gray-100 transition-all">
                         <input type="hidden" id="levelSelect" value="Level A">
                         <div class="flex justify-between items-center mb-2"><label class="text-[10px] font-bold text-gray-400 tracking-wider uppercase">Độ khó</label></div>
-
-                        <!-- Level Grid Compact -->
                         <div class="grid grid-cols-3 gap-1.5 mb-1.5">
                             <div onclick="updateLevel('Level A', this)" class="level-card selected cursor-pointer py-2 rounded-xl bg-gray-50 text-center"><div class="text-base mb-0.5">🌱</div><div class="text-[9px] font-bold text-gray-600">Level A</div></div>
                             <div onclick="updateLevel('Level B', this)" class="level-card cursor-pointer py-2 rounded-xl bg-gray-50 text-center"><div class="text-base mb-0.5">🌿</div><div class="text-[9px] font-bold text-gray-600">Level B</div></div>
@@ -419,18 +377,9 @@
                             <div onclick="updateLevel('TOEIC', this)" class="level-card cursor-pointer py-2 rounded-xl bg-gray-50 text-center"><div class="text-base mb-0.5">💼</div><div class="text-[9px] font-bold text-gray-600">TOEIC</div></div>
                             <div onclick="updateLevel('IELTS', this)" class="level-card cursor-pointer py-2 rounded-xl bg-gray-50 text-center"><div class="text-base mb-0.5">🎓</div><div class="text-[9px] font-bold text-gray-600">IELTS</div></div>
                         </div>
-
-                        <!-- Quantity Slider Compact -->
                         <div class="flex justify-between items-center mb-1"><label class="text-[10px] font-bold text-gray-400 tracking-wider">SỐ LƯỢNG CÂU HỎI</label><span id="qtyDisplay" class="text-[10px] font-bold text-white bg-gray-800 px-1.5 py-0.5 rounded">10</span></div>
                         <input type="range" id="quantityRange" min="5" max="30" step="5" value="10" class="w-full h-1.5 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-yellow-500 hover:accent-yellow-400">
                     </div>
-
-                    <!-- FOOTER: COPYRIGHT & VERSION -->
-                    <div class="w-full flex justify-between mt-4 px-2 items-end">
-                        <span class="text-[0.6rem] text-gray-400 font-bold">© nguyenbachtoan</span>
-                        <span class="text-[0.5rem] text-gray-300 font-mono select-none">v1.7.3 (Mixed Mode)</span>
-                    </div>
-
                 </div>
             </div>
 
@@ -439,8 +388,6 @@
                 <div class="no-shrink px-4 pt-2 pb-1 bg-white z-10 transition-all border-b border-gray-50">
                     <div id="gameHeader" class="flex justify-between items-center mb-1.5 transition-all">
                         <span class="font-bold text-gray-400 text-[10px] uppercase tracking-wider truncate max-w-[60%]" id="gameTitle">General</span>
-
-                        <!-- NEW COMBO UI IN HEADER -->
                         <div class="flex items-center gap-2">
                              <div id="comboBadge" class="hidden fire-badge px-2 py-0.5 rounded-full text-[10px] font-black items-center gap-1 shadow-sm transition-all transform scale-0">
                                 <i class="fas fa-fire"></i> <span id="comboCountText">x2</span>
@@ -454,21 +401,32 @@
                 </div>
 
                 <div id="gameDisplayWrapper" class="scrollable-content px-4 w-full flex items-center justify-center relative">
-                      <!-- Floating Combo Text Container -->
                     <div id="floatingComboContainer" class="absolute inset-0 pointer-events-none flex justify-center items-center z-50"></div>
 
-                    <div class="game-content-box w-full flex flex-col items-center py-4 justify-center min-h-[100px] transition-all">
+                    <div id="gameContentBox" class="game-content-box w-full flex flex-col items-center py-4 justify-center min-h-[100px] transition-all">
                         <span id="instructionText" class="text-[9px] font-bold text-gray-300 uppercase tracking-[0.2em] mb-2 bg-gray-50 px-3 py-1 rounded-full transition-all">Translate</span>
 
-                        <!-- READING PASSAGE AREA (Hidden by default) -->
-                        <div id="readingPassageDisplay" class="reading-passage-box hidden custom-scroll">
-                            This is where the reading passage will go. It can be quite long so we need it to scroll if necessary.
-                        </div>
+                        <!-- READING PASSAGE AREA -->
+                        <div id="readingPassageDisplay" class="reading-passage-box hidden custom-scroll"></div>
 
-                        <!-- Extra Compact Main Display -->
+                        <!-- MAIN DISPLAY -->
                         <h2 id="mainDisplay" class="text-xl sm:text-2xl font-black text-center text-gray-800 mb-2 leading-tight break-words max-w-full drop-shadow-sm transition-all">Loading...</h2>
 
-                        <!-- Smaller Listening Icon -->
+                        <!-- SCRAMBLE MODE UI (HIDDEN DEFAULT) -->
+                        <div id="scrambleContainer" class="w-full hidden flex-col items-center gap-4 mt-2">
+                             <div id="scrambleResult" class="result-zone w-full min-h-[60px] flex justify-center text-center"></div>
+                             <div class="w-full border-t border-gray-100"></div>
+                             <div id="scrambleBank" class="flex flex-wrap justify-center gap-1.5 w-full"></div>
+                        </div>
+
+                        <!-- ROLEPLAY CHAT UI (HIDDEN DEFAULT) -->
+                        <div id="roleplayContainer" class="hidden w-full h-full flex flex-col">
+                            <div id="chatHistory" class="flex-1 w-full chat-container overflow-y-auto custom-scroll">
+                                <!-- Chat bubbles go here -->
+                            </div>
+                        </div>
+
+                        <!-- LISTENING UI -->
                         <div id="listeningDisplay" class="hidden flex flex-col items-center">
                             <button onclick="playTTS()" class="w-16 h-16 rounded-full bg-pink-100 text-pink-500 flex items-center justify-center text-2xl shadow-md active:scale-95 transition-transform mb-2 speaker-pulse"><i class="fas fa-volume-up"></i></button>
                             <p class="text-gray-400 text-[10px] font-bold">Tap to listen</p>
@@ -476,20 +434,17 @@
 
                         <p id="subDisplay" class="text-indigo-500 font-bold text-xs hidden bg-indigo-50 px-3 py-1 rounded-lg mt-1 animate-bounce-slow border border-indigo-100 transition-all">(hint)</p>
 
-                        <!-- Quick Options for Reading/Quiz -->
-                        <div id="quickOptions" class="hidden flex-wrap justify-center gap-2 mt-2 w-full">
-                            <!-- JS will inject buttons here -->
-                        </div>
+                        <!-- QUICK OPTIONS -->
+                        <div id="quickOptions" class="hidden flex-wrap justify-center gap-2 mt-2 w-full"></div>
                     </div>
                 </div>
 
-                <!-- COMPACT INPUT ROW (Size decreased) -->
+                <!-- COMPACT INPUT ROW -->
                 <div id="inputContainer" class="no-shrink p-2 bg-white border-t border-gray-50 w-full z-10 shadow-[0_-5px_20px_rgba(0,0,0,0.02)] transition-all">
                     <div class="flex items-center gap-2 w-full">
                         <div class="relative flex-1 group" id="inputWrapper">
                             <input type="text" id="answerInput" class="w-full bg-gray-50 border-2 border-transparent text-base font-bold py-2.5 px-4 rounded-xl focus:outline-none focus:bg-white focus:border-yellow-400 transition-all shadow-inner placeholder-gray-300" placeholder="Nhập đáp án..." autocomplete="off">
                         </div>
-                        <!-- Nút check linh hoạt -->
                         <button id="checkBtn" onclick="checkAnswer()" class="no-shrink w-11 h-11 bg-gray-900 text-white text-base rounded-xl shadow-lg shadow-gray-400/30 active:scale-[0.9] transition-all flex items-center justify-center hover:bg-black">
                             <i class="fas fa-check"></i>
                         </button>
@@ -515,53 +470,41 @@
                     </div>
                     <div id="resultList" class="w-full bg-white rounded-3xl border border-white p-2 mb-4 overflow-y-auto max-h-[50vh] custom-scroll text-left shadow-lg shadow-yellow-100/50"></div>
                 </div>
-                <!-- Review Button (Session) -->
                 <button id="reviewBtn" onclick="startReview()" class="hidden w-full bg-orange-500 text-white font-bold py-4 rounded-3xl shadow-lg shadow-orange-200 active:scale-95 no-shrink mb-3 transition-transform"><i class="fas fa-recycle mr-2"></i> Học lại ngay</button>
-
                 <button onclick="resetGame()" class="w-full bg-gray-900 text-white font-bold py-4 rounded-3xl shadow-lg active:scale-95 no-shrink mb-8"><i class="fas fa-redo mr-2"></i> Chơi lại</button>
             </div>
         </div>
 
-        <!-- MODALS -->
-
-        <!-- NEW TOPIC SELECTION MODAL -->
+        <!-- MODALS (Hidden by default) -->
+        <!-- Topic Modal -->
         <div id="topicModal" class="hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center pointer-events-none">
             <div class="absolute inset-0 bg-black/40 backdrop-blur-sm pointer-events-auto transition-opacity duration-300 opacity-0" id="topicBackdrop" onclick="closeTopicModal()"></div>
             <div class="bg-white w-full sm:w-[28rem] h-[90vh] sm:h-[85vh] rounded-t-3xl sm:rounded-3xl flex flex-col pointer-events-auto transform transition-transform duration-300 translate-y-full" id="topicContentPanel">
                 <div class="p-5 border-b flex items-center justify-between bg-yellow-50 rounded-t-3xl">
-                    <div>
-                        <h2 class="font-black text-xl text-yellow-800 flex items-center gap-2">📚 Chọn Chủ Đề</h2>
-                        <p class="text-xs text-yellow-600 font-medium">Oxford Picture Dictionary System</p>
-                    </div>
+                    <div><h2 class="font-black text-xl text-yellow-800 flex items-center gap-2">📚 Chọn Chủ Đề</h2><p class="text-xs text-yellow-600 font-medium">Oxford Picture Dictionary System</p></div>
                     <button onclick="closeTopicModal()" class="w-8 h-8 rounded-full bg-white flex items-center justify-center text-gray-500 shadow-sm"><i class="fas fa-times"></i></button>
                 </div>
-                <div class="flex-1 overflow-y-auto p-4 bg-white" id="topicListContent">
-                    <!-- Topics will be injected here -->
-                </div>
+                <div class="flex-1 overflow-y-auto p-4 bg-white" id="topicListContent"></div>
             </div>
         </div>
 
-        <!-- SETTINGS -->
+        <!-- Settings -->
         <div id="settingsPanel" class="hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center pointer-events-none">
             <div class="absolute inset-0 bg-black/40 backdrop-blur-sm pointer-events-auto transition-opacity duration-300 opacity-0" id="settingsBackdrop" onclick="toggleSettings()"></div>
             <div class="bg-white w-full sm:w-[28rem] rounded-t-3xl sm:rounded-3xl p-6 pointer-events-auto transform transition-transform duration-300 translate-y-full safe-pb" id="settingsContent">
                 <div class="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-6"></div>
                 <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2"><i class="fas fa-cog text-gray-400"></i> Cài đặt</h2>
-
                 <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100 mb-4">
                     <p class="text-sm text-indigo-800 font-bold mb-1">Thống kê học tập</p>
                     <p class="text-xs text-indigo-600 mb-1">Chuỗi ngày (Streak): <span id="settingStreak" class="font-bold">0</span> ngày 🔥</p>
                     <p class="text-xs text-indigo-600">Lần học cuối: <span id="lastLearnedTime" class="font-bold">Chưa có</span></p>
                 </div>
-
                 <p id="keyStatus" class="text-xs mt-4 text-center text-green-600 font-bold">✅ Đã kết nối Server</p>
-                <div class="mt-4 text-center">
-                    <p class="text-[0.6rem] text-gray-400 font-bold">© nguyenbachtoan</p>
-                </div>
+                <div class="mt-4 text-center"><p class="text-[0.6rem] text-gray-400 font-bold">© nguyenbachtoan</p></div>
             </div>
         </div>
 
-        <!-- DICTIONARY -->
+        <!-- Dictionary -->
         <div id="dictModal" class="hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center pointer-events-none">
             <div class="absolute inset-0 bg-black/40 backdrop-blur-sm pointer-events-auto transition-opacity duration-300 opacity-0" id="dictBackdrop" onclick="closeDictModal()"></div>
             <div class="bg-white w-full sm:w-[28rem] h-[85vh] sm:h-[80vh] rounded-t-3xl sm:rounded-3xl flex flex-col pointer-events-auto transform transition-transform duration-300 translate-y-full" id="dictContent">
@@ -574,7 +517,7 @@
             </div>
         </div>
 
-        <!-- THEORY -->
+        <!-- Theory -->
         <div id="theoryModal" class="hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center pointer-events-none">
             <div class="absolute inset-0 bg-black/40 backdrop-blur-sm pointer-events-auto transition-opacity duration-300 opacity-0" id="theoryBackdrop" onclick="closeTheoryModal()"></div>
             <div class="bg-white w-full sm:w-[28rem] h-[85vh] sm:h-[80vh] rounded-t-3xl sm:rounded-3xl flex flex-col pointer-events-auto transform transition-transform duration-300 translate-y-full" id="theoryContentPanel">
@@ -597,7 +540,7 @@
             </div>
         </div>
 
-        <!-- OTHER OVERLAYS -->
+        <!-- OVERLAYS -->
         <div id="loadingOverlay" class="hidden absolute inset-0 bg-white/90 z-[60] flex flex-col items-center justify-center backdrop-blur-sm"><div class="loader mb-4"></div><p id="loadingText" class="text-gray-600 font-bold text-sm tracking-wide animate-pulse">ĐANG XỬ LÝ...</p></div>
 
         <div id="feedbackOverlay" class="hidden fixed inset-0 z-50 flex flex-col items-center justify-center pointer-events-none">
@@ -615,7 +558,7 @@
                     <p id="synonymText" class="text-xs text-gray-500 mt-3 hidden bg-gray-50 p-2 rounded-lg italic border-t border-gray-100 pt-2 w-full text-center"></p>
                     <p id="grammarExplanation" class="text-sm text-indigo-600 mt-5 pt-4 border-t border-gray-100 italic hidden text-left bg-indigo-50/50 -mx-6 -mb-6 p-6"></p>
                 </div>
-                <button onclick="nextQuestion(); document.getElementById('answerInput').focus();" class="w-full bg-gray-900 text-white font-bold text-lg py-4 rounded-3xl shadow-xl shadow-gray-400/40 active:scale-95 transition-transform flex items-center justify-center group">Tiếp tục <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i></button>
+                <button onclick="nextQuestion()" class="w-full bg-gray-900 text-white font-bold text-lg py-4 rounded-3xl shadow-xl shadow-gray-400/40 active:scale-95 transition-transform flex items-center justify-center group">Tiếp tục <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i></button>
             </div>
         </div>
 
@@ -658,193 +601,71 @@
 
         // --- USER SYSTEM: STREAK & PERSISTENT DATA ---
         const UserSystem = {
-            data: {
-                streak: 0,
-                lastLoginDate: null,
-                lastActivityTime: null,
-                wrongAnswers: [] // [{question, answer, mode, topic, addedDate}]
-            },
+            data: { streak: 0, lastLoginDate: null, lastActivityTime: null, wrongAnswers: [] },
             load() {
                 const s = localStorage.getItem('aiTutorUser');
-                if (s) {
-                    try {
-                        const parsed = JSON.parse(s);
-                        this.data = { ...this.data, ...parsed };
-                    } catch (e) { console.error("Data Load Error", e); }
-                }
-                this.checkStreak();
-                this.updateUI();
+                if (s) { try { const parsed = JSON.parse(s); this.data = { ...this.data, ...parsed }; if(!this.data.wrongAnswers) this.data.wrongAnswers = []; } catch (e) { console.error("Data Load Error", e); } }
+                this.checkStreak(); this.updateUI();
             },
-            save() {
-                localStorage.setItem('aiTutorUser', JSON.stringify(this.data));
-                this.updateUI();
-            },
+            save() { localStorage.setItem('aiTutorUser', JSON.stringify(this.data)); this.updateUI(); },
             checkStreak() {
                 const today = new Date().toDateString();
                 const last = this.data.lastLoginDate;
-
-                if (last !== today) {
-                    // Logic: If last login was yesterday, streak++. If older, streak=1.
-                    if (last) {
-                        const d1 = new Date(last);
-                        const d2 = new Date(today);
-                        const diffTime = Math.abs(d2 - d1);
-                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-                        if (diffDays === 1) {
-                            // Streak maintained but not incremented here.
-                        } else if (diffDays > 1) {
-                            this.data.streak = 0; // Reset
-                        }
-                    }
+                if (last && last !== today) {
+                    const d1 = new Date(last); const d2 = new Date(today);
+                    const diffDays = Math.ceil(Math.abs(d2 - d1) / (1000 * 60 * 60 * 24));
+                    if (diffDays > 1) this.data.streak = 0;
                 }
             },
             recordActivity() {
                 const today = new Date().toDateString();
-                const now = new Date().toLocaleString('vi-VN');
-
                 if (this.data.lastLoginDate !== today) {
-                    // First activity of the day
                     const last = this.data.lastLoginDate;
                     if (last) {
-                        const d1 = new Date(last);
-                        const d2 = new Date(today);
+                        const d1 = new Date(last); const d2 = new Date(today);
                         const diffDays = Math.ceil(Math.abs(d2 - d1) / (1000 * 60 * 60 * 24));
-                        if (diffDays === 1) this.data.streak++;
-                        else this.data.streak = 1;
-                    } else {
-                        this.data.streak = 1;
-                    }
+                        if (diffDays === 1) this.data.streak++; else this.data.streak = 1;
+                    } else { this.data.streak = 1; }
                     this.data.lastLoginDate = today;
                 }
-
-                this.data.lastActivityTime = now;
+                this.data.lastActivityTime = new Date().toLocaleString('vi-VN');
                 this.save();
             },
             addWrongAnswer(item, mode) {
-                // Deduplicate based on question text
                 const exists = this.data.wrongAnswers.find(w => w.question === item.question || (item.vi && w.question === item.vi));
-                if (!exists) {
-                    this.data.wrongAnswers.push({
-                        ...item,
-                        savedMode: mode,
-                        addedDate: new Date().toDateString()
-                    });
-                    this.save();
-                }
+                if (!exists) { this.data.wrongAnswers.push({ ...item, savedMode: mode, addedDate: new Date().toDateString() }); this.save(); }
             },
             removeWrongAnswer(questionText) {
                 this.data.wrongAnswers = this.data.wrongAnswers.filter(w => w.question !== questionText && w.vi !== questionText);
                 this.save();
             },
             updateUI() {
-                const streakEl = document.getElementById('streakCount');
-                if (streakEl) streakEl.textContent = this.data.streak;
-
-                const settingStreak = document.getElementById('settingStreak');
-                if(settingStreak) settingStreak.textContent = this.data.streak;
-
-                const lastTime = document.getElementById('lastLearnedTime');
-                if(lastTime) lastTime.textContent = this.data.lastActivityTime || "Chưa có";
-
+                const streakEl = document.getElementById('streakCount'); if (streakEl) streakEl.textContent = this.data.streak;
+                const settingStreak = document.getElementById('settingStreak'); if(settingStreak) settingStreak.textContent = this.data.streak;
+                const lastTime = document.getElementById('lastLearnedTime'); if(lastTime) lastTime.textContent = this.data.lastActivityTime || "Chưa có";
                 const reviewContainer = document.getElementById('dailyReviewContainer');
                 const wrongCount = document.getElementById('wrongCount');
                 if (reviewContainer && wrongCount) {
-                    if (this.data.wrongAnswers.length > 0) {
-                        reviewContainer.classList.remove('hidden');
-                        wrongCount.textContent = this.data.wrongAnswers.length;
-                    } else {
-                        reviewContainer.classList.add('hidden');
-                    }
+                    if (this.data.wrongAnswers && this.data.wrongAnswers.length > 0) { reviewContainer.classList.remove('hidden'); wrongCount.textContent = this.data.wrongAnswers.length; }
+                    else { reviewContainer.classList.add('hidden'); }
                 }
             }
         };
 
         const nopdTopics = {
-            "Everyday Language": [
-                {en: "Meeting & Greeting", vi: "Chào hỏi & Làm quen"},
-                {en: "Time & Date", vi: "Thời gian & Ngày tháng"},
-                {en: "Numbers", vi: "Số đếm"},
-                {en: "Colors", vi: "Màu sắc"},
-                {en: "Weather", vi: "Thời tiết"},
-                {en: "Money", vi: "Tiền tệ"}
-            ],
-            "People": [
-                {en: "Family Members", vi: "Thành viên gia đình"},
-                {en: "The Human Body", vi: "Cơ thể người"},
-                {en: "Face & Hair", vi: "Gương mặt & Tóc"},
-                {en: "Emotions", vi: "Cảm xúc"},
-                {en: "Clothes", vi: "Quần áo"},
-                {en: "Daily Routine", vi: "Thói quen hàng ngày"}
-            ],
-            "Housing": [
-                {en: "House Exterior", vi: "Ngoại thất ngôi nhà"},
-                {en: "Living Room", vi: "Phòng khách"},
-                {en: "Kitchen", vi: "Nhà bếp"},
-                {en: "Bedroom", vi: "Phòng ngủ"},
-                {en: "Bathroom", vi: "Phòng tắm"},
-                {en: "Household Chores", vi: "Việc nhà"}
-            ],
-            "Food": [
-                {en: "Fruit", vi: "Trái cây"},
-                {en: "Vegetables", vi: "Rau củ"},
-                {en: "Meat & Poultry", vi: "Thịt & Gia cầm"},
-                {en: "Seafood", vi: "Hải sản"},
-                {en: "Drinks", vi: "Đồ uống"},
-                {en: "Supermarket", vi: "Siêu thị"},
-                {en: "Restaurant", vi: "Nhà hàng"}
-            ],
-            "Health": [
-                {en: "Medical Care", vi: "Chăm sóc y tế"},
-                {en: "Ailments & Injuries", vi: "Bệnh & Chấn thương"},
-                {en: "The Hospital", vi: "Bệnh viện"},
-                {en: "Dental Care", vi: "Chăm sóc nha khoa"}
-            ],
-            "Community": [
-                {en: "The City", vi: "Thành phố"},
-                {en: "Downtown", vi: "Trung tâm thành phố"},
-                {en: "Shopping Mall", vi: "Trung tâm thương mại"},
-                {en: "Bank", vi: "Ngân hàng"},
-                {en: "Post Office", vi: "Bưu điện"},
-                {en: "Library", vi: "Thư viện"}
-            ],
-            "Transport": [
-                {en: "Car Parts", vi: "Phụ tùng xe hơi"},
-                {en: "Bicycle", vi: "Xe đạp"},
-                {en: "Public Transportation", vi: "Giao thông công cộng"},
-                {en: "Airport", vi: "Sân bay"},
-                {en: "Traffic Signs", vi: "Biển báo giao thông"}
-            ],
-            "Work": [
-                {en: "Office", vi: "Văn phòng"},
-                {en: "Construction Site", vi: "Công trường xây dựng"},
-                {en: "Farming", vi: "Nông trại"},
-                {en: "Jobs & Occupations", vi: "Nghề nghiệp"},
-                {en: "Tools", vi: "Dụng cụ"}
-            ],
-            "Nature": [
-                {en: "Animals", vi: "Động vật"},
-                {en: "Birds & Insects", vi: "Chim & Côn trùng"},
-                {en: "Plants & Trees", vi: "Cây cối"},
-                {en: "The Universe", vi: "Vũ trụ"},
-                {en: "Environment", vi: "Môi trường"}
-            ],
-            "School": [
-                {en: "Classroom", vi: "Lớp học"},
-                {en: "School Subjects", vi: "Môn học"},
-                {en: "Stationery", vi: "Văn phòng phẩm"},
-                {en: "Study Activities", vi: "Hoạt động học tập"}
-            ],
-            "Recreation": [
-                {en: "Sports", vi: "Thể thao"},
-                {en: "Hobbies", vi: "Sở thích"},
-                {en: "Music", vi: "Âm nhạc"},
-                {en: "Beach", vi: "Bãi biển"},
-                {en: "Camping", vi: "Cắm trại"}
-            ]
+            "Everyday Language": [{en: "Meeting & Greeting", vi: "Chào hỏi & Làm quen"}, {en: "Time & Date", vi: "Thời gian & Ngày tháng"}, {en: "Numbers", vi: "Số đếm"}, {en: "Colors", vi: "Màu sắc"}, {en: "Weather", vi: "Thời tiết"}, {en: "Money", vi: "Tiền tệ"}],
+            "People": [{en: "Family Members", vi: "Thành viên gia đình"}, {en: "The Human Body", vi: "Cơ thể người"}, {en: "Face & Hair", vi: "Gương mặt & Tóc"}, {en: "Emotions", vi: "Cảm xúc"}, {en: "Clothes", vi: "Quần áo"}, {en: "Daily Routine", vi: "Thói quen hàng ngày"}],
+            "Housing": [{en: "House Exterior", vi: "Ngoại thất ngôi nhà"}, {en: "Living Room", vi: "Phòng khách"}, {en: "Kitchen", vi: "Nhà bếp"}, {en: "Bedroom", vi: "Phòng ngủ"}, {en: "Bathroom", vi: "Phòng tắm"}, {en: "Household Chores", vi: "Việc nhà"}],
+            "Food": [{en: "Fruit", vi: "Trái cây"}, {en: "Vegetables", vi: "Rau củ"}, {en: "Meat & Poultry", vi: "Thịt & Gia cầm"}, {en: "Seafood", vi: "Hải sản"}, {en: "Drinks", vi: "Đồ uống"}, {en: "Supermarket", vi: "Siêu thị"}, {en: "Restaurant", vi: "Nhà hàng"}],
+            "Health": [{en: "Medical Care", vi: "Chăm sóc y tế"}, {en: "Ailments & Injuries", vi: "Bệnh & Chấn thương"}, {en: "The Hospital", vi: "Bệnh viện"}, {en: "Dental Care", vi: "Chăm sóc nha khoa"}],
+            "Community": [{en: "The City", vi: "Thành phố"}, {en: "Downtown", vi: "Trung tâm thành phố"}, {en: "Shopping Mall", vi: "Trung tâm thương mại"}, {en: "Bank", vi: "Ngân hàng"}, {en: "Post Office", vi: "Bưu điện"}, {en: "Library", vi: "Thư viện"}],
+            "Transport": [{en: "Car Parts", vi: "Phụ tùng xe hơi"}, {en: "Bicycle", vi: "Xe đạp"}, {en: "Public Transportation", vi: "Giao thông công cộng"}, {en: "Airport", vi: "Sân bay"}, {en: "Traffic Signs", vi: "Biển báo giao thông"}],
+            "Work": [{en: "Office", vi: "Văn phòng"}, {en: "Construction Site", vi: "Công trường xây dựng"}, {en: "Farming", vi: "Nông trại"}, {en: "Jobs & Occupations", vi: "Nghề nghiệp"}, {en: "Tools", vi: "Dụng cụ"}],
+            "Nature": [{en: "Animals", vi: "Động vật"}, {en: "Birds & Insects", vi: "Chim & Côn trùng"}, {en: "Plants & Trees", vi: "Cây cối"}, {en: "The Universe", vi: "Vũ trụ"}, {en: "Environment", vi: "Môi trường"}],
+            "School": [{en: "Classroom", vi: "Lớp học"}, {en: "School Subjects", vi: "Môn học"}, {en: "Stationery", vi: "Văn phòng phẩm"}, {en: "Study Activities", vi: "Hoạt động học tập"}],
+            "Recreation": [{en: "Sports", vi: "Thể thao"}, {en: "Hobbies", vi: "Sở thích"}, {en: "Music", vi: "Âm nhạc"}, {en: "Beach", vi: "Bãi biển"}, {en: "Camping", vi: "Cắm trại"}]
         };
 
-        // --- FULL RESTORED OFFLINE DATA ---
         const offlineData = {
             vocab: { "Daily Life": [{vi: "Cà phê", en: "coffee", others: "java, joe"}, {vi: "Máy tính", en: "computer", others: "pc, laptop"}, {vi: "Sách", en: "book", others: "volume, novel"}, {vi: "Bút", en: "pen", others: "biro, marker"}], "Work & Business": [{vi: "Phát triển", en: "develop", others: "grow, expand"}]},
             phrases: { "General": [{vi: "Bỏ cuộc", en: "give up", others: "quit, surrender"}, {vi: "Chăm sóc", en: "look after", others: "take care of"}] },
@@ -876,6 +697,7 @@
                 "ed": [{question: "stop", answer: "stopped", explanation: "Gấp đôi phụ âm."}, {question: "plan", answer: "planned", explanation: "Gấp đôi phụ âm."}],
                 "classify": [{question: "She runs [fast]. (Type?)", answer: "adverb", explanation: "Bổ nghĩa cho động từ runs."}, {question: "It is a [fast] car. (Type?)", "answer": "adjective", explanation: "Bổ nghĩa cho danh từ car."}]
             },
+            scramble: { "General": [{vi: "Tôi đi học bằng xe buýt.", en: "I go to school by bus"}, {vi: "Cô ấy đang nấu ăn trong bếp.", en: "She is cooking in the kitchen"}] },
             reading: { "Daily Life": [{passage: "My name is John...", question: "What time does John wake up?", answer: "6 AM", options: ["6 AM", "7 AM"], type: "mc", explanation: "Text says: 'I wake up at 6 AM'."}] },
             theory: {
                 "Present Simple": { title: "Thì Hiện Tại Đơn (Present Simple)", content: `<h3 class="font-bold text-indigo-700 mb-2">1. Công thức</h3><div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm font-mono"><div class="mb-1"><span class="text-green-600 font-bold">(+)</span> S + V(s/es)</div><div class="mb-1"><span class="text-red-500 font-bold">(-)</span> S + do/does + not + V</div><div><span class="text-blue-500 font-bold">(?)</span> Do/Does + S + V?</div></div><h3 class="font-bold text-indigo-700 mb-2">2. Cách dùng</h3><ul class="list-disc list-inside space-y-1 mb-4 text-gray-700"><li>Thói quen ở hiện tại.</li><li>Sự thật hiển nhiên.</li><li>Lịch trình cố định.</li></ul>` },
@@ -907,98 +729,61 @@
         const tenseTranslations = { "Present Simple": "Hiện tại đơn", "Present Continuous": "Hiện tại tiếp diễn", "Present Perfect": "Hiện tại hoàn thành", "Present Perfect Continuous": "HT hoàn thành tiếp diễn", "Past Simple": "Quá khứ đơn", "Past Continuous": "Quá khứ tiếp diễn", "Past Perfect": "Quá khứ hoàn thành", "Past Perfect Continuous": "QK hoàn thành tiếp diễn", "Future Simple": "Tương lai đơn", "Future Continuous": "Tương lai tiếp diễn", "Future Perfect": "Tương lai hoàn thành", "Future Perfect Continuous": "TL hoàn thành tiếp diễn" };
         const formReadableNames = { "irregular": "Irregular Verbs (Bất quy tắc)", "irregular_v3": "Past Participle (Quá khứ phân từ)", "noun_suffix": "Noun Suffixes (Hậu tố Danh từ)", "adj_suffix": "Adjective Suffixes (Hậu tố Tính từ)", "prefixes": "Prefixes (Tiền tố)", "verb_noun": "Verb to Noun (Động từ → Danh từ)", "noun_adj": "Noun to Adjective (Danh từ → Tính từ)", "adj_adv": "Adjective to Adverb (Tính từ → Trạng từ)", "ing": "-ING Ending (Đuôi -ING)", "ed": "-ED Ending (Đuôi -ED)", "classify": "Word Class (Phân loại từ)" };
 
-        let gameState = { mode: 'vocab', data: [], currentIdx: 0, score: 0, history: [], currentCorrect: "", currentOthers: [], isReviewMode: false };
-        let theoryTab = 'grammar';
-        let currentGlobalTopic = null; // Stores the active NOPD topic (English)
-        let currentGlobalTopicVi = null; // Stores Vietnamese name
-        let comboCount = 0; // NEW: Track consecutive answers
+        let gameState = { mode: 'vocab', data: [], currentIdx: 0, score: 0, history: [], currentCorrect: "", currentOthers: [], isReviewMode: false, roleplayContext: null };
+        let currentGlobalTopic = null;
+        let currentGlobalTopicVi = null;
+        let comboCount = 0;
 
         const els = {
-            app: document.getElementById('app'),
             screens: { start: document.getElementById('startScreen'), game: document.getElementById('gameScreen'), result: document.getElementById('resultScreen') },
             views: { sharedInput: document.getElementById('sharedInputArea'), reading: document.getElementById('viewReading'), grammar: document.getElementById('viewGrammar'), forms: document.getElementById('viewForms') },
             inputs: { vocabTopic: document.getElementById('vocabTopicInput'), vocabSelect: document.getElementById('vocabTopicSelect'), readingTopic: document.getElementById('readingTopicInput'), readingSelect: document.getElementById('readingTopicSelect'), grammarTense: document.getElementById('grammarTenseSelect'), formsType: document.getElementById('formsTypeSelect'), answer: document.getElementById('answerInput'), dict: document.getElementById('dictInput') },
-            game: { title: document.getElementById('gameTitle'), qNum: document.getElementById('currentQ'), totalQ: document.getElementById('totalQ'), progress: document.getElementById('progressBar'), display: document.getElementById('mainDisplay'), passageDisplay: document.getElementById('readingPassageDisplay'), listeningDisplay: document.getElementById('listeningDisplay'), subDisplay: document.getElementById('subDisplay'), instruction: document.getElementById('instructionText'), quickOptions: document.getElementById('quickOptions'), comboBadge: document.getElementById('comboBadge'), comboText: document.getElementById('comboCountText'), floatingCombo: document.getElementById('floatingComboContainer') },
+            game: { title: document.getElementById('gameTitle'), qNum: document.getElementById('currentQ'), totalQ: document.getElementById('totalQ'), progress: document.getElementById('progressBar'), display: document.getElementById('mainDisplay'), passageDisplay: document.getElementById('readingPassageDisplay'), listeningDisplay: document.getElementById('listeningDisplay'), subDisplay: document.getElementById('subDisplay'), instruction: document.getElementById('instructionText'), quickOptions: document.getElementById('quickOptions'), comboBadge: document.getElementById('comboBadge'), comboText: document.getElementById('comboCountText'), floatingCombo: document.getElementById('floatingComboContainer'), scrambleContainer: document.getElementById('scrambleContainer'), scrambleBank: document.getElementById('scrambleBank'), scrambleResult: document.getElementById('scrambleResult'), roleplayContainer: document.getElementById('roleplayContainer'), chatHistory: document.getElementById('chatHistory'), wrapper: document.getElementById('gameDisplayWrapper'), contentBox: document.getElementById('gameContentBox') },
             feedback: { overlay: document.getElementById('feedbackOverlay'), title: document.getElementById('feedbackTitle'), correctText: document.getElementById('correctAnswerText'), explanation: document.getElementById('grammarExplanation'), synonym: document.getElementById('synonymText'), border: document.getElementById('feedbackBorder') },
             settings: { panel: document.getElementById('settingsPanel'), content: document.getElementById('settingsContent'), backdrop: document.getElementById('settingsBackdrop'), keyStatus: document.getElementById('keyStatus') },
             dict: { modal: document.getElementById('dictModal'), content: document.getElementById('dictContent'), backdrop: document.getElementById('dictBackdrop'), result: document.getElementById('dictResultArea'), input: document.getElementById('dictInput') },
             theory: { modal: document.getElementById('theoryModal'), content: document.getElementById('theoryContentPanel'), backdrop: document.getElementById('theoryBackdrop'), listGrammar: document.getElementById('theoryListGrammar'), listForms: document.getElementById('theoryListForms'), detail: document.getElementById('theoryDetail'), contentText: document.getElementById('theoryDetailContent'), tabs: { grammar: document.getElementById('btnTheoryGrammar'), forms: document.getElementById('btnTheoryForms') } },
             topic: { modal: document.getElementById('topicModal'), content: document.getElementById('topicContentPanel'), backdrop: document.getElementById('topicBackdrop'), list: document.getElementById('topicListContent'), banner: document.getElementById('activeTopicBanner'), bannerName: document.getElementById('activeTopicName'), bannerNameVi: document.getElementById('activeTopicNameVi') },
-            wrappers: { onlineVocab: document.getElementById('onlineVocabInput'), offlineVocab: document.getElementById('offlineVocabSelect'), readingInput: document.getElementById('readingTopicInput'), readingSelect: document.getElementById('readingSelectWrapper'), inputWrapper: document.getElementById('inputWrapper'), inputIcon: document.getElementById('inputIcon'), inputTitle: document.getElementById('inputTitle'), lockedOverlay: document.getElementById('lockedInputOverlay'), lockedName: document.getElementById('lockedTopicName'), lockedNameVi: document.getElementById('lockedTopicNameVi') },
-            config: { level: document.getElementById('levelSelect'), qtyInput: document.getElementById('quantityRange'), qtyDisplay: document.getElementById('qtyDisplay'), section: document.getElementById('configSection'), startBtn: document.getElementById('startBtn') },
+            wrappers: { inputWrapper: document.getElementById('inputWrapper'), lockedOverlay: document.getElementById('lockedInputOverlay'), lockedName: document.getElementById('lockedTopicName'), lockedNameVi: document.getElementById('lockedTopicNameVi') },
+            config: { level: document.getElementById('levelSelect'), qtyInput: document.getElementById('quantityRange'), qtyDisplay: document.getElementById('qtyDisplay') },
             loading: { overlay: document.getElementById('loadingOverlay'), text: document.getElementById('loadingText') },
-            aiStatus: { dot: document.getElementById('aiStatusDot'), text: document.getElementById('aiStatusText') },
+            aiStatus: { dot: document.getElementById('aiStatusDot') },
             checkBtn: document.getElementById('checkBtn'),
-            modeCards: { vocab: document.getElementById('mode-vocab'), phrases: document.getElementById('mode-phrases'), idioms: document.getElementById('mode-idioms'), listening: document.getElementById('mode-listening'), reading: document.getElementById('mode-reading'), grammar: document.getElementById('mode-grammar'), forms: document.getElementById('mode-forms') }
+            modeCards: { vocab: document.getElementById('mode-vocab'), phrases: document.getElementById('mode-phrases'), idioms: document.getElementById('mode-idioms'), listening: document.getElementById('mode-listening'), reading: document.getElementById('mode-reading'), grammar: document.getElementById('mode-grammar'), forms: document.getElementById('mode-forms'), scramble: document.getElementById('mode-scramble'), roleplay: document.getElementById('mode-roleplay') }
         };
 
-        if (els.inputs.grammarTense) {
-            let html = '<option value="random">🎲 Tổng hợp (Mixed Tenses)</option>';
-            html += Object.keys(offlineData.grammar).map(t => `<option value="${t}">${t} (${tenseTranslations[t] || ''})</option>`).join('');
-            els.inputs.grammarTense.innerHTML = html;
-        }
-        if (els.inputs.formsType) {
-            let html = '<option value="random">🎲 Tổng hợp (Mixed Forms)</option>';
-            html += Object.keys(offlineData.forms).map(t => `<option value="${t}">${formReadableNames[t] || t}</option>`).join('');
-            els.inputs.formsType.innerHTML = html;
-        }
-
         const toggleModal = (modal, content, backdrop, show) => { if (show) { modal.classList.remove('hidden'); setTimeout(() => { backdrop.classList.remove('opacity-0'); content.classList.remove('translate-y-full'); }, 10); } else { backdrop.classList.add('opacity-0'); content.classList.add('translate-y-full'); setTimeout(() => { modal.classList.add('hidden'); }, 300); } };
-
         const checkKeyStatus = () => { if(els.aiStatus.dot) els.aiStatus.dot.className = "ai-status-dot status-online"; };
         const toggleSettings = () => { const isHidden = els.settings.panel.classList.contains('hidden'); toggleModal(els.settings.panel, els.settings.content, els.settings.backdrop, isHidden); };
         const openDictModal = () => { toggleModal(els.dict.modal, els.dict.content, els.dict.backdrop, true); setTimeout(() => els.dict.input.focus(), 300); };
         const closeDictModal = () => toggleModal(els.dict.modal, els.dict.content, els.dict.backdrop, false);
         const openTheoryModal = () => { toggleModal(els.theory.modal, els.theory.content, els.theory.backdrop, true); switchTheoryTab('grammar'); };
         const closeTheoryModal = () => toggleModal(els.theory.modal, els.theory.content, els.theory.backdrop, false);
-
-        // --- TOPIC MODAL FUNCTIONS ---
-        const openTopicModal = () => {
-            renderTopicList();
-            toggleModal(els.topic.modal, els.topic.content, els.topic.backdrop, true);
-        };
+        const openTopicModal = () => { renderTopicList(); toggleModal(els.topic.modal, els.topic.content, els.topic.backdrop, true); };
         const closeTopicModal = () => toggleModal(els.topic.modal, els.topic.content, els.topic.backdrop, false);
 
         const renderTopicList = () => {
             let html = '';
             for (const [category, topics] of Object.entries(nopdTopics)) {
-                html += `
-                    <div class="mb-4">
-                        <h3 class="font-black text-gray-400 text-xs uppercase tracking-widest mb-2 sticky top-0 bg-white py-1 z-10">${category}</h3>
-                        <div class="grid grid-cols-2 gap-2">
-                            ${topics.map(topic => `
-                                <div onclick="selectTopic('${topic.en}', '${topic.vi}')" class="topic-cat-card bg-gray-50 hover:bg-yellow-50 border border-gray-100 hover:border-yellow-200 p-3 rounded-xl cursor-pointer flex flex-col justify-center min-h-[60px]">
-                                    <span class="font-bold text-gray-700 text-sm leading-tight mb-1">${topic.en}</span>
-                                    <span class="text-[10px] text-gray-400 font-medium leading-tight">${topic.vi}</span>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
+                html += `<div class="mb-4"><h3 class="font-black text-gray-400 text-xs uppercase tracking-widest mb-2 sticky top-0 bg-white py-1 z-10">${category}</h3><div class="grid grid-cols-2 gap-2">${topics.map(topic => `<div onclick="selectTopic('${topic.en}', '${topic.vi}')" class="topic-cat-card bg-gray-50 hover:bg-yellow-50 border border-gray-100 hover:border-yellow-200 p-3 rounded-xl cursor-pointer flex flex-col justify-center min-h-[60px]"><span class="font-bold text-gray-700 text-sm leading-tight mb-1">${topic.en}</span><span class="text-[10px] text-gray-400 font-medium leading-tight">${topic.vi}</span></div>`).join('')}</div></div>`;
             }
             els.topic.list.innerHTML = html;
         };
 
         const selectTopic = (topicEn, topicVi) => {
-            currentGlobalTopic = topicEn;
-            currentGlobalTopicVi = topicVi;
+            currentGlobalTopic = topicEn; currentGlobalTopicVi = topicVi;
             els.topic.banner.classList.remove('hidden'); els.topic.bannerName.textContent = topicEn; els.topic.bannerNameVi.textContent = topicVi;
             els.wrappers.lockedOverlay.classList.remove('hidden'); els.wrappers.lockedName.textContent = topicEn; els.wrappers.lockedNameVi.textContent = topicVi;
             closeTopicModal();
             const activeCard = document.querySelector('.mode-card.active'); if (activeCard) { setMode(activeCard.id.replace('mode-', '')); }
         };
 
-        const clearTopic = () => {
-            currentGlobalTopic = null; currentGlobalTopicVi = null;
-            els.topic.banner.classList.add('hidden'); els.wrappers.lockedOverlay.classList.add('hidden');
-            const activeCard = document.querySelector('.mode-card.active'); if (activeCard) { setMode(activeCard.id.replace('mode-', '')); }
-        };
+        const clearTopic = () => { currentGlobalTopic = null; currentGlobalTopicVi = null; els.topic.banner.classList.add('hidden'); els.wrappers.lockedOverlay.classList.add('hidden'); const activeCard = document.querySelector('.mode-card.active'); if (activeCard) { setMode(activeCard.id.replace('mode-', '')); } };
 
-        // --- CONFETTI & COMBO LOGIC (NEW) ---
+        // --- CONFETTI & COMBO LOGIC ---
         const canvasConfetti = document.getElementById('confetti-canvas');
         const ctxConfetti = canvasConfetti.getContext('2d');
         let particles = [];
-
         const resizeCanvas = () => { canvasConfetti.width = window.innerWidth; canvasConfetti.height = window.innerHeight; };
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
@@ -1006,207 +791,76 @@
         function createParticles(x, y, count) {
             const colors = ['#FCD34D', '#EF4444', '#3B82F6', '#10B981', '#8B5CF6'];
             for (let i = 0; i < count; i++) {
-                particles.push({
-                    x: x, y: y,
-                    vx: (Math.random() - 0.5) * 10,
-                    vy: (Math.random() - 1) * 10 - 2,
-                    size: Math.random() * 8 + 4,
-                    color: colors[Math.floor(Math.random() * colors.length)],
-                    life: 100,
-                    decay: Math.random() * 0.05 + 0.02
-                });
+                particles.push({ x: x, y: y, vx: (Math.random() - 0.5) * 10, vy: (Math.random() - 1) * 10 - 2, size: Math.random() * 8 + 4, color: colors[Math.floor(Math.random() * colors.length)], life: 100, decay: Math.random() * 0.05 + 0.02 });
             }
         }
-
         function updateConfetti() {
             ctxConfetti.clearRect(0, 0, canvasConfetti.width, canvasConfetti.height);
             for (let i = 0; i < particles.length; i++) {
-                let p = particles[i];
-                p.x += p.vx;
-                p.y += p.vy;
-                p.vy += 0.2; // Gravity
-                p.life -= 1;
-                p.size -= p.decay;
-
-                if (p.life > 0 && p.size > 0) {
-                    ctxConfetti.fillStyle = p.color;
-                    ctxConfetti.beginPath();
-                    ctxConfetti.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                    ctxConfetti.fill();
-                } else {
-                    particles.splice(i, 1);
-                    i--;
-                }
+                let p = particles[i]; p.x += p.vx; p.y += p.vy; p.vy += 0.2; p.life -= 1; p.size -= p.decay;
+                if (p.life > 0 && p.size > 0) { ctxConfetti.fillStyle = p.color; ctxConfetti.beginPath(); ctxConfetti.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctxConfetti.fill(); }
+                else { particles.splice(i, 1); i--; }
             }
             if (particles.length > 0) requestAnimationFrame(updateConfetti);
         }
-
         function fireConfetti(fullScreen = false) {
-            if (fullScreen) {
-                createParticles(window.innerWidth / 2, window.innerHeight / 2, 100);
-            } else {
-                createParticles(window.innerWidth / 2, window.innerHeight / 1.5, 30);
-            }
-            if (particles.length <= 100) requestAnimationFrame(updateConfetti); // Only start loop if not running
+            if (fullScreen) { createParticles(window.innerWidth / 2, window.innerHeight / 2, 100); }
+            else { createParticles(window.innerWidth / 2, window.innerHeight / 1.5, 30); }
+            if (particles.length <= 100) requestAnimationFrame(updateConfetti);
         }
-
         function triggerComboVisuals(streak) {
-            if (streak > 1) {
-                els.game.display.classList.remove('pop-in');
-                void els.game.display.offsetWidth; // Trigger reflow
-                els.game.display.classList.add('pop-in');
-            }
+            if (streak > 1) { els.game.display.classList.remove('pop-in'); void els.game.display.offsetWidth; els.game.display.classList.add('pop-in'); }
             if (streak >= 2) {
-                const floatEl = document.createElement('div');
-                floatEl.className = 'combo-text text-4xl';
-                floatEl.textContent = `COMBO x${streak}!`;
-                floatEl.style.left = '50%';
-                floatEl.style.top = '40%';
-                floatEl.style.transform = 'translate(-50%, -50%)';
-                els.game.floatingCombo.appendChild(floatEl);
-                setTimeout(() => floatEl.remove(), 1000);
+                const floatEl = document.createElement('div'); floatEl.className = 'combo-text text-4xl'; floatEl.textContent = `COMBO x${streak}!`;
+                floatEl.style.left = '50%'; floatEl.style.top = '40%'; floatEl.style.transform = 'translate(-50%, -50%)';
+                els.game.floatingCombo.appendChild(floatEl); setTimeout(() => floatEl.remove(), 1000);
             }
-            if (streak >= 2) {
-                els.game.comboBadge.classList.remove('hidden', 'scale-0');
-                els.game.comboBadge.classList.add('scale-100', 'flex');
-                els.game.comboText.textContent = `x${streak}`;
-            } else {
-                els.game.comboBadge.classList.add('hidden', 'scale-0');
-                els.game.comboBadge.classList.remove('flex');
-            }
-            if (streak % 5 === 0) fireConfetti(true);
-            else if (streak > 1) fireConfetti(false);
+            if (streak >= 2) { els.game.comboBadge.classList.remove('hidden', 'scale-0'); els.game.comboBadge.classList.add('scale-100', 'flex'); els.game.comboText.textContent = `x${streak}`; }
+            else { els.game.comboBadge.classList.add('hidden', 'scale-0'); els.game.comboBadge.classList.remove('flex'); }
+            if (streak % 5 === 0) fireConfetti(true); else if (streak > 1) fireConfetti(false);
         }
 
-        // --- ROBUST FETCH HELPERS ---
+        // --- GAME LOGIC ---
         async function robustFetch(url, retries = 3) {
             for (let i = 0; i < retries; i++) {
                 try {
-                    const res = await fetch(url);
-                    if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
-                    return await res.json();
-                } catch (e) {
-                    if (i === retries - 1) throw e;
-                    await new Promise(r => setTimeout(r, 1000 * (i + 1)));
-                }
+                    const res = await fetch(url); if (!res.ok) throw new Error(`HTTP Error: ${res.status}`); return await res.json();
+                } catch (e) { if (i === retries - 1) throw e; await new Promise(r => setTimeout(r, 1000 * (i + 1))); }
             }
         }
 
         async function callServerAI(promptText, jsonMode = true, retries = 3) {
             for (let i = 0; i < retries; i++) {
                 try {
-                    const res = await fetch(`${SERVER_URL}/api/generate`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ prompt: promptText, jsonMode: jsonMode })
-                    });
+                    const res = await fetch(`${SERVER_URL}/api/generate`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt: promptText, jsonMode: jsonMode }) });
                     const data = await res.json();
                     if (data.error) throw new Error(data.error);
                     if (jsonMode) {
                         let cleanText = data.result.replace(/```json/g, '').replace(/```/g, '').trim();
                         const parsed = JSON.parse(cleanText);
                         if (Array.isArray(parsed)) { if (parsed.length === 0) throw new Error("Empty Array Returned"); return parsed; }
-                        if (typeof parsed === 'object' && parsed !== null) {
-                            if (parsed.title || parsed.definition) return parsed;
-                            const values = Object.values(parsed);
-                            const foundArray = values.find(v => Array.isArray(v));
-                            if (foundArray && foundArray.length > 0) return foundArray;
-                            if (Object.keys(parsed).length > 0) return parsed;
-                        }
+                        if (typeof parsed === 'object' && parsed !== null) { if (parsed.title || parsed.definition || parsed.reply) return parsed; const values = Object.values(parsed); const foundArray = values.find(v => Array.isArray(v)); if (foundArray && foundArray.length > 0) return foundArray; if (Object.keys(parsed).length > 0) return parsed; }
                         throw new Error("AI returned unrecognized data structure.");
                     } else { return data.result; }
                 } catch (e) {
                     console.warn(`Server Attempt ${i + 1} failed: ${e.message}`);
-                    const loadingText = document.getElementById('loadingText');
-                    if(loadingText && !loadingText.parentElement.classList.contains('hidden')) loadingText.textContent = `ĐANG THỬ LẠI (${i+1}/${retries})...`;
-                    if (i === retries - 1) throw e;
-                    await new Promise(r => setTimeout(r, 1500 * (i + 1)));
+                    const loadingText = document.getElementById('loadingText'); if(loadingText && !loadingText.parentElement.classList.contains('hidden')) loadingText.textContent = `ĐANG THỬ LẠI (${i+1}/${retries})...`;
+                    if (i === retries - 1) throw e; await new Promise(r => setTimeout(r, 1500 * (i + 1)));
                 }
             }
         }
 
-        function isVietnamese(str) { return /[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]/i.test(str); }
-        const lookupDictionary = async () => {
-            const word = els.dict.input.value.trim(); if (!word) return;
-            els.dict.result.innerHTML = '<div class="flex flex-col items-center justify-center h-48"><div class="loader mb-2"></div><p class="text-xs text-gray-500 font-bold">Đang tra cứu...</p></div>';
-            try {
-                if (isVietnamese(word)) {
-                    const data = await robustFetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(word)}&langpair=vi|en`);
-                    if (data.responseStatus === 200) els.dict.result.innerHTML = `<div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 animate-fadeIn"><h2 class="text-2xl font-black text-gray-800 mb-1">${word}</h2><p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">VIETNAMESE</p><div class="border-t border-gray-100 pt-4"><p class="font-bold text-indigo-600 text-xl">${data.responseData.translatedText}</p><p class="text-xs text-gray-400 mt-1">English Translation</p></div></div>`;
-                    else els.dict.result.innerHTML = `<div class="p-4 text-center text-red-400 font-bold">Không tìm thấy bản dịch.</div>`;
-                } else {
-                    let freeApiData = null, translation = null;
-                    try { const dictData = await robustFetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`); freeApiData = dictData[0]; } catch (e) {}
-                    try { const transData = await robustFetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(word)}&langpair=en|vi`); if (transData.responseStatus === 200) translation = transData.responseData.translatedText; } catch (e) {}
-                    if (!freeApiData && !translation) { els.dict.result.innerHTML = `<div class="text-center p-4 text-gray-400 font-medium">Không tìm thấy từ này.</div>`; return; }
-                    let html = `<div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 animate-fadeIn"><div class="flex items-center justify-between mb-2"><h2 class="text-3xl font-black text-gray-800 capitalize">${freeApiData ? freeApiData.word : word}</h2>`;
-                    if (freeApiData) { const audioSrc = freeApiData.phonetics.find(p => p.audio)?.audio; if (audioSrc) html += `<button onclick="new Audio('${audioSrc}').play()" class="w-10 h-10 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center hover:bg-orange-200 transition-colors"><i class="fas fa-volume-up"></i></button>`; }
-                    html += `</div>`;
-                    if (freeApiData) { const phonetic = freeApiData.phonetic || (freeApiData.phonetics.find(p => p.text)?.text) || ""; html += `<p class="text-orange-500 font-mono text-sm mb-6 font-bold">${phonetic}</p>`; }
-                    if (translation) html += `<div class="mb-6 bg-green-50 p-4 rounded-2xl border border-green-100"><p class="text-[10px] text-green-800 font-black uppercase tracking-widest mb-1">NGHĨA TIẾNG VIỆT</p><p class="text-xl font-bold text-gray-800">${translation}</p></div>`;
-                    if (freeApiData && freeApiData.meanings) { html += `<div class="mb-2"><h3 class="font-bold text-gray-700 text-sm uppercase tracking-wider border-b border-gray-100 pb-2 mb-3">Định nghĩa (Anh-Anh)</h3><ul class="list-disc pl-5 text-sm text-gray-600 space-y-2 leading-relaxed">`; const defs = freeApiData.meanings[0].definitions.slice(0, 3); defs.forEach(d => { html += `<li>${d.definition}</li>`; }); html += `</ul></div>`; }
-                    html += `</div>`; els.dict.result.innerHTML = html;
-                }
-            } catch (e) { els.dict.result.innerHTML = `<div class="text-center p-4 text-red-500 font-bold">Lỗi kết nối hoặc API quá tải.</div>`; }
-        };
-
-        const switchTheoryTab = (tab) => {
-            theoryTab = tab;
-            els.theory.tabs.grammar.className = tab==='grammar' ? 'flex-1 py-2.5 rounded-xl text-xs font-bold bg-indigo-100 text-indigo-700 transition-colors' : 'flex-1 py-2.5 rounded-xl text-xs font-bold text-gray-500 hover:bg-gray-50 transition-colors';
-            els.theory.tabs.forms.className = tab==='forms' ? 'flex-1 py-2.5 rounded-xl text-xs font-bold bg-green-100 text-green-700 transition-colors' : 'flex-1 py-2.5 rounded-xl text-xs font-bold text-gray-500 hover:bg-gray-50 transition-colors';
-            els.theory.listGrammar.classList.toggle('hidden', tab !== 'grammar');
-            els.theory.listForms.classList.toggle('hidden', tab !== 'forms');
-            els.theory.detail.classList.add('hidden');
-            const dataSrc = tab === 'grammar' ? offlineData.grammar : offlineData.forms;
-            const container = tab === 'grammar' ? els.theory.listGrammar : els.theory.listForms;
-            container.innerHTML = Object.keys(dataSrc).map(t => `<div onclick="loadTheory('${t}', '${tab}')" class="p-4 bg-white rounded-2xl shadow-sm border border-gray-100 cursor-pointer hover:bg-gray-50 active:scale-[0.98] transition-all flex justify-between items-center group"><span class="font-bold text-gray-700 group-hover:text-indigo-600 transition-colors">${tab === 'forms' ? (formReadableNames[t] || t) : `${t} <span class="text-xs font-normal text-gray-500 ml-1">(${tenseTranslations[t] || ''})</span>`}</span><i class="fas fa-chevron-right text-gray-300 text-xs"></i></div>`).join('');
-        };
-        const backToTheoryList = () => { els.theory.detail.classList.add('hidden'); if(theoryTab === 'grammar') els.theory.listGrammar.classList.remove('hidden'); else els.theory.listForms.classList.remove('hidden'); };
-
-        const renderTheoryAI = (data) => {
-            let html = `<div class="animate-fadeIn"><h2 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-500 mb-4 border-b pb-4">${data.title || "Lý thuyết"}</h2>`;
-            if(data.definition) html += `<div class="mb-6"><p class="text-gray-700 text-sm leading-relaxed font-medium">${data.definition}</p></div>`;
-            if(data.formulas && data.formulas.length > 0) { html += `<h3 class="text-sm font-bold text-indigo-800 mb-3 flex items-center gap-2"><i class="fas fa-flask text-indigo-500"></i> Công thức</h3><div class="space-y-2 mb-6">`; data.formulas.forEach(f => { let icon = '•'; let color = 'text-gray-700'; if(f.type === 'affirmative' || f.type.includes('+')) { icon = '(+)'; color = 'text-green-600'; } else if(f.type === 'negative' || f.type.includes('-')) { icon = '(-)'; color = 'text-red-500'; } else if(f.type === 'question' || f.type.includes('?')) { icon = '(?)'; color = 'text-blue-500'; } html += `<div class="bg-indigo-50/50 p-3 rounded-xl border border-indigo-100 flex items-start gap-3"><span class="${color} font-black text-sm pt-0.5 whitespace-nowrap">${icon}</span><span class="font-mono text-sm text-indigo-900 font-bold">${f.formula || f.structure}</span></div>`; }); html += `</div>`; }
-            if(data.rules && data.rules.length > 0) { html += `<h3 class="text-sm font-bold text-green-800 mb-3 flex items-center gap-2"><i class="fas fa-gavel text-green-500"></i> Quy tắc</h3><div class="space-y-2 mb-6">`; data.rules.forEach(r => { html += `<div class="bg-green-50 p-3 rounded-xl border border-green-100"><div class="font-bold text-gray-800 text-sm mb-1">${r.rule}</div>${r.example ? `<div class="text-xs text-gray-500 italic">VD: ${r.example}</div>` : ''}</div>`; }); html += `</div>`; }
-            if(data.usages && data.usages.length > 0) { html += `<h3 class="text-sm font-bold text-orange-800 mb-3 flex items-center gap-2"><i class="fas fa-list-ul text-orange-500"></i> Cách dùng</h3><ul class="space-y-2 mb-6">`; data.usages.forEach(u => { html += `<li class="flex items-start gap-2 text-sm text-gray-700 bg-orange-50/50 p-2 rounded-lg border border-orange-100"><i class="fas fa-check-circle text-orange-400 mt-0.5 text-xs"></i> <span>${u}</span></li>`; }); html += `</ul>`; }
-            if(data.signs) html += `<h3 class="text-sm font-bold text-purple-800 mb-3 flex items-center gap-2"><i class="fas fa-eye text-purple-500"></i> Dấu hiệu nhận biết</h3><div class="bg-purple-50 p-3 rounded-xl border border-purple-100 text-sm text-purple-900 font-medium italic mb-6">${data.signs}</div>`;
-            if(data.examples && data.examples.length > 0) { html += `<h3 class="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2"><i class="fas fa-quote-left text-gray-400"></i> Ví dụ</h3><div class="grid gap-2">`; data.examples.forEach(ex => { html += `<div class="border-l-4 border-gray-200 pl-3 py-1"><div class="text-sm font-bold text-gray-800">${ex.en}</div><div class="text-xs text-gray-500">${ex.vi}</div></div>`; }); html += `</div>`; }
-            html += `</div>`; return html;
-        }
-
-        const loadTheory = async (topic, type) => {
-            els.theory.listGrammar.classList.add('hidden'); els.theory.listForms.classList.add('hidden'); els.theory.detail.classList.remove('hidden');
-            els.theory.contentText.innerHTML = '<div class="flex flex-col items-center justify-center h-48"><div class="loader mb-2"></div><p class="text-xs text-gray-500 font-bold">Đang tải kiến thức từ Server...</p></div>';
-            const friendlyName = formReadableNames[topic] || topic;
-            setTimeout(async () => {
-                try {
-                    let prompt = "";
-                    if (type === 'forms') prompt = `Generate theory for Word Forms: "${friendlyName}". Return ONLY Valid JSON. Structure: { "title": "${friendlyName}", "definition": "...", "rules": [{"rule": "...", "example": "..."}], "examples": [{"en": "...", "vi": "..."}] }`;
-                    else prompt = `Generate theory for English Grammar: "${topic}". Return ONLY Valid JSON. Structure: { "title": "Vietnamese Title", "definition": "...", "formulas": [{"type": "affirmative(+)/negative(-)/question(?)", "formula": "..."}], "usages": ["..."], "signs": "...", "examples": [{"en": "...", "vi": "..."}] }`;
-                    const jsonData = await callServerAI(prompt);
-                    els.theory.contentText.innerHTML = renderTheoryAI(jsonData);
-                } catch(e) {
-                    console.error("Server Error:", e);
-                    const offlineContent = offlineData.theory[topic];
-                    if (offlineContent) els.theory.contentText.innerHTML = `<h2 class="text-2xl font-black text-indigo-900 mb-6 border-b pb-4">${offlineContent.title} (Offline)</h2>${offlineContent.content}`;
-                    else els.theory.contentText.innerHTML = `<div class="text-center p-4 text-red-500 font-bold">Lỗi kết nối Server và không có dữ liệu Offline.<br><span class="text-xs font-normal text-gray-500">${e.message}</span><br><button onclick="loadTheory('${topic}', '${type}')" class="mt-4 bg-indigo-100 text-indigo-700 px-4 py-2 rounded-lg text-xs font-bold">Thử lại</button></div>`;
-                }
-            }, 300);
-        };
-
-        const showLoading = (b) => { els.loading.overlay.classList.toggle('hidden', !b); if(b) els.loading.text.textContent = "ĐANG GỌI SERVER..."; };
-        const updateLevel = (val, el) => { document.getElementById('levelSelect').value = val; document.querySelectorAll('.level-card').forEach(c => { c.classList.remove('selected', 'bg-yellow-50', 'border-yellow-400'); c.classList.add('bg-gray-50', 'border-transparent'); }); el.classList.add('selected'); };
-
         const updateUI = () => {
-             if (!gameState.data || gameState.data.length === 0 || !gameState.data[gameState.currentIdx]) return;
+             if (gameState.mode !== 'roleplay' && (!gameState.data || !gameState.data[gameState.currentIdx])) return;
              const item = gameState.data[gameState.currentIdx];
             els.game.qNum.textContent = gameState.currentIdx + 1;
-            els.game.progress.style.width = `${((gameState.currentIdx + 1) / gameState.data.length) * 100}%`;
+            els.game.progress.style.width = `${((gameState.currentIdx + 1) / (gameState.data.length || 10)) * 100}%`;
             els.inputs.answer.value = "";
             els.game.quickOptions.classList.add('hidden'); els.game.quickOptions.innerHTML = '';
-            els.game.display.classList.remove('hidden'); els.game.listeningDisplay.classList.add('hidden'); els.game.subDisplay.classList.add('hidden'); els.game.passageDisplay.classList.add('hidden');
+            els.game.display.classList.remove('hidden'); els.game.listeningDisplay.classList.add('hidden'); els.game.subDisplay.classList.add('hidden'); els.game.passageDisplay.classList.add('hidden'); els.game.scrambleContainer.classList.add('hidden'); els.game.roleplayContainer.classList.add('hidden');
             els.wrappers.inputWrapper.classList.remove('hidden');
             els.checkBtn.classList.remove('btn-expanded', 'w-full', 'rounded-3xl'); els.checkBtn.classList.add('w-11', 'rounded-xl', 'no-shrink'); els.checkBtn.innerHTML = '<i class="fas fa-check"></i>';
+            els.inputs.answer.placeholder = "Nhập đáp án...";
 
             let modeToRender = gameState.isReviewMode ? item.savedMode : gameState.mode;
 
@@ -1219,16 +873,210 @@
                 els.game.display.textContent = item.question; els.game.display.classList.remove('text-2xl', 'sm:text-2xl'); els.game.display.classList.add('text-lg', 'sm:text-xl');
                 els.game.instruction.textContent = item.type === 'tf' ? "TRUE OR FALSE?" : (item.type === 'cloze' ? "FILL IN THE BLANK" : "MULTIPLE CHOICE");
                 gameState.currentCorrect = item.answer; gameState.currentOthers = [];
-                if (item.type !== 'cloze') { els.wrappers.inputWrapper.classList.add('hidden'); els.checkBtn.classList.remove('w-11', 'rounded-xl', 'no-shrink'); els.checkBtn.classList.remove('no-shrink'); els.checkBtn.classList.add('btn-expanded', 'w-full', 'rounded-3xl'); els.checkBtn.innerHTML = '<span class="font-bold mr-2">KIỂM TRA</span> <i class="fas fa-check"></i>'; }
+                if (item.type !== 'cloze') { els.wrappers.inputWrapper.classList.add('hidden'); els.checkBtn.classList.remove('w-11', 'rounded-xl', 'no-shrink'); els.checkBtn.classList.add('btn-expanded', 'w-full', 'rounded-3xl'); els.checkBtn.innerHTML = '<span class="font-bold mr-2">KIỂM TRA</span> <i class="fas fa-check"></i>'; }
                 if (item.options && item.options.length > 0 && item.type !== 'cloze') { els.game.quickOptions.classList.remove('hidden'); item.options.forEach(opt => { const btn = document.createElement('button'); btn.className = "option-chip bg-white px-3 py-2 rounded-xl text-sm font-bold text-gray-700 shadow-sm w-full mb-1"; btn.textContent = opt; btn.onclick = () => { Array.from(els.game.quickOptions.children).forEach(c => c.classList.remove('option-selected')); btn.classList.add('option-selected'); els.inputs.answer.value = opt; }; els.game.quickOptions.appendChild(btn); }); }
             }
             else if (modeToRender === 'grammar') { els.game.display.textContent = item.question; els.game.instruction.textContent = "TYPE THE CONJUGATED VERB"; els.game.subDisplay.textContent = item.verb ? `Verb: (${item.verb})` : ""; els.game.subDisplay.classList.remove('hidden'); gameState.currentCorrect = item.answer; gameState.currentOthers = item.others ? item.others.split(',').map(s => s.trim().toLowerCase()) : []; }
             else if (modeToRender === 'forms') { els.game.display.textContent = item.question; els.game.instruction.textContent = "WORD FORM"; els.game.subDisplay.classList.add('hidden'); gameState.currentCorrect = item.answer; gameState.currentOthers = []; }
+            else if (modeToRender === 'scramble') {
+                els.game.display.textContent = item.vi;
+                els.game.instruction.textContent = "ARRANGE THE SENTENCE";
+                gameState.currentCorrect = item.en;
+                els.wrappers.inputWrapper.classList.add('hidden');
+                els.game.scrambleContainer.classList.remove('hidden');
+                renderScrambleGame(item.en);
+                els.checkBtn.classList.remove('w-11', 'rounded-xl', 'no-shrink');
+                els.checkBtn.classList.add('btn-expanded', 'w-full', 'rounded-3xl');
+                els.checkBtn.innerHTML = '<span class="font-bold mr-2">KIỂM TRA</span> <i class="fas fa-check"></i>';
+            }
+            else if (modeToRender === 'roleplay') {
+                els.game.display.classList.add('hidden');
+                els.game.roleplayContainer.classList.remove('hidden');
+                els.game.instruction.textContent = "ROLEPLAY CHAT";
+                els.inputs.answer.placeholder = "Type your reply...";
+                els.checkBtn.innerHTML = '<i class="fas fa-paper-plane"></i>'; // Send icon
+
+                // If starting fresh
+                if(gameState.currentIdx === 0 && els.game.chatHistory.children.length === 0) {
+                     addChatBubble('ai', gameState.roleplayContext.aiFirstMessage);
+                }
+            }
         };
 
+        // --- ROLEPLAY LOGIC ---
+        function applyVocabulary(text, vocabList) {
+            if (!vocabList || !Array.isArray(vocabList) || vocabList.length === 0) return text;
+            
+            let formattedText = text;
+            vocabList.sort((a, b) => b.word.length - a.word.length);
+
+            vocabList.forEach(item => {
+                const escapedWord = item.word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const regex = new RegExp(`\\b(${escapedWord})\\b`, 'gi');
+                if (regex.test(formattedText)) {
+                    formattedText = formattedText.replace(regex, `$1<span class="vocab-note">(${item.meaning})</span>`);
+                }
+            });
+            return formattedText;
+        }
+
+        function addChatBubble(sender, text, feedbackHtml = null, isRawHtml = false) {
+            const bubble = document.createElement('div');
+            bubble.className = `chat-bubble ${sender}`;
+            
+            if (isRawHtml) bubble.innerHTML = text;
+            else bubble.textContent = text;
+            
+            els.game.chatHistory.appendChild(bubble);
+
+            if (feedbackHtml) {
+                const fb = document.createElement('div');
+                fb.innerHTML = feedbackHtml;
+                els.game.chatHistory.appendChild(fb);
+            }
+            
+            // Use smooth scroll
+            setTimeout(() => {
+                els.game.chatHistory.scrollTo({
+                    top: els.game.chatHistory.scrollHeight,
+                    behavior: 'smooth'
+                });
+            }, 50);
+        }
+
+        async function handleRoleplaySubmit() {
+            const userText = els.inputs.answer.value.trim();
+            if (!userText) return;
+
+            addChatBubble('user', userText);
+            els.inputs.answer.value = '';
+
+            // Show typing indicator
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'chat-bubble ai typing-indicator';
+            typingDiv.innerHTML = '<span></span><span></span><span></span>';
+            typingDiv.id = 'typingIndicator';
+            els.game.chatHistory.appendChild(typingDiv);
+            els.game.chatHistory.scrollTo({ top: els.game.chatHistory.scrollHeight, behavior: 'smooth' });
+
+            // Generate AI Response
+            try {
+                const prompt = `
+Context: English learning roleplay.
+Scenario: "${gameState.roleplayContext.scenario}"
+My Role (AI): "${gameState.roleplayContext.aiRole}"
+User Role: "${gameState.roleplayContext.userRole}"
+User just said: "${userText}"
+
+Instructions:
+1.  **Analyze**: Check the user's input for grammar, vocabulary, or pragmatics errors.
+    - If PERFECT: set 'isCorrect' to true, 'correction' to null.
+    - If WRONG/UNNATURAL: set 'isCorrect' to false. Provide the FULL Corrected Sentence in 'correction'. Provide a detailed explanation in Vietnamese in 'explanation'.
+    - 'explanation' must explain WHY it is wrong (tense usage, preposition, unnatural phrasing, context).
+    - 'errorType': Categorize as "Grammar", "Vocabulary", or "Context".
+
+2.  **Reply**: Respond naturally to continue the conversation.
+    - **Vocabulary Extraction**: Identify 1-3 useful/difficult words/phrases in YOUR reply. Provide their Vietnamese meaning.
+    - NOTE: The words MUST exist exactly in your 'reply' string.
+
+Output JSON:
+{
+  "reply": "Your response string...",
+  "vocabulary": [ { "word": "exact_word_in_reply", "meaning": "vietnamese_meaning" } ],
+  "analysis": {
+    "isCorrect": boolean,
+    "correction": "Full corrected sentence OR null",
+    "explanation": "Vietnamese explanation OR null",
+    "errorType": "Grammar/Vocabulary/Context"
+  },
+  "isFinished": boolean
+}`;
+
+                const response = await callServerAI(prompt);
+
+                if(document.getElementById('typingIndicator')) document.getElementById('typingIndicator').remove();
+
+                let feedbackHtml = null;
+                if (response.analysis && !response.analysis.isCorrect && response.analysis.correction) {
+                    const uClean = userText.trim().replace(/[.,!?;]/g, '').toLowerCase();
+                    const cClean = response.analysis.correction.trim().replace(/[.,!?;]/g, '').toLowerCase();
+
+                    if (uClean !== cClean) {
+                         feedbackHtml = `
+                         <div class="correction-card">
+                            <div class="correction-header">
+                                <i class="fas fa-wrench"></i> ${response.analysis.errorType || "Suggestion"}
+                            </div>
+                            <div class="correction-content">
+                                <div class="correction-diff">
+                                    <span class="diff-wrong">${userText}</span>
+                                    <span class="diff-right">${response.analysis.correction}</span>
+                                </div>
+                                <div class="correction-explanation">
+                                    <span class="correction-tag">Giải thích:</span> ${response.analysis.explanation || ''}
+                                </div>
+                            </div>
+                         </div>`;
+                    }
+                }
+
+                const richReply = applyVocabulary(response.reply, response.vocabulary);
+                addChatBubble('ai', richReply, feedbackHtml, true);
+
+                if (response.isFinished) {
+                    setTimeout(() => {
+                         alert("Cuộc hội thoại đã kết thúc thành công! +5 điểm.");
+                         gameState.score += 5;
+                         finishGame();
+                    }, 3000);
+                } else {
+                    gameState.currentIdx++;
+                    if(gameState.currentIdx > 15) {
+                        setTimeout(() => { alert("Great conversation! You survived 15 turns."); finishGame(); }, 1000);
+                    }
+                }
+
+            } catch (e) {
+                if(document.getElementById('typingIndicator')) document.getElementById('typingIndicator').remove();
+                addChatBubble('ai', "Sorry, I lost my train of thought. Please try saying that again.");
+                console.error(e);
+            }
+        }
+
+        // --- SCRAMBLE LOGIC ---
+        function renderScrambleGame(sentence) {
+            const words = sentence.split(' ');
+            const shuffled = [...words].sort(() => Math.random() - 0.5);
+            els.game.scrambleBank.innerHTML = ''; els.game.scrambleResult.innerHTML = ''; els.game.scrambleResult.classList.remove('has-items');
+            shuffled.forEach((word, idx) => {
+                const chip = document.createElement('div'); chip.className = 'word-chip'; chip.textContent = word; chip.dataset.word = word; chip.dataset.id = idx;
+                chip.onclick = () => moveScrambleWord(chip); els.game.scrambleBank.appendChild(chip);
+            });
+        }
+        function moveScrambleWord(chip) {
+            const isResult = chip.parentElement === els.game.scrambleResult;
+            if (isResult) { els.game.scrambleBank.appendChild(chip); chip.classList.remove('selected'); }
+            else { els.game.scrambleResult.appendChild(chip); chip.classList.add('selected'); }
+            if (els.game.scrambleResult.children.length > 0) els.game.scrambleResult.classList.add('has-items'); else els.game.scrambleResult.classList.remove('has-items');
+            updateScrambleInput();
+        }
+        function updateScrambleInput() { const words = Array.from(els.game.scrambleResult.children).map(c => c.textContent); els.inputs.answer.value = words.join(' '); }
+
         const checkAnswer = () => {
-            const user = els.inputs.answer.value.trim().toLowerCase();
-            if(!user) { if(els.checkBtn.classList.contains('btn-expanded')) { els.checkBtn.classList.add('animate-pulse'); setTimeout(()=>els.checkBtn.classList.remove('animate-pulse'), 200); } return; }
+            if (gameState.mode === 'roleplay') {
+                handleRoleplaySubmit();
+                return;
+            }
+
+            let user = els.inputs.answer.value.trim();
+            if (gameState.mode === 'scramble') {
+                 const normalize = s => s.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"").toLowerCase().replace(/\s{2,}/g," ");
+                 user = normalize(user);
+                 const correctNorm = normalize(gameState.currentCorrect);
+                 if (user === correctNorm) user = gameState.currentCorrect.toLowerCase();
+            } else { user = user.toLowerCase(); }
+
+            if(!user && gameState.mode !== 'scramble') { if(els.checkBtn.classList.contains('btn-expanded')) { els.checkBtn.classList.add('animate-pulse'); setTimeout(()=>els.checkBtn.classList.remove('animate-pulse'), 200); } return; }
             if (gameState.currentIdx >= gameState.data.length) return;
             const item = gameState.data[gameState.currentIdx];
             const mainCorrect = gameState.currentCorrect.toLowerCase();
@@ -1237,382 +1085,306 @@
             gameState.history.push({ q: gameState.mode === 'listening' ? `🔊 ${item.en}` : (gameState.mode === 'reading' ? `📖 ${item.question}` : els.game.display.textContent), a: gameState.currentCorrect, u: els.inputs.answer.value, ok: isCorrect });
 
             if(isCorrect) {
-                gameState.score++;
-                comboCount++;
-                triggerComboVisuals(comboCount);
-                // IF IN REVIEW MODE AND CORRECT, REMOVE FROM DB
-                if (gameState.isReviewMode) {
-                    // Question text matches key in DB
-                    const qKey = item.question || item.vi;
-                    UserSystem.removeWrongAnswer(qKey);
-                }
+                gameState.score++; comboCount++; triggerComboVisuals(comboCount);
+                if (gameState.score / gameState.data.length > 0.8) fireConfetti(true);
+                if (gameState.isReviewMode) UserSystem.removeWrongAnswer(item.question || item.vi);
             } else {
-                comboCount = 0;
-                els.game.comboBadge.classList.add('hidden');
-                els.game.display.classList.add('shake-element');
-                setTimeout(() => els.game.display.classList.remove('shake-element'), 300);
-
-                // IF WRONG, ADD TO DB (Persist)
-                if (!gameState.isReviewMode) {
-                    UserSystem.addWrongAnswer(item, gameState.mode);
-                }
+                comboCount = 0; els.game.comboBadge.classList.add('hidden');
+                els.game.display.classList.add('shake-element'); setTimeout(() => els.game.display.classList.remove('shake-element'), 300);
+                if (!gameState.isReviewMode) UserSystem.addWrongAnswer(item, gameState.mode);
             }
 
-            els.feedback.title.textContent = isCorrect ? "Tuyệt vời!" : "Sai rồi!"; els.feedback.title.className = isCorrect ? "text-4xl font-black mb-6 tracking-tight text-green-600" : "text-4xl font-black mb-6 tracking-tight text-red-500";
+            els.feedback.title.textContent = isCorrect ? "Tuyệt vời!" : "Sai rồi!";
+            els.feedback.title.className = isCorrect ? "text-4xl font-black mb-6 tracking-tight text-green-600" : "text-4xl font-black mb-6 tracking-tight text-red-500";
             els.feedback.border.className = isCorrect ? "absolute top-0 left-0 w-2 h-full bg-green-500 transition-all group-hover:w-3" : "absolute top-0 left-0 w-2 h-full bg-red-500 transition-all group-hover:w-3";
             document.getElementById('feedbackIcon').textContent = isCorrect ? "🎉" : "😅"; els.feedback.correctText.textContent = gameState.currentCorrect;
+
             let modeToCheck = gameState.isReviewMode ? item.savedMode : gameState.mode;
-            if ((modeToCheck === 'vocab' || modeToCheck === 'listening' || modeToCheck === 'phrases' || modeToCheck === 'idioms' || modeToCheck === 'grammar') && item.others) { els.feedback.synonym.textContent = `Also correct: ${item.others}`; els.feedback.synonym.classList.remove('hidden'); } else { els.feedback.synonym.classList.add('hidden'); }
+            if ((['vocab','listening','phrases','idioms','grammar'].includes(modeToCheck)) && item.others) { els.feedback.synonym.textContent = `Also correct: ${item.others}`; els.feedback.synonym.classList.remove('hidden'); } else { els.feedback.synonym.classList.add('hidden'); }
+
             els.feedback.explanation.textContent = item.explanation ? "💡 " + item.explanation : ""; els.feedback.explanation.classList.toggle('hidden', !item.explanation);
             els.feedback.overlay.classList.remove('hidden'); document.activeElement?.blur();
         };
 
         const finishGame = () => {
              UserSystem.recordActivity();
-             // Big celebration if score is high
-             if (gameState.score / gameState.data.length > 0.8) fireConfetti(true);
-
-             // Calculate wrong answers
              const wrongCount = gameState.history.filter(h => !h.ok).length;
              const reviewBtn = document.getElementById('reviewBtn');
-             if (wrongCount > 0 && !gameState.isReviewMode) {
-                 reviewBtn.classList.remove('hidden');
-                 reviewBtn.innerHTML = `<i class="fas fa-recycle mr-2"></i> Học lại ngay (${wrongCount})`;
-             } else {
-                 reviewBtn.classList.add('hidden');
-             }
-
+             if (wrongCount > 0 && !gameState.isReviewMode) { reviewBtn.classList.remove('hidden'); reviewBtn.innerHTML = `<i class="fas fa-recycle mr-2"></i> Học lại ngay (${wrongCount})`; } else { reviewBtn.classList.add('hidden'); }
              document.getElementById('finalScore').textContent = gameState.score;
-            document.getElementById('totalScoreQ').textContent = gameState.data.length;
+            document.getElementById('totalScoreQ').textContent = gameState.data.length || 10;
             document.getElementById('resultList').innerHTML = gameState.history.map(h => `<div class="p-4 border-b border-gray-100 flex gap-4 items-center last:border-0"><div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${h.ok ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-500'} font-bold text-lg">${h.ok?'<i class="fas fa-check"></i>':'<i class="fas fa-times"></i>'}</div><div class="flex-1 min-w-0"><div class="text-xs font-bold text-gray-400 mb-1 truncate">${h.q}</div><div class="font-black text-gray-800 text-base">${h.a}</div>${!h.ok ? `<div class="text-sm font-medium text-red-400 line-through mt-0.5">${h.u}</div>` : ''}</div></div>`).join('');
             switchScreen('result');
         };
 
-        const startReview = () => {
-            // Immediate review of current session's wrong answers
-            const wrongIndices = gameState.history.map((h, index) => h.ok ? -1 : index).filter(i => i !== -1);
-            if (wrongIndices.length === 0) return;
-            const wrongData = wrongIndices.map(i => gameState.data[i]);
-            gameState.data = wrongData;
-            gameState.isReviewMode = false; // "Instant Review" just repeats them, doesn't count as "Persistent Review Mode" clearing
-            els.game.title.textContent += " (Review)";
-            startGame();
+        const nextQuestion = () => {
+             els.feedback.overlay.classList.add('hidden');
+             gameState.currentIdx++;
+             if(gameState.currentIdx >= gameState.data.length) finishGame();
+             else {
+                 updateUI();
+                 if (gameState.mode !== 'scramble' && gameState.mode !== 'reading' && gameState.mode !== 'roleplay') {
+                      setTimeout(() => els.inputs.answer.focus(), 100);
+                 }
+             }
         };
 
-        // NEW: DAILY PERSISTENT REVIEW
-        const startDailyReview = () => {
-             const data = UserSystem.data.wrongAnswers;
-             if (!data || data.length === 0) { alert("Bạn chưa có câu sai nào trong kho!"); return; }
+        const getRandomSubTopic = () => { const c = Object.keys(nopdTopics); const rc = c[Math.floor(Math.random() * c.length)]; const t = nopdTopics[rc]; return t[Math.floor(Math.random() * t.length)].en; };
 
-             // Take max 10 for review
-             const sessionData = data.slice(0, 15);
-             gameState.data = sessionData;
-             gameState.isReviewMode = true; // IMPORTANT: Correct answers here will remove items from DB
-             els.game.title.textContent = "Ôn Tập Sai Lầm";
-             startGame();
-        };
-
-        const nextQuestion = () => { els.feedback.overlay.classList.add('hidden'); gameState.currentIdx++; if(gameState.currentIdx >= gameState.data.length) finishGame(); else updateUI(); };
-        const startGame = () => { gameState.currentIdx = 0; gameState.score = 0; comboCount = 0; gameState.history = []; els.game.totalQ.textContent = gameState.data.length; switchScreen('game'); updateUI(); };
-
-        // --- RANDOM HELPER FUNCTIONS ---
-        const getRandomSubTopic = () => {
-            const categories = Object.keys(nopdTopics);
-            const randomCat = categories[Math.floor(Math.random() * categories.length)];
-            const topics = nopdTopics[randomCat];
-            const randomTopic = topics[Math.floor(Math.random() * topics.length)];
-            return randomTopic.en;
-        };
-
-        const getRandomGrammarTense = () => {
-            const tenses = Object.keys(offlineData.grammar);
-            return tenses[Math.floor(Math.random() * tenses.length)];
-        };
-
-        const getRandomFormType = () => {
-            const types = Object.keys(offlineData.forms);
-            return types[Math.floor(Math.random() * types.length)];
-        };
-
-        // --- GENERATE CONTENT (UPDATED FOR NOPD TOPICS) ---
         const generateContent = async (type) => {
             const qty = parseInt(els.config.qtyInput.value); const rawLevel = els.config.level.value;
-            showLoading(true); gameState.mode = type; gameState.isReviewMode = false;
+            els.loading.overlay.classList.remove('hidden'); els.loading.text.textContent = "ĐANG GỌI SERVER...";
+            gameState.mode = type; gameState.isReviewMode = false;
 
-            // 1. DETERMINE CONTEXT (Topic)
-            let context = "";
-            let displayTitle = "";
-            let prompt = "";
-            let isRandomSelection = false;
-
-            // PRIORITY: LOCKED TOPIC -> INPUT VALUE -> RANDOM
-            if (currentGlobalTopic) {
-                context = currentGlobalTopic;
-                displayTitle = currentGlobalTopic;
-            } else {
-                let rawInput = (els.inputs.vocabTopic.value || els.inputs.readingTopic.value || els.inputs.readingSelect.value || "").trim();
-
-                // If input is empty, pick a specific sub-topic for deep randomization
-                if (!rawInput && (type === 'vocab' || type === 'phrases' || type === 'idioms' || type === 'listening')) {
-                    context = "Mixed Topics"; // NEW: Keyword for AI to mix topics
-                    isRandomSelection = true;
-                    displayTitle = "Tổng hợp (Mixed)";
-                } else if (!rawInput && type === 'reading') {
-                     context = getRandomSubTopic(); // Reading still needs a focused topic usually
-                     isRandomSelection = true;
-                     displayTitle = `${context} (Random)`;
-                } else {
-                    context = rawInput;
-                    displayTitle = context;
-                }
-
-                // For Grammar/Forms specifically, check if "Random" is selected
-                if (type === 'grammar') {
-                    let selectedTense = els.inputs.grammarTense.value;
-                    if (selectedTense === 'random') {
-                        context = "Mixed Tenses";
-                        displayTitle = "Tổng hợp 12 thì (Mixed)";
-                    } else {
-                        context = selectedTense;
-                        displayTitle = `${context} (${tenseTranslations[context] || ''})`;
-                    }
-                }
-                else if (type === 'forms') {
-                    let selectedType = els.inputs.formsType.value;
-                    if (selectedType === 'random') {
-                        context = "Mixed Word Forms";
-                        displayTitle = "Biến thể tổng hợp (Mixed)";
-                    } else {
-                        context = selectedType;
-                        displayTitle = formReadableNames[context] || context;
-                    }
-                }
+            let context = "", displayTitle = "";
+            if (currentGlobalTopic) { context = currentGlobalTopic; displayTitle = currentGlobalTopic; }
+            else {
+                 let rawInput = (els.inputs.vocabTopic.value || "").trim();
+                 if (type === 'vocab' || type === 'phrases' || type === 'idioms' || type === 'listening' || type === 'scramble' || type === 'roleplay') {
+                    if(!rawInput) { context = "Mixed Topics"; displayTitle = "Tổng hợp (Mixed)"; } else { context = rawInput; displayTitle = context; }
+                 }
+                 else if (type === 'reading') { context = els.inputs.readingSelect.value || getRandomSubTopic(); displayTitle = context; }
+                 else if (type === 'grammar') {
+                     let t = els.inputs.grammarTense.value;
+                     if(t === 'random') { context = "Mixed Tenses"; displayTitle = "Tổng hợp 12 thì"; } else { context = t; displayTitle = t; }
+                 }
+                 else if (type === 'forms') {
+                     let t = els.inputs.formsType.value;
+                     if(t === 'random') { context = "Mixed Word Forms"; displayTitle = "Biến thể tổng hợp"; } else { context = t; displayTitle = formReadableNames[t] || t; }
+                 }
             }
 
-            let levelPrompt = "";
-            if (rawLevel === 'Level A') levelPrompt = "CEFR A1-A2 (Beginner). Very basic words, simple sentences.";
-            else if (rawLevel === 'Level B') levelPrompt = "CEFR B1-B2 (Intermediate). Conversational, standard vocabulary.";
-            else if (rawLevel === 'Level C') levelPrompt = "CEFR C1-C2 (Advanced). Sophisticated vocabulary, complex sentence structures.";
-            else if (rawLevel === 'TOEIC') levelPrompt = "TOEIC Business English. Workplace context, formal tone. Focus on office scenarios.";
-            else if (rawLevel === 'IELTS') levelPrompt = "IELTS Academic Band 7.5+. Advanced/Academic vocabulary (C1-C2). Complex grammatical structures.";
-            else levelPrompt = `Level ${rawLevel}`;
-
-            // Add Random Seed to Prompt to ensure freshness
+            let prompt = "";
+            let levelPrompt = rawLevel === 'Level A' ? "CEFR A1 (Basic)" : (rawLevel === 'Level B' ? "CEFR B1 (Intermediate)" : "CEFR C1 (Advanced)");
+            const topicInjection = currentGlobalTopic ? `FOCUS TOPIC: '${currentGlobalTopic}'. Ensure sentences relate to this topic.` : "";
             const randomSeed = Math.floor(Math.random() * 10000);
+            const orderInstruction = "LIST IN RANDOM ORDER. DO NOT LIST BY FREQUENCY.";
+
+            if (type === 'vocab') {
+                 let pc = context === "Mixed Topics" ? "a RANDOM MIX of common English topics" : `'${context}'`;
+                 prompt = `Generate ${qty} SINGLE English vocabulary words related to ${pc}. ${topicInjection} STRICT RULES: 1. 'en' MUST be a single word. 2. 'vi' MUST be ACCURATE Vietnamese definition. LEVEL: ${levelPrompt}. ${orderInstruction} Seed: ${randomSeed}. Format: JSON Array [{"vi": "...", "en": "...", "others": "synonyms"}]`;
+            }
+            else if (type === 'phrases') {
+                 let pc = context === "Mixed Topics" ? "a RANDOM MIX of common English topics" : `'${context}'`;
+                 prompt = `Generate ${qty} English PHRASAL VERBS or COLLOCATIONS related to ${pc}. ${topicInjection} STRICT RULES: 1. 'en' MUST be a phrase. 2. 'vi' is natural Vietnamese. LEVEL: ${levelPrompt}. ${orderInstruction} Seed: ${randomSeed}. Format: JSON Array [{"vi": "...", "en": "...", "others": "synonyms"}]`;
+            }
+            else if (type === 'idioms') {
+                 let pc = context === "Mixed Topics" ? "VARIOUS common situations" : `'${context}'`;
+                 prompt = `Generate ${qty} English IDIOMS or PROVERBS related to ${pc}. ${topicInjection} STRICT RULES: 1. 'en' is the idiom. 2. 'vi' is figurative meaning. ${orderInstruction} Seed: ${randomSeed}. Format: JSON Array [{"vi": "...", "en": "...", "others": "literal meaning"}]`;
+            }
+            else if (type === 'listening') {
+                 let pc = context === "Mixed Topics" ? "VARIOUS common daily topics" : `'${context}'`;
+                 prompt = `Generate ${qty} English words/phrases for listening practice related to ${pc}. ${topicInjection} STRICT RULES: 1. 'en' and 'vi' must be accurate translations. LEVEL: ${levelPrompt}. ${orderInstruction} Seed: ${randomSeed}. Format: JSON Array [{"vi": "...", "en": "...", "others": "..."}]`;
+            }
+            else if (type === 'scramble') {
+                 let pc = context === "Mixed Topics" ? "Daily Conversation" : `'${context}'`;
+                 prompt = `Generate ${qty} complete English sentences (5-12 words) related to ${pc}. ${topicInjection} STRICT RULES: 1. 'en' must be grammatically correct, natural English. 2. 'vi' is Vietnamese translation. LEVEL: ${levelPrompt}. ${orderInstruction} Seed: ${randomSeed}. Format: JSON Array [{"vi": "...", "en": "..."}]`;
+            }
+            else if (type === 'reading') {
+                 prompt = `Generate ${qty} SHORT reading comprehension questions related to '${context}'. ${topicInjection} STRICT RULES: 1. 'explanation' in VIETNAMESE. LEVEL: ${levelPrompt}. Seed: ${randomSeed}. Format: JSON Array [{"passage": "...", "question": "...", "answer": "...", "options": ["..."], "type": "mc", "explanation": "..."}]`;
+            }
+            else if (type === 'grammar') {
+                 let pc = context === "Mixed Tenses" ? "a RANDOM MIX of English tenses (Present, Past, Future, Perfect, Continuous...)" : `English grammar questions about '${context}'`;
+                 prompt = `Generate ${qty} English grammar questions covering ${pc}. ${topicInjection} STRICT RULES: 1. 'question' has blank '___' and base verb in parens. 2. 'answer' is ONLY conjugated verb. 3. 'explanation' in VIETNAMESE. LEVEL: ${levelPrompt}. ${orderInstruction} Seed: ${randomSeed}. Format: JSON Array [{"question": "...", "verb": "...", "answer": "...", "others": "...", "explanation": "..."}]`;
+            }
+            else if (type === 'forms') {
+                 let pc = context === "Mixed Word Forms" ? "a RANDOM MIX of word forms (Noun, Verb, Adjective, Adverb, Prefixes, Suffixes)" : `Word Form exercises for '${context}'`;
+                 prompt = `Generate ${qty} ${pc}. ${topicInjection} STRICT RULES: 1. 'explanation' in VIETNAMESE explaining word class change. LEVEL: ${levelPrompt}. ${orderInstruction} Seed: ${randomSeed}. Format: JSON Array [{"question": "...", "answer": "...", "explanation": "..."}]`;
+            }
+            else if (type === 'roleplay') {
+                let pc = context === "Mixed Topics" ? "ordering coffee OR checking in at a hotel" : `${context}`;
+                prompt = `Create a Roleplay Scenario for English learning related to: ${pc}. Level: ${levelPrompt}. Output JSON: { "scenario": "Description of situation...", "aiRole": "Role AI plays (e.g. Barista)", "userRole": "Role user plays (e.g. Customer)", "aiFirstMessage": "First sentence AI says to start conversation" }`;
+            }
 
             try {
-                // Adjust prompts based on whether a Global Topic is active
-                // If Topic is locked, we inject the Topic into Grammar/Forms prompts too
-                let topicInjection = currentGlobalTopic ? `FOCUS TOPIC: '${currentGlobalTopic}'. Ensure sentences relate to this topic.` : "";
-                let orderInstruction = "LIST IN RANDOM ORDER. DO NOT LIST BY FREQUENCY.";
-
-                // --- HIGH PRECISION PROMPTS ---
-
-                if (type === 'vocab') {
-                    let promptContext = context === "Mixed Topics" ? "a RANDOM MIX of common English topics (Daily Life, Work, Travel, Food, etc.)" : `'${context}'`;
-                    prompt = `Generate ${qty} SINGLE English vocabulary words related to ${promptContext}. ${topicInjection}
-                    STRICT RULES:
-                    1. 'en' MUST be a single word.
-                    2. 'vi' MUST be the ACCURATE, STANDARD Vietnamese definition for the English word. Do not confuse meanings.
-                    3. Double check: does 'vi' actually mean 'en'? Avoid hallucinations.
-                    4. LEVEL: ${levelPrompt}.
-                    ${orderInstruction} Seed: ${randomSeed}.
-                    Format: JSON Array [{"vi": "...", "en": "...", "others": "synonyms"}]`;
-                }
-
-                if (type === 'phrases') {
-                      let promptContext = context === "Mixed Topics" ? "a RANDOM MIX of common English topics" : `'${context}'`;
-                      prompt = `Generate ${qty} English PHRASAL VERBS or COLLOCATIONS related to ${promptContext}. ${topicInjection}
-                      STRICT RULES:
-                      1. 'en' MUST be a phrase.
-                      2. 'vi' is the natural Vietnamese translation (not literal).
-                      3. Ensure the phrase actually exists in standard English.
-                      LEVEL: ${levelPrompt}. ${orderInstruction} Seed: ${randomSeed}.
-                      Format: JSON Array [{"vi": "...", "en": "...", "others": "synonyms"}]`;
-                }
-
-                if (type === 'idioms') {
-                    let promptContext = context === "Mixed Topics" ? "VARIOUS common situations" : `'${context}'`;
-                    prompt = `Generate ${qty} English IDIOMS or PROVERBS related to ${promptContext}. ${topicInjection}
-                    STRICT RULES:
-                    1. 'en' is the idiom.
-                    2. 'vi' is the figurative Vietnamese meaning (not literal translation).
-                    3. Ensure accuracy.
-                    ${orderInstruction} Seed: ${randomSeed}.
-                    Format: JSON Array [{"vi": "...", "en": "...", "others": "literal meaning"}]`;
-                }
-
-                if (type === 'listening') {
-                      let promptContext = context === "Mixed Topics" ? "VARIOUS common daily topics" : `'${context}'`;
-                      prompt = `Generate ${qty} English vocabulary words/phrases for listening practice related to ${promptContext}. ${topicInjection}
-                      STRICT RULES:
-                      1. 'en' and 'vi' must be accurate translations.
-                      LEVEL: ${levelPrompt}. ${orderInstruction} Seed: ${randomSeed}.
-                      Format: JSON Array [{"vi": "...", "en": "...", "others": "..."}]`;
-                }
-
-                if (type === 'reading') {
-                      // Reading usually needs a specific context to generate a coherent passage
-                      prompt = `Generate ${qty} SHORT reading comprehension questions related to '${context}'. ${topicInjection}
-                      STRICT RULES:
-                      1. Passage, Question, Answers in English. 'explanation' in VIETNAMESE.
-                      2. Explanation must be clear and explain WHY the answer is correct based on the text.
-                      LEVEL: ${levelPrompt}. Seed: ${randomSeed}.
-                      Format: JSON Array [{"passage": "...", "question": "...", "answer": "...", "options": ["..."], "type": "mc", "explanation": "..."}]`;
-                }
-
-                if (type === 'grammar') {
-                    // NEW: Handle Mixed Tenses Logic
-                    let promptContext = context === "Mixed Tenses"
-                        ? "a RANDOM MIX of English tenses (Present, Past, Future, Perfect, Continuous...)"
-                        : `English grammar questions about '${context}'`;
-
-                    prompt = `Generate ${qty} English grammar questions covering ${promptContext}. ${topicInjection}
-                    STRICT RULES:
-                    1. 'question' has blank '___' and base verb in parens.
-                    2. 'answer' is ONLY conjugated verb.
-                    3. 'explanation' in VIETNAMESE must be accurate and explain the rule used.
-                    LEVEL: ${levelPrompt}. ${orderInstruction} Seed: ${randomSeed}.
-                    Format: JSON Array [{"question": "...", "verb": "...", "answer": "...", "others": "...", "explanation": "..."}]`;
-                }
-
-                if (type === 'forms') {
-                    // NEW: Handle Mixed Forms Logic
-                    let promptContext = context === "Mixed Word Forms"
-                        ? "a RANDOM MIX of word forms (Noun, Verb, Adjective, Adverb, Prefixes, Suffixes)"
-                        : `Word Form exercises for '${context}'`;
-
-                    prompt = `Generate ${qty} ${promptContext}. ${topicInjection}
-                    STRICT RULES:
-                    1. 'explanation' in VIETNAMESE must explain the word class change (e.g., noun to verb).
-                    LEVEL: ${levelPrompt}. ${orderInstruction} Seed: ${randomSeed}.
-                    Format: JSON Array [{"question": "...", "answer": "...", "explanation": "..."}]`;
-                }
-
-                // CALL SERVER
                 const aiResult = await callServerAI(prompt);
 
-                if (!Array.isArray(aiResult)) throw new Error("AI trả về định dạng không đúng (Cần danh sách câu hỏi).");
-                if (aiResult.length === 0) throw new Error("AI trả về danh sách rỗng.");
-
-                // CLIENT SIDE SHUFFLE TO PREVENT "HELLO" SYNDROME
-                // Especially for Vocab/Listening, shuffle the result so the most common words don't always appear first
-                if (type !== 'reading') {
-                      aiResult.sort(() => Math.random() - 0.5);
+                if (type === 'roleplay') {
+                    gameState.roleplayContext = aiResult;
+                    gameState.data = []; // Not used in roleplay
+                    els.game.chatHistory.innerHTML = ''; // Clear chat
+                    if (currentGlobalTopic) displayTitle = `${currentGlobalTopic} (Sticky)`;
+                    els.game.title.textContent = `ROLEPLAY: ${aiResult.scenario}`;
+                    startGame();
+                    els.loading.overlay.classList.add('hidden');
+                    return;
                 }
 
+                if (type !== 'reading') aiResult.sort(() => Math.random() - 0.5);
                 gameState.data = aiResult;
-                displayTitle = displayTitle.replace(/\(\)/g, '').trim();
-
-                // If locked, show Topic Name in title
                 if (currentGlobalTopic) displayTitle = `${currentGlobalTopic} (Sticky)`;
-
-                els.game.title.textContent = `${type.toUpperCase()}: ${displayTitle}`; startGame(); showLoading(false); return;
+                els.game.title.textContent = `${type.toUpperCase()}: ${displayTitle}`;
+                startGame(); els.loading.overlay.classList.add('hidden');
             } catch(e) {
-                console.error("Online generation failed:", e);
-                alert(`Không thể kết nối Server hoặc dữ liệu lỗi. \nLỗi: ${e.message}\nĐang chuyển sang chế độ Offline.`);
-
-                // Fallback (Offline doesn't really support strict topic locking for all modes easily, revert to standard)
+                console.error(e);
+                if (type === 'roleplay') {
+                    alert("Không thể khởi tạo Roleplay do lỗi Server. Vui lòng thử lại.");
+                    els.loading.overlay.classList.add('hidden');
+                    return;
+                }
                 let source = [];
-                // NEW OFFLINE MIXING LOGIC
-                if (type === 'grammar' && els.inputs.grammarTense.value === 'random') {
-                    Object.values(offlineData.grammar).forEach(arr => source = source.concat(arr));
-                    displayTitle = "Tổng hợp (Offline)";
-                }
-                else if (type === 'forms' && els.inputs.formsType.value === 'random') {
-                    Object.values(offlineData.forms).forEach(arr => source = source.concat(arr));
-                    displayTitle = "Tổng hợp (Offline)";
-                }
-                // Standard Fallback logic
-                else if(type === 'vocab' || type === 'listening') { displayTitle = els.inputs.vocabSelect.value; source = offlineData.vocab[displayTitle] || []; }
-                else if(type === 'phrases') { source = offlineData.phrases["General"] || []; displayTitle = "Cụm từ cơ bản"; }
-                else if(type === 'idioms') { source = offlineData.idioms["General"] || []; displayTitle = "Tục ngữ phổ biến"; }
-                else if(type === 'reading') { displayTitle = els.inputs.readingSelect.value; source = offlineData.reading[displayTitle] || []; }
-                else if(type === 'grammar') { displayTitle = els.inputs.grammarTense.value; source = offlineData.grammar[displayTitle] || []; }
-                else if(type === 'forms') { const rawType = els.inputs.formsType.value; displayTitle = formReadableNames[rawType] || rawType; source = offlineData.forms[rawType] || []; }
+                // OFFLINE FALLBACK LOGIC
+                if (type === 'grammar' && context === 'Mixed Tenses') Object.values(offlineData.grammar).forEach(arr => source = source.concat(arr));
+                else if (type === 'forms' && context === 'Mixed Word Forms') Object.values(offlineData.forms).forEach(arr => source = source.concat(arr));
+                else if (offlineData[type] && offlineData[type][context]) source = offlineData[type][context];
+                else if (offlineData[type]) source = Object.values(offlineData[type]).flat();
 
-                // Fallback to default if topic specific data is missing
                 if(!source.length && type==='vocab') source = offlineData.vocab["Daily Life"];
+                if(type === 'scramble' && !source.length) source = offlineData.scramble["General"];
 
-                let finalData = []; while(finalData.length < qty && source.length > 0) { finalData = finalData.concat([...source].sort(()=>0.5-Math.random())); }
-                if (finalData.length === 0) { alert("Chưa có dữ liệu Offline cho mục này."); showLoading(false); return; }
-
-                gameState.data = finalData.slice(0, qty); els.game.title.textContent = `${displayTitle} (Offline Mode)`; startGame(); showLoading(false);
+                let finalData = []; while(finalData.length < qty && source.length > 0) finalData = finalData.concat([...source].sort(()=>0.5-Math.random()));
+                gameState.data = finalData.slice(0, qty); els.game.title.textContent = `${displayTitle} (Offline)`;
+                startGame(); els.loading.overlay.classList.add('hidden');
             }
         };
 
-        const startGeneration = () => { const activeCard = document.querySelector('.mode-card.active'); let mode = 'vocab'; if (activeCard) { mode = activeCard.id.replace('mode-', ''); } generateContent(mode); };
-        const playTTS = () => { if(gameState.currentCorrect) { const u = new SpeechSynthesisUtterance(gameState.currentCorrect); u.lang = 'en-US'; u.rate = 0.9; speechSynthesis.speak(u); } };
-        
-        // --- ADDED MISSING FUNCTIONS (FIXED REFERENCE ERROR) ---
-
+        const startGame = () => { gameState.currentIdx = 0; gameState.score = 0; comboCount = 0; gameState.history = []; els.game.totalQ.textContent = gameState.data.length || 10; switchScreen('game'); updateUI(); };
         const setMode = (mode) => {
-             // Remove active class from all cards
-             Object.values(els.modeCards).forEach(card => {
-                 if(card) {
-                     card.classList.remove('active', 'border-yellow-400', 'bg-yellow-50');
-                     const icon = card.querySelector('.mode-icon');
-                     if(icon) icon.classList.remove('bg-yellow-200');
-                 }
-             });
+             Object.values(els.modeCards).forEach(c => c && c.classList.remove('active', 'border-yellow-400', 'bg-yellow-50'));
+             if(els.modeCards[mode]) els.modeCards[mode].classList.add('active');
 
-             // Add active to selected
-             const activeCard = els.modeCards[mode];
-             if(activeCard) {
-                 activeCard.classList.add('active');
-             }
-
-             // Handle UI Views (Input areas)
-             els.views.sharedInput.classList.add('hidden');
-             els.views.reading.classList.add('hidden');
-             els.views.grammar.classList.add('hidden');
-             els.views.forms.classList.add('hidden');
-
+             Object.values(els.views).forEach(v => v.classList.add('hidden'));
              if(mode === 'reading') els.views.reading.classList.remove('hidden');
              else if(mode === 'grammar') els.views.grammar.classList.remove('hidden');
              else if(mode === 'forms') els.views.forms.classList.remove('hidden');
              else els.views.sharedInput.classList.remove('hidden');
 
-             // Reset title based on mode (visual only, actual title set on generation)
-             // document.getElementById('inputTitle').textContent = ...
+             // Handle Roleplay Layout Toggles
+             if(mode === 'roleplay') {
+                els.game.wrapper.classList.add('rp-mode');
+                els.game.contentBox.classList.add('rp-mode');
+             } else {
+                els.game.wrapper.classList.remove('rp-mode');
+                els.game.contentBox.classList.remove('rp-mode');
+             }
         };
 
-        const switchScreen = (screenName) => {
-            els.screens.start.classList.add('hidden');
-            els.screens.game.classList.add('hidden');
-            els.screens.result.classList.add('hidden');
+        const startGeneration = () => { const activeCard = document.querySelector('.mode-card.active'); let mode = 'vocab'; if (activeCard) { mode = activeCard.id.replace('mode-', ''); } generateContent(mode); };
 
-            if(screenName === 'start') els.screens.start.classList.remove('hidden');
-            else if(screenName === 'game') els.screens.game.classList.remove('hidden');
-            else if(screenName === 'result') els.screens.result.classList.remove('hidden');
+        const switchScreen = (n) => { els.screens.start.classList.add('hidden'); els.screens.game.classList.add('hidden'); els.screens.result.classList.add('hidden'); els.screens[n].classList.remove('hidden'); };
+        const resetGame = () => { switchScreen('start'); gameState.currentIdx = 0; };
+        const startReview = () => {
+             const wrongIndices = gameState.history.map((h, i) => h.ok ? -1 : i).filter(i => i !== -1);
+             if (wrongIndices.length === 0) return;
+             gameState.data = wrongIndices.map(i => gameState.data[i]); gameState.isReviewMode = false; els.game.title.textContent += " (Review)"; startGame();
+        };
+        const startDailyReview = () => {
+             const data = UserSystem.data.wrongAnswers;
+             if (!data || data.length === 0) { alert("Kho sai lầm trống!"); return; }
+             gameState.data = data.slice(0, 15); gameState.isReviewMode = true; els.game.title.textContent = "Ôn Tập Sai Lầm"; startGame();
         };
 
-        const resetGame = () => {
-            switchScreen('start');
-            // Reset state
-            gameState.currentIdx = 0;
-            gameState.score = 0;
-            comboCount = 0;
-            gameState.history = [];
-            
-            // Clear current topic if needed, or keep sticky?
-            // For now, let's keep sticky if set, until user explicitly clears it.
-            // But usually Home button means full reset.
-            // clearTopic(); // Uncomment if Home button should clear topic lock
-            
-            showLoading(false);
+        const updateLevel = (val, el) => { document.getElementById('levelSelect').value = val; document.querySelectorAll('.level-card').forEach(c => { c.classList.remove('selected', 'bg-yellow-50', 'border-yellow-400'); c.classList.add('bg-gray-50', 'border-transparent'); }); el.classList.add('selected'); };
+        const playTTS = () => { if(gameState.currentCorrect) { const u = new SpeechSynthesisUtterance(gameState.currentCorrect); u.lang = 'en-US'; u.rate = 0.9; speechSynthesis.speak(u); } };
+
+        function isVietnamese(str) { return /[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]/i.test(str); }
+
+        const lookupDictionary = async () => {
+            const word = els.dict.input.value.trim(); if (!word) return;
+            els.dict.result.innerHTML = '<div class="flex flex-col items-center justify-center h-48"><div class="loader mb-2"></div><p class="text-xs text-gray-500 font-bold">Đang tra cứu...</p></div>';
+            try {
+                if (isVietnamese(word)) {
+                    const data = await robustFetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(word)}&langpair=vi|en`);
+                    if (data.responseStatus === 200) els.dict.result.innerHTML = `<div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 animate-fadeIn"><h2 class="text-2xl font-black text-gray-800 mb-1">${word}</h2><p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">VIETNAMESE</p><div class="border-t border-gray-100 pt-4"><p class="font-bold text-indigo-600 text-xl">${data.responseData.translatedText}</p><p class="text-xs text-gray-400 mt-1">English Translation</p></div></div>`;
+                    else els.dict.result.innerHTML = `<div class="p-4 text-center text-red-400 font-bold">Không tìm thấy bản dịch.</div>`;
+                } else {
+                    let freeApiData = null, translation = null;
+                    try { const dictData = await robustFetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`); freeApiData = dictData[0]; } catch (e) {}
+                    try { const transData = await robustFetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(word)}&langpair=en|vi`); if (transData.responseStatus === 200) translation = transData.responseData.translatedText; } catch (e) {}
+
+                    if (!freeApiData && !translation) { els.dict.result.innerHTML = `<div class="text-center p-4 text-gray-400 font-medium">Không tìm thấy từ này.</div>`; return; }
+
+                    let html = `<div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 animate-fadeIn"><div class="flex items-center justify-between mb-2"><h2 class="text-3xl font-black text-gray-800 capitalize">${freeApiData ? freeApiData.word : word}</h2>`;
+                    if (freeApiData) { const audioSrc = freeApiData.phonetics.find(p => p.audio)?.audio; if (audioSrc) html += `<button onclick="new Audio('${audioSrc}').play()" class="w-10 h-10 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center hover:bg-orange-200 transition-colors"><i class="fas fa-volume-up"></i></button>`; }
+                    html += `</div>`;
+
+                    if (freeApiData) { const phonetic = freeApiData.phonetic || (freeApiData.phonetics.find(p => p.text)?.text) || ""; html += `<p class="text-orange-500 font-mono text-sm mb-6 font-bold">${phonetic}</p>`; }
+                    if (translation) html += `<div class="mb-6 bg-green-50 p-4 rounded-2xl border border-green-100"><p class="text-[10px] text-green-800 font-black uppercase tracking-widest mb-1">NGHĨA TIẾNG VIỆT</p><p class="text-xl font-bold text-gray-800">${translation}</p></div>`;
+
+                    if (freeApiData && freeApiData.meanings) { html += `<div class="mb-2"><h3 class="font-bold text-gray-700 text-sm uppercase tracking-wider border-b border-gray-100 pb-2 mb-3">Định nghĩa (Anh-Anh)</h3><ul class="list-disc pl-5 text-sm text-gray-600 space-y-2 leading-relaxed">`; const defs = freeApiData.meanings[0].definitions.slice(0, 3); defs.forEach(d => { html += `<li>${d.definition}</li>`; }); html += `</ul></div>`; }
+                    html += `</div>`; els.dict.result.innerHTML = html;
+                }
+            } catch (e) { els.dict.result.innerHTML = `<div class="text-center p-4 text-red-500 font-bold">Lỗi kết nối hoặc API quá tải.</div>`; }
         };
 
-        Object.assign(window, { openTopicModal, closeTopicModal, selectTopic, clearTopic, openDictModal, closeDictModal, lookupDictionary, switchTheoryTab, openTheoryModal, closeTheoryModal, backToTheoryList, loadTheory, showLoading, toggleSettings, updateLevel, setMode, switchScreen, resetGame, checkAnswer, nextQuestion, startGeneration, playTTS, startReview, startDailyReview });
+        const renderTheoryAI = (data) => {
+            let html = `<div class="animate-fadeIn"><h2 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-500 mb-4 border-b pb-4">${data.title || "Lý thuyết"}</h2>`;
+            if(data.definition) html += `<div class="mb-6"><p class="text-gray-700 text-sm leading-relaxed font-medium">${data.definition}</p></div>`;
+            if(data.formulas && data.formulas.length > 0) { html += `<h3 class="text-sm font-bold text-indigo-800 mb-3 flex items-center gap-2"><i class="fas fa-flask text-indigo-500"></i> Công thức</h3><div class="space-y-2 mb-6">`; data.formulas.forEach(f => { let icon = '•'; let color = 'text-gray-700'; if(f.type === 'affirmative' || f.type.includes('+')) { icon = '(+)'; color = 'text-green-600'; } else if(f.type === 'negative' || f.type.includes('-')) { icon = '(-)'; color = 'text-red-500'; } else if(f.type === 'question' || f.type.includes('?')) { icon = '(?)'; color = 'text-blue-500'; } html += `<div class="bg-indigo-50/50 p-3 rounded-xl border border-indigo-100 flex items-start gap-3"><span class="${color} font-black text-sm pt-0.5 whitespace-nowrap">${icon}</span><span class="font-mono text-sm text-indigo-900 font-bold">${f.formula || f.structure}</span></div>`; }); html += `</div>`; }
+            if(data.rules && data.rules.length > 0) { html += `<h3 class="text-sm font-bold text-green-800 mb-3 flex items-center gap-2"><i class="fas fa-gavel text-green-500"></i> Quy tắc</h3><div class="space-y-2 mb-6">`; data.rules.forEach(r => { html += `<div class="bg-green-50 p-3 rounded-xl border border-green-100"><div class="font-bold text-gray-800 text-sm mb-1">${r.rule}</div>${r.example ? `<div class="text-xs text-gray-500 italic">VD: ${r.example}</div>` : ''}</div>`; }); html += `</div>`; }
+            if(data.usages && data.usages.length > 0) { html += `<h3 class="text-sm font-bold text-orange-800 mb-3 flex items-center gap-2"><i class="fas fa-list-ul text-orange-500"></i> Cách dùng</h3><ul class="space-y-2 mb-6">`; data.usages.forEach(u => { html += `<li class="flex items-start gap-2 text-sm text-gray-700 bg-orange-50/50 p-2 rounded-lg border border-orange-100"><i class="fas fa-check-circle text-orange-400 mt-0.5 text-xs"></i> <span>${u}</span></li>`; }); html += `</ul>`; }
+            if(data.signs) html += `<h3 class="text-sm font-bold text-purple-800 mb-3 flex items-center gap-2"><i class="fas fa-eye text-purple-500"></i> Dấu hiệu nhận biết</h3><div class="bg-purple-50 p-3 rounded-xl border border-purple-100 text-sm text-purple-900 font-medium italic mb-6">${data.signs}</div>`;
+            if(data.examples && data.examples.length > 0) { html += `<h3 class="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2"><i class="fas fa-quote-left text-gray-400"></i> Ví dụ</h3><div class="grid gap-2">`; data.examples.forEach(ex => { html += `<div class="border-l-4 border-gray-200 pl-3 py-1"><div class="text-sm font-bold text-gray-800">${ex.en}</div><div class="text-xs text-gray-500">${ex.vi}</div></div>`; }); html += `</div>`; }
+            html += `</div>`; return html;
+        };
 
-        checkKeyStatus();
-        UserSystem.load(); // LOAD USER DATA ON START
-        els.dict.input.addEventListener('keypress', (e) => { if(e.key === 'Enter') lookupDictionary(); });
-        els.inputs.answer.addEventListener('keypress', (e) => { if(e.key === 'Enter') checkAnswer(); });
-        els.config.qtyInput.addEventListener('input', (e) => { els.config.qtyDisplay.textContent = `${e.target.value}`; });
-        
-        // Init Default Mode
-        setMode('vocab');
+        const loadTheory = async (topic, type) => {
+             els.theory.listGrammar.classList.add('hidden'); els.theory.listForms.classList.add('hidden'); els.theory.detail.classList.remove('hidden');
+             els.theory.contentText.innerHTML = '<div class="flex flex-col items-center justify-center h-48"><div class="loader mb-2"></div><p class="text-xs text-gray-500 font-bold">Đang tải kiến thức từ Server...</p></div>';
+             const friendlyName = formReadableNames[topic] || topic;
+             setTimeout(async () => {
+                 try {
+                     let prompt = "";
+                     if (type === 'forms') prompt = `Generate theory for Word Forms: "${friendlyName}". Return ONLY Valid JSON. Structure: { "title": "${friendlyName}", "definition": "...", "rules": [{"rule": "...", "example": "..."}], "examples": [{"en": "...", "vi": "..."}] }`;
+                     else prompt = `Generate theory for English Grammar: "${topic}". Return ONLY Valid JSON. Structure: { "title": "Vietnamese Title", "definition": "...", "formulas": [{"type": "affirmative(+)/negative(-)/question(?)", "formula": "..."}], "usages": ["..."], "signs": "...", "examples": [{"en": "...", "vi": "..."}] }`;
+                     const jsonData = await callServerAI(prompt);
+                     els.theory.contentText.innerHTML = renderTheoryAI(jsonData);
+                 } catch(e) {
+                     const offlineContent = offlineData.theory[topic];
+                     if (offlineContent) els.theory.contentText.innerHTML = `<h2 class="text-2xl font-black text-indigo-900 mb-6 border-b pb-4">${offlineContent.title} (Offline)</h2>${offlineContent.content}`;
+                     else els.theory.contentText.innerHTML = `<div class="text-center p-4 text-red-500 font-bold">Lỗi kết nối Server và không có dữ liệu Offline.<br><span class="text-xs font-normal text-gray-500">${e.message}</span><br><button onclick="loadTheory('${topic}', '${type}')" class="mt-4 bg-indigo-100 text-indigo-700 px-4 py-2 rounded-lg text-xs font-bold">Thử lại</button></div>`;
+                 }
+             }, 300);
+        };
+
+        let theoryTab = 'grammar';
+        const switchTheoryTab = (tab) => {
+            theoryTab = tab;
+            els.theory.tabs.grammar.className = tab==='grammar' ? 'flex-1 py-2.5 rounded-xl text-xs font-bold bg-indigo-100 text-indigo-700 transition-colors' : 'flex-1 py-2.5 rounded-xl text-xs font-bold text-gray-500 hover:bg-gray-50 transition-colors';
+            els.theory.tabs.forms.className = tab==='forms' ? 'flex-1 py-2.5 rounded-xl text-xs font-bold bg-green-100 text-green-700 transition-colors' : 'flex-1 py-2.5 rounded-xl text-xs font-bold text-gray-500 hover:bg-gray-50 transition-colors';
+            els.theory.listGrammar.classList.toggle('hidden', tab !== 'grammar');
+            els.theory.listForms.classList.toggle('hidden', tab !== 'forms');
+            els.theory.detail.classList.add('hidden');
+            const dataSrc = tab === 'grammar' ? offlineData.grammar : offlineData.forms;
+            const container = tab === 'grammar' ? els.theory.listGrammar : els.theory.listForms;
+            const keys = Object.keys(dataSrc);
+            container.innerHTML = keys.map(t => `<div onclick="loadTheory('${t}', '${tab}')" class="p-4 bg-white rounded-2xl shadow-sm border border-gray-100 cursor-pointer hover:bg-gray-50 active:scale-[0.98] transition-all flex justify-between items-center group"><span class="font-bold text-gray-700 group-hover:text-indigo-600 transition-colors">${tab === 'forms' ? (formReadableNames[t] || t) : `${t} <span class="text-xs font-normal text-gray-500 ml-1">(${tenseTranslations[t] || ''})</span>`}</span><i class="fas fa-chevron-right text-gray-300 text-xs"></i></div>`).join('');
+        };
+
+        const backToTheoryList = () => { els.theory.detail.classList.add('hidden'); if(theoryTab === 'grammar') els.theory.listGrammar.classList.remove('hidden'); else els.theory.listForms.classList.remove('hidden'); };
+
+        // --- GLOBAL ASSIGNMENT (EXPOSE TO HTML) ---
+        Object.assign(window, {
+            openTopicModal, closeTopicModal, selectTopic, clearTopic,
+            openDictModal, closeDictModal, lookupDictionary,
+            switchTheoryTab, openTheoryModal, closeTheoryModal, backToTheoryList, loadTheory,
+            toggleSettings, updateLevel, setMode, switchScreen, resetGame,
+            checkAnswer, nextQuestion, startGeneration, playTTS, startReview, startDailyReview
+        });
+
+        // --- INITIALIZATION ---
+        try {
+            checkKeyStatus();
+            UserSystem.load();
+
+            // Init Random Options
+            if (els.inputs.grammarTense) {
+                let html = '<option value="random">🎲 Tổng hợp (Mixed Tenses)</option>';
+                html += Object.keys(offlineData.grammar).map(t => `<option value="${t}">${t} (${tenseTranslations[t] || ''})</option>`).join('');
+                els.inputs.grammarTense.innerHTML = html;
+            }
+            if (els.inputs.formsType) {
+                let html = '<option value="random">🎲 Tổng hợp (Mixed Forms)</option>';
+                html += Object.keys(offlineData.forms).map(t => `<option value="${t}">${formReadableNames[t] || t}</option>`).join('');
+                els.inputs.formsType.innerHTML = html;
+            }
+
+            setMode('roleplay'); // Default to showcase
+            els.inputs.answer.addEventListener('keypress', (e) => { if(e.key === 'Enter') checkAnswer(); });
+            els.config.qtyInput.addEventListener('input', (e) => { els.config.qtyDisplay.textContent = `${e.target.value}`; });
+        } catch (e) {
+            console.error("Initialization Error:", e);
+        }
     </script>
 </body>
 </html>
