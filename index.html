@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <!-- interactive-widget=resizes-content: Hỗ trợ Android/iOS resize vùng nhìn -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
-    <title>AI Tutor: Best of Both (Fixed)</title>
+    <title>AI Tutor: Ultimate Full Version (v2.9.8)</title>
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -80,9 +80,11 @@
             flex-direction: column;
         }
 
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        /* --- SCROLLBAR CUSTOMIZATION --- */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
@@ -119,9 +121,45 @@
         .mode-card { border: 1px solid #f1f5f9; cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden; }
         .mode-card.active { border-color: #F59E0B; background-color: #fffbeb; ring: 2px solid #fcd34d; ring-opacity: 0.5; }
 
-        .chat-bubble { max-width: 90%; padding: 10px 14px; border-radius: 16px; font-size: 0.95rem; line-height: 1.5; margin-bottom: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-        .chat-bubble.ai { align-self: flex-start; background-color: #ffffff; border: 1px solid #e2e8f0; color: #334155; border-bottom-left-radius: 4px; }
-        .chat-bubble.user { align-self: flex-end; background-color: #4f46e5; color: white; border-bottom-right-radius: 4px; }
+        /* --- ENHANCED CHAT BUBBLES --- */
+        .chat-bubble {
+            max-width: 85%; /* Giảm max-width để trông gọn hơn trên mobile */
+            width: fit-content; /* Quan trọng: Chỉ chiếm độ rộng vừa đủ nội dung */
+            padding: 10px 14px;
+            border-radius: 18px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 8px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            word-wrap: break-word; /* Đảm bảo từ dài xuống dòng */
+            overflow-wrap: break-word;
+            position: relative;
+            animation: slideInBubble 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideInBubble {
+            from { opacity: 0; transform: translateY(10px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .chat-bubble.ai {
+            align-self: flex-start; /* Căn trái trong Flex container */
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            color: #334155;
+            border-bottom-left-radius: 4px;
+            margin-right: auto; /* Đẩy sang trái */
+        }
+
+        .chat-bubble.user {
+            align-self: flex-end; /* Căn phải trong Flex container */
+            background-color: #4f46e5;
+            color: white;
+            border-bottom-right-radius: 4px;
+            margin-left: auto; /* Đẩy sang phải */
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+        }
+
         .word-chip { cursor: pointer; user-select: none; transition: all 0.2s; }
         #confetti-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 100; }
         .mobile-compact-input { padding: 0.75rem 1rem !important; font-size: 1rem !important; }
@@ -182,8 +220,10 @@
                         <span>🥑</span>
                         <div class="flex flex-col leading-none">
                             <span>AI Tutor</span>
+                            <!-- COPYRIGHT HEADER -->
+                            <span class="text-[9px] text-gray-400 font-semibold tracking-wider mt-0.5 hover:text-indigo-500 transition-colors select-none">© nguyenbachtoan</span>
                         </div>
-                        <span class="bg-indigo-100 text-indigo-700 text-[9px] px-1.5 py-0.5 rounded-md font-bold ml-1 self-start">v2.9.3</span>
+                        <span class="bg-indigo-100 text-indigo-700 text-[9px] px-1.5 py-0.5 rounded-md font-bold ml-1 self-start">v2.9.8</span>
                     </h1>
                 </div>
             </div>
@@ -308,11 +348,6 @@
                              <div id="viewForms" class="hidden"><div class="relative"><select id="formsTypeSelect" class="mobile-compact-input w-full bg-gray-50 border border-gray-200 rounded-xl font-bold appearance-none outline-none focus:border-indigo-400"></select><i class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-xs"></i></div></div>
                          </div>
                          <button onclick="startGeneration()" id="startBtn" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold text-base py-4 rounded-xl shadow-lg shadow-slate-200 active:scale-95 transition-all flex items-center justify-center gap-3"><span>BẮT ĐẦU</span> <i class="fas fa-arrow-right"></i></button>
-
-                         <!-- Copyright Footer -->
-                         <div class="mt-4 text-center select-none">
-                             <p class="text-[10px] font-bold text-gray-300 uppercase tracking-widest hover:text-indigo-300 transition-colors cursor-default">© 2025 nguyenbachtoan</p>
-                         </div>
                     </div>
                 </div>
             </div>
@@ -342,9 +377,14 @@
                         <div id="gameDisplayWrapper" class="w-full max-w-2xl flex flex-col items-center transition-all duration-300">
                             <span id="instructionText" class="text-[9px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-4 bg-white px-3 py-1 rounded-full border border-gray-100 shadow-sm">INSTRUCTION</span>
                             <div id="readingPassageDisplay" class="hidden w-full bg-white p-5 rounded-2xl border-l-4 border-yellow-400 shadow-sm text-gray-700 mb-6 text-sm leading-relaxed text-justify"></div>
+
+                            <!-- Roleplay Container (Flex Col for correct sizing) -->
                             <div id="roleplayContainer" class="hidden w-full flex-1 min-h-[40vh] flex flex-col">
-                                 <div id="chatHistory" class="flex-1 overflow-y-auto p-3 space-y-3 bg-white rounded-2xl border border-gray-200 shadow-inner custom-scroll mb-3"></div>
+                                 <div id="chatHistory" class="flex-1 overflow-y-auto p-3 space-y-3 bg-white rounded-2xl border border-gray-200 shadow-inner custom-scroll flex flex-col scroll-smooth">
+                                 </div>
+                                 <div id="chat-anchor" style="height: 1px;"></div>
                             </div>
+
                             <div id="scrambleContainer" class="hidden w-full">
                                  <div id="scrambleResult" class="min-h-[80px] bg-white border-2 border-dashed border-indigo-200 rounded-2xl flex flex-wrap items-center justify-center p-3 gap-2 mb-4 transition-colors hover:border-indigo-300"></div>
                                  <div id="scrambleBank" class="flex flex-wrap justify-center gap-2"></div>
@@ -551,7 +591,7 @@
             modeCards: { vocab: document.getElementById('mode-vocab'), phrases: document.getElementById('mode-phrases'), idioms: document.getElementById('mode-idioms'), listening: document.getElementById('mode-listening'), reading: document.getElementById('mode-reading'), grammar: document.getElementById('mode-grammar'), forms: document.getElementById('mode-forms'), scramble: document.getElementById('mode-scramble'), roleplay: document.getElementById('mode-roleplay') }
         };
 
-        // --- HELPER FUNCTIONS (Moved up for Scope Fix) ---
+        // --- HELPER FUNCTIONS ---
         function toggleModal(modal, content, backdrop, show) {
             if (show) {
                 modal.classList.remove('hidden');
@@ -570,7 +610,6 @@
             document.getElementById('levelSelect').value = val;
             document.querySelectorAll('.level-chip').forEach(c => { c.classList.remove('active'); });
             if(el) el.classList.add('active');
-            // This is safe because UserSystem is defined later but executed later
             UserSystem.save();
         }
 
@@ -595,6 +634,23 @@
             switchScreen('start');
             gameState.currentIdx = 0;
         }
+
+        // --- NEW: CHAT SCROLL HELPER (SMOOTH & DELAYED) ---
+        // Helps emulate real chat app behavior by waiting for layout paint
+function scrollToBottom() {
+    const anchor = document.getElementById('chat-anchor');
+    debugger
+    if (anchor) {
+        console.log("Scrolling to bottom...");
+        // Sử dụng requestAnimationFrame để đảm bảo trình duyệt đã vẽ xong tin nhắn mới
+        requestAnimationFrame(() => {
+            anchor.scrollIntoView({
+                behavior: 'smooth',
+                block: 'end'
+            });
+        });
+    }
+}
 
         function checkExamAnswer() {
             if (gameState.mode === 'roleplay') return;
@@ -724,14 +780,36 @@
             "Recreation": [{en: "Sports", vi: "Thể thao"}, {en: "Hobbies", vi: "Sở thích"}, {en: "Music", vi: "Âm nhạc"}, {en: "Beach", vi: "Bãi biển"}, {en: "Camping", vi: "Cắm trại"}]
         };
 
-
         const offlineData = {
-            vocab: { "Daily Life": [{vi: "Cà phê", en: "coffee", others: "java, joe"}, {vi: "Máy tính", en: "computer", others: "pc, laptop"}, {vi: "Sách", en: "book", others: "volume, novel"}, {vi: "Bút", en: "pen", others: "biro, marker"}], "Work & Business": [{vi: "Phát triển", en: "develop", others: "grow, expand"}]},
-            phrases: { "General": [{vi: "Bỏ cuộc", en: "give up", others: "quit, surrender"}, {vi: "Chăm sóc", en: "look after", others: "take care of"}] },
-            idioms: { "General": [{vi: "Một mũi tên trúng hai đích", en: "kill two birds with one stone", others: ""}, {vi: "Mưa như trút nước", en: "raining cats and dogs", others: ""}] },
+            vocab: { "Daily Life": [
+                {vi: "Cà phê", en: "coffee", others: "java, joe"},
+                {vi: "Máy tính", en: "computer", others: "pc, laptop"},
+                {vi: "Sách", en: "book", others: "volume, novel"},
+                {vi: "Bút", en: "pen", others: "biro, marker"},
+                {vi: "Điện thoại", en: "phone", others: "cellphone, mobile"},
+                {vi: "Xe đạp", en: "bicycle", others: "bike, cycle"}
+            ], "Work & Business": [{vi: "Phát triển", en: "develop", others: "grow, expand"}]},
+            phrases: { "General": [
+                {vi: "Bỏ cuộc", en: "give up", others: "quit, surrender"},
+                {vi: "Chăm sóc", en: "look after", others: "take care of"},
+                {vi: "Tìm kiếm", en: "look for", others: "search, seek"},
+                {vi: "Tham gia", en: "take part in", others: "participate, join"}
+            ] },
+            idioms: { "General": [
+                {vi: "Một mũi tên trúng hai đích", en: "kill two birds with one stone", others: ""},
+                {vi: "Mưa như trút nước", en: "raining cats and dogs", others: ""},
+                {vi: "Dễ như ăn kẹo", en: "piece of cake", others: "easy, simple"},
+                {vi: "Tốn kém", en: "cost an arm and a leg", others: "expensive, pricey"}
+            ] },
             grammar: {
-                "Present Simple": [{question: "She usually ___ (walk) to work.", verb: "walk", answer: "walks", explanation: "Thói quen ở hiện tại (She -> V+s)."}, {question: "The sun ___ (rise) in the East.", verb: "rise", answer: "rises", explanation: "Sự thật hiển nhiên."}],
-                "Present Continuous": [{question: "Look! It ___ (rain) outside.", verb: "rain", answer: "is raining", explanation: "Đang xảy ra lúc nói (Look!)."}, {question: "I ___ (study) now.", verb: "study", answer: "am studying", explanation: "Đang diễn ra (now)."}],
+                "Present Simple": [
+                    {question: "She usually ___ (walk) to work.", verb: "walk", answer: "walks", explanation: "Thói quen ở hiện tại (She -> V+s)."},
+                    {question: "The sun ___ (rise) in the East.", verb: "rise", answer: "rises", explanation: "Sự thật hiển nhiên."}
+                ],
+                "Present Continuous": [
+                    {question: "Look! It ___ (rain) outside.", verb: "rain", answer: "is raining", explanation: "Đang xảy ra lúc nói (Look!)."},
+                    {question: "I ___ (study) now.", verb: "study", answer: "am studying", explanation: "Đang diễn ra (now)."}
+                ],
                 "Present Perfect": [{question: "I ___ (see) that movie twice.", verb: "see", answer: "have seen", explanation: "Kinh nghiệm trong quá khứ."}],
                 "Present Perfect Continuous": [{question: "It ___ (rain) for 3 hours.", verb: "rain", answer: "has been raining", explanation: "Nhấn mạnh quá trình liên tục."}],
                 "Past Simple": [{question: "I ___ (go) to the cinema yesterday.", verb: "go", answer: "went", explanation: "Đã xảy ra và kết thúc (yesterday)."}],
@@ -744,8 +822,14 @@
                 "Future Perfect Continuous": [{question: "By 2030, I ___ (teach) for 20 years.", verb: "teach", answer: "will have been teaching", explanation: "Quá trình tính đến mốc TL."}]
             },
             forms: {
-                "irregular": [{question: "go (V2)", answer: "went", explanation: "go - went - gone"}, {question: "buy (V2)", answer: "bought", explanation: "buy - bought - bought"}],
-                "irregular_v3": [{question: "go (V3)", answer: "gone", explanation: "go - went - gone"}, {question: "write (V3)", answer: "written", explanation: "write - wrote - written"}],
+                "irregular": [
+                    {question: "go (V2)", answer: "went", explanation: "go - went - gone"},
+                    {question: "buy (V2)", answer: "bought", explanation: "buy - bought - bought"}
+                ],
+                "irregular_v3": [
+                    {question: "go (V3)", answer: "gone", explanation: "go - went - gone"},
+                    {question: "write (V3)", answer: "written", explanation: "write - wrote - written"}
+                ],
                 "noun_suffix": [{question: "inform (Noun -tion)", answer: "information", explanation: "Thêm -ation."}, {question: "develop (Noun -ment)", answer: "development", explanation: "Thêm -ment."}],
                 "adj_suffix": [{question: "beauty (Adj -ful)", answer: "beautiful", explanation: "y -> i + ful."}, {question: "care (Adj -less)", answer: "careless", explanation: "Thêm -less."}],
                 "prefixes": [{question: "happy (Prefix: not)", answer: "unhappy", explanation: "Thêm un-."}, {question: "agree (Prefix: not)", answer: "disagree", explanation: "Thêm dis-."}],
@@ -756,7 +840,7 @@
                 "ed": [{question: "stop", answer: "stopped", explanation: "Gấp đôi phụ âm."}, {question: "plan", answer: "planned", explanation: "Gấp đôi phụ âm."}],
                 "classify": [{question: "She runs [fast]. (Type?)", answer: "adverb", explanation: "Bổ nghĩa cho động từ runs."}, {question: "It is a [fast] car. (Type?)", "answer": "adjective", explanation: "Bổ nghĩa cho danh từ car."}]
             },
-            scramble: { "General": [{vi: "Tôi đi học bằng xe buýt.", en: "I go to school by bus"}, {vi: "Cô ấy đang nấu ăn trong bếp.", en: "She is cooking in the kitchen"}] },
+            scramble: { "General": [{vi: "Tôi đi học bằng xe buýt.", en: "I go to school by bus"}, {vi: "Cô ấy đang nấu ăn trong bếp.", en: "She is cooking in the kitchen"}, {vi: "Anh ấy chơi bóng đá giỏi.", en: "He plays football well"}] },
             reading: { "Daily Life": [{passage: "My name is John...", question: "What time does John wake up?", answer: "6 AM", options: ["6 AM", "7 AM"], type: "mc", explanation: "Text says: 'I wake up at 6 AM'."}] },
             theory: {
                 // FALLBACK ONLY - will try to use AI first
@@ -909,6 +993,7 @@
                 els.game.progress.style.width = `${((gameState.currentIdx + 1) / (gameState.data.length || 10)) * 100}%`;
              }
 
+            // Clear inputs and states
             els.inputs.answer.value = "";
             els.game.quickOptions.classList.add('hidden'); els.game.quickOptions.innerHTML = '';
             els.game.display.classList.remove('hidden'); els.game.listeningDisplay.classList.add('hidden'); els.game.subDisplay.classList.add('hidden'); els.game.passageDisplay.classList.add('hidden'); els.game.scrambleContainer.classList.add('hidden'); els.game.roleplayContainer.classList.add('hidden');
@@ -936,6 +1021,7 @@
                 gameState.currentCorrect = item.en;
                 els.wrappers.inputWrapper.classList.add('hidden');
                 els.game.scrambleContainer.classList.remove('hidden');
+                // CLEAN UP & RENDER
                 renderScrambleGame(item.en);
             }
             else if (modeToRender === 'roleplay') {
@@ -965,7 +1051,7 @@
             if (isRawHtml) bubble.innerHTML = text; else bubble.textContent = text;
             els.game.chatHistory.appendChild(bubble);
             if (feedbackHtml) { const fb = document.createElement('div'); fb.innerHTML = feedbackHtml; els.game.chatHistory.appendChild(fb); }
-            els.game.chatHistory.scrollTop = els.game.chatHistory.scrollHeight;
+            scrollToBottom();
         }
 
         async function submitChat() {
@@ -973,19 +1059,24 @@
             if (!userText) return;
             addChatBubble('user', userText);
             els.inputs.answer.value = '';
+
+            // Create typing indicator
             const typingDiv = document.createElement('div');
             typingDiv.className = 'chat-bubble ai italic text-gray-400 text-sm';
             typingDiv.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i> AI đang trả lời...';
             typingDiv.id = 'typingIndicator';
             els.game.chatHistory.appendChild(typingDiv);
-            els.game.chatHistory.scrollTop = els.game.chatHistory.scrollHeight;
+            scrollToBottom();
+
             try {
                 const prompt = `Context: English learning roleplay. Scenario: "${gameState.roleplayContext.scenario}". My Role (AI): "${gameState.roleplayContext.aiRole}". User Role: "${gameState.roleplayContext.userRole}". User said: "${userText}".
                 1. Analyze user errors (Grammar/Vocab). If wrong, provide correction & explanation in Vietnamese.
                 2. Reply naturally. Identify 1-3 hard words in reply.
                 Output JSON: { "reply": "...", "vocabulary": [{"word": "...", "meaning": "..."}], "analysis": { "isCorrect": bool, "correction": "...", "explanation": "...", "errorType": "..." }, "isFinished": bool }`;
                 const response = await callServerAI(prompt);
+
                 if(document.getElementById('typingIndicator')) document.getElementById('typingIndicator').remove();
+
                 let feedbackHtml = null;
                 if (response.analysis && !response.analysis.isCorrect && response.analysis.correction) {
                     const uClean = userText.trim().replace(/[.,!?;]/g, '').toLowerCase();
@@ -996,6 +1087,7 @@
                 }
                 const richReply = applyVocabulary(response.reply, response.vocabulary);
                 addChatBubble('ai', richReply, feedbackHtml, true);
+
                 if (response.isFinished) {
                     addChatBubble('ai', "<i>(Cuộc hội thoại đã kết thúc. Bạn có thể bấm 'Kết thúc' ở trên để xem lại.)</i>", null, true);
                 } else {
@@ -1008,20 +1100,37 @@
             }
         }
 
+        // --- SCRAMBLE LOGIC FIXED ---
         function renderScrambleGame(sentence) {
             const words = sentence.split(' ');
             const shuffled = [...words].sort(() => Math.random() - 0.5);
-            els.game.scrambleBank.innerHTML = ''; els.game.scrambleResult.innerHTML = '';
+
+            // CLEAR EVERYTHING inside container except the structure divs if they exist,
+            // but actually we append button to container, so we must clear old buttons.
+            // Safe way: clear banks, remove any BUTTONs from container.
+            els.game.scrambleBank.innerHTML = '';
+            els.game.scrambleResult.innerHTML = '';
+
+            // Remove any existing "Check" buttons to prevent stacking
+            const existingBtn = els.game.scrambleContainer.querySelector('#checkScrambleBtn');
+            if(existingBtn) existingBtn.remove();
+
             shuffled.forEach((word, idx) => {
-                const chip = document.createElement('div'); chip.className = 'word-chip bg-white border-2 border-indigo-100 hover:border-indigo-300 text-indigo-700 px-3 py-1.5 md:px-4 md:py-2 rounded-xl font-bold text-sm md:text-base shadow-sm active:scale-95'; chip.textContent = word;
-                chip.onclick = () => moveScrambleWord(chip); els.game.scrambleBank.appendChild(chip);
+                const chip = document.createElement('div');
+                chip.className = 'word-chip bg-white border-2 border-indigo-100 hover:border-indigo-300 text-indigo-700 px-3 py-1.5 md:px-4 md:py-2 rounded-xl font-bold text-sm md:text-base shadow-sm active:scale-95 select-none transition-all';
+                chip.textContent = word;
+                chip.onclick = () => moveScrambleWord(chip);
+                els.game.scrambleBank.appendChild(chip);
             });
+
              const checkScrambleBtn = document.createElement('button');
+             checkScrambleBtn.id = 'checkScrambleBtn'; // Assign ID for easy removal
              checkScrambleBtn.className = "w-full mt-4 md:mt-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-colors text-sm shadow-md active:scale-95";
              checkScrambleBtn.innerHTML = "KIỂM TRA KẾT QUẢ";
              checkScrambleBtn.onclick = checkExamAnswer;
              els.game.scrambleContainer.appendChild(checkScrambleBtn);
         }
+
         function moveScrambleWord(chip) {
             const isResult = chip.parentElement === els.game.scrambleResult;
             if (isResult) { els.game.scrambleBank.appendChild(chip); chip.classList.remove('bg-yellow-100', 'border-yellow-300', 'text-yellow-800'); chip.classList.add('bg-white', 'border-indigo-100', 'text-indigo-700'); }
