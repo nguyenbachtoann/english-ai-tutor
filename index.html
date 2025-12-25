@@ -3,8 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <!-- interactive-widget=resizes-content: Hỗ trợ Android/iOS resize vùng nhìn -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
-    <title>AI Tutor: Ultimate Full Version (v2.9.8)</title>
+    <!-- THÊM viewport-fit=cover ĐỂ TRÀN VIỀN -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content, viewport-fit=cover">
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="AI Tutor">
+    <link rel="apple-touch-icon" href="icon-180.png">
+    <meta name="theme-color" content="#f8fafc">
+
+    <title>AI Tutor: Ultimate Full Version (v3.0.6)</title>
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -15,6 +23,11 @@
 
     <style>
         :root {
+            /* ĐỊNH NGHĨA VÙNG AN TOÀN (SAFE AREA) */
+            --sat: env(safe-area-inset-top);
+            --sab: env(safe-area-inset-bottom);
+            --sal: env(safe-area-inset-left);
+            --sar: env(safe-area-inset-right);
             --app-height: 100%;
         }
 
@@ -22,6 +35,7 @@
             height: 100%;
             width: 100%;
             overflow: hidden;
+            background-color: #f8fafc; /* Tránh viền trắng khi kéo overscroll */
         }
 
         body {
@@ -35,6 +49,9 @@
             overflow: hidden;
             overscroll-behavior: none;
             touch-action: none;
+            /* Padding cho 2 bên hông nếu xoay ngang điện thoại */
+            padding-left: var(--sal);
+            padding-right: var(--sar);
         }
 
         #app-container {
@@ -49,6 +66,24 @@
             transition: height 0.1s ease-out;
         }
 
+        /* --- HEADER TỐI ƯU CHO IPHONE (TAI THỎ/DYNAMIC ISLAND) --- */
+        #mainHeader {
+            /* Padding top = 12px + Safe Area Top */
+            padding-top: max(12px, var(--sat));
+            padding-bottom: 12px;
+        }
+
+        /* --- FOOTER/INPUT TỐI ƯU CHO IPHONE (HOME BAR) --- */
+        #inputContainer {
+            /* Padding bottom = 12px + Safe Area Bottom */
+            padding-bottom: max(12px, var(--sab));
+        }
+
+        /* Input Area ở màn hình Start (Nút Bắt đầu) */
+        .safe-area-bottom-padding {
+            padding-bottom: max(20px, var(--sab)) !important;
+        }
+
         @media (min-width: 768px) {
             body {
                 position: relative;
@@ -57,6 +92,7 @@
                 align-items: center;
                 justify-content: center;
                 touch-action: auto;
+                padding: 0; /* Reset padding trên desktop */
             }
             #app-container {
                 position: relative;
@@ -66,6 +102,13 @@
                 border-radius: 24px;
                 box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
                 border: 1px solid rgba(255,255,255,0.8);
+                /* Reset padding safe area trong container desktop vì đã có border-radius */
+            }
+            #mainHeader {
+                padding-top: 1rem; /* Reset về 16px chuẩn */
+            }
+            #inputContainer {
+                padding-bottom: 1rem; /* Reset về 16px chuẩn */
             }
         }
 
@@ -171,6 +214,8 @@
             backdrop-filter: blur(4px);
             display: flex; align-items: center; justify-content: center;
             padding: 1rem;
+             /* Đảm bảo modal không bị che bởi keyboard trên mobile */
+            padding-bottom: max(1rem, var(--sab));
         }
 
         .custom-modal-container {
@@ -179,11 +224,14 @@
             overflow: hidden; transition: all 0.2s;
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
             width: 100%; height: 100%; border-radius: 0;
+            /* Padding top cho modal full screen để tránh notch */
+            padding-top: var(--sat);
         }
 
         @media (min-width: 768px) {
             .custom-modal-container {
                 border-radius: 24px; width: auto; min-width: 450px; max-width: 900px; height: auto; max-height: 85vh;
+                padding-top: 0; /* Reset padding top trên desktop modal */
             }
             .modal-type-dict { width: 500px; height: 600px; }
             .modal-type-topic { width: 800px; height: 600px; }
@@ -210,7 +258,7 @@
     <div id="app-container">
 
         <!-- HEADER -->
-        <div id="mainHeader" class="px-4 py-3 md:py-4 bg-white/95 backdrop-blur-md border-b border-gray-100 flex justify-between items-center z-50 shrink-0 shadow-sm transition-transform duration-200">
+        <div id="mainHeader" class="px-4 bg-white/95 backdrop-blur-md border-b border-gray-100 flex justify-between items-center z-50 shrink-0 shadow-sm transition-transform duration-200">
             <div class="flex items-center gap-3">
                 <button onclick="resetGame()" class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-white hover:text-indigo-600 flex items-center justify-center transition-all border border-transparent hover:border-gray-100 active:scale-90">
                     <i class="fas fa-home"></i>
@@ -223,7 +271,7 @@
                             <!-- COPYRIGHT HEADER -->
                             <span class="text-[9px] text-gray-400 font-semibold tracking-wider mt-0.5 hover:text-indigo-500 transition-colors select-none">© nguyenbachtoan</span>
                         </div>
-                        <span class="bg-indigo-100 text-indigo-700 text-[9px] px-1.5 py-0.5 rounded-md font-bold ml-1 self-start">v2.9.8</span>
+                        <span class="bg-indigo-100 text-indigo-700 text-[9px] px-1.5 py-0.5 rounded-md font-bold ml-1 self-start">v3.0.6</span>
                     </h1>
                 </div>
             </div>
@@ -338,7 +386,7 @@
                     </div>
 
                     <!-- Start Input Area -->
-                    <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm sticky bottom-0 z-20">
+                    <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm sticky bottom-0 z-20 safe-area-bottom-padding">
                          <div id="inputAreaWrapper" class="space-y-3 mb-4">
                              <div id="sharedInputArea" class="w-full">
                                  <input type="text" id="vocabTopicInput" placeholder="VD: Marketing, Football..." class="mobile-compact-input w-full bg-gray-50 border border-gray-200 rounded-xl font-bold text-gray-800 focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-50 transition-all outline-none shadow-inner" onkeypress="if(event.key==='Enter') startGeneration()">
@@ -636,20 +684,21 @@
             gameState.currentIdx = 0;
         }
 
-        // --- NEW: CHAT SCROLL HELPER (SMOOTH & DELAYED) ---
-        // Helps emulate real chat app behavior by waiting for layout paint
-function scrollToBottom() {
-    const anchor = document.getElementById('chat-anchor');
-    if (anchor) {
-        // Sử dụng requestAnimationFrame để đảm bảo trình duyệt đã vẽ xong tin nhắn mới
-        requestAnimationFrame(() => {
-            anchor.scrollIntoView({
-                behavior: 'smooth',
-                block: 'end'
-            });
-        });
-    }
-}
+        // --- NEW: FORCE SCROLL TO BOTTOM (MULTI-STAGE) ---
+        // This function ensures the chat scrolls to the very bottom
+        // regardless of keyboard state, animations, or DOM reflow.
+        function scrollToBottom() {
+            const anchor = document.getElementById('chat-anchor');
+            if (anchor) {
+                // Sử dụng requestAnimationFrame để đảm bảo trình duyệt đã vẽ xong tin nhắn mới
+                requestAnimationFrame(() => {
+                    anchor.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'end'
+                    });
+                });
+            }
+        }
 
         function checkExamAnswer() {
             if (gameState.mode === 'roleplay') return;
