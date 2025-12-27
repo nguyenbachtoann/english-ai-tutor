@@ -12,7 +12,7 @@
     <link rel="apple-touch-icon" href="icon-180.png">
     <meta name="theme-color" content="#f8fafc">
 
-    <title>AI Tutor: Ultimate Full Version (v3.0.6)</title>
+    <title>AI Tutor: Ultimate Full Version (v3.1.5)</title>
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -214,7 +214,7 @@
             backdrop-filter: blur(4px);
             display: flex; align-items: center; justify-content: center;
             padding: 1rem;
-             /* Đảm bảo modal không bị che bởi keyboard trên mobile */
+            /* Đảm bảo modal không bị che bởi keyboard trên mobile */
             padding-bottom: max(1rem, var(--sab));
         }
 
@@ -223,7 +223,9 @@
             display: flex; flex-direction: column;
             overflow: hidden; transition: all 0.2s;
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-            width: 100%; height: 100%; border-radius: 0;
+            width: 100%; height: 100%;
+            /* FIX BORDER RADIUS FOR MOBILE */
+            border-radius: 24px;
             /* Padding top cho modal full screen để tránh notch */
             padding-top: var(--sat);
         }
@@ -271,7 +273,7 @@
                             <!-- COPYRIGHT HEADER -->
                             <span class="text-[9px] text-gray-400 font-semibold tracking-wider mt-0.5 hover:text-indigo-500 transition-colors select-none">© nguyenbachtoan</span>
                         </div>
-                        <span class="bg-indigo-100 text-indigo-700 text-[9px] px-1.5 py-0.5 rounded-md font-bold ml-1 self-start">v3.0.6</span>
+                        <span class="bg-indigo-100 text-indigo-700 text-[9px] px-1.5 py-0.5 rounded-md font-bold ml-1 self-start">v3.1.5</span>
                     </h1>
                 </div>
             </div>
@@ -309,8 +311,8 @@
                             </div>
                         </button>
 
-                         <!-- Config Box -->
-                         <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100/50">
+                        <!-- Config Box -->
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100/50">
                             <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3 flex items-center gap-2"><i class="fas fa-sliders-h"></i> CẤU HÌNH</h4>
                             <div class="mb-4">
                                 <input type="hidden" id="levelSelect" value="Level A">
@@ -365,37 +367,42 @@
 
                     <!-- Pinned Topic Banner -->
                     <div id="activeTopicBanner" class="hidden mb-6 bg-indigo-600 text-white p-4 rounded-2xl shadow-lg flex items-center justify-between">
-                         <div class="flex items-center gap-3"><div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center"><i class="fas fa-thumbtack text-xs"></i></div><div class="min-w-0"><p class="text-[9px] font-bold text-indigo-200 uppercase tracking-widest">ĐANG GHIM</p><h3 id="activeTopicName" class="font-black text-base truncate">Topic</h3></div></div>
-                         <button onclick="clearTopic()" class="bg-indigo-500 text-white px-3 py-1.5 rounded-lg font-bold text-[10px] border border-indigo-400 whitespace-nowrap">Thoát</button>
+                        <div class="flex items-center gap-3"><div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center"><i class="fas fa-thumbtack text-xs"></i></div><div class="min-w-0"><p class="text-[9px] font-bold text-indigo-200 uppercase tracking-widest">ĐANG GHIM</p><h3 id="activeTopicName" class="font-black text-base truncate">Topic</h3></div></div>
+                        <button onclick="clearTopic()" class="bg-indigo-500 text-white px-3 py-1.5 rounded-lg font-bold text-[10px] border border-indigo-400 whitespace-nowrap">Thoát</button>
                     </div>
 
                     <!-- Modes Grid -->
                     <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6" id="modeGrid">
-                         <div onclick="setMode('roleplay')" id="mode-roleplay" class="mode-card col-span-2 sm:col-span-3 bg-white p-5 rounded-2xl shadow-sm hover:shadow-md active h-auto">
+                        <div onclick="setMode('roleplay')" id="mode-roleplay" class="mode-card col-span-2 sm:col-span-3 bg-white p-5 rounded-2xl shadow-sm hover:shadow-md active h-auto">
                             <div class="absolute right-0 top-0 px-2 py-0.5 bg-purple-600 text-white text-[9px] font-bold rounded-bl-lg z-10">HOT</div>
                             <div class="flex items-center gap-4 relative z-10">
                                 <div class="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center text-xl border border-purple-100"><i class="fas fa-comments"></i></div>
                                 <div class="flex-1"><h3 class="text-base font-black text-gray-800">Thực Chiến AI</h3><p class="text-xs text-gray-500 font-medium mt-0.5">Chat hội thoại nhập vai với AI.</p></div>
                             </div>
-                         </div>
-                         <div onclick="setMode('vocab')" id="mode-vocab" class="mode-card bg-white p-4 rounded-2xl shadow-sm flex flex-col items-center text-center gap-2 hover-lift"><div class="w-10 h-10 rounded-xl bg-yellow-50 text-yellow-600 flex items-center justify-center text-lg"><i class="fas fa-font"></i></div><div><h3 class="font-bold text-gray-700 text-sm">Từ Vựng</h3><p class="text-[10px] text-gray-400 font-bold">Word Matching</p></div></div>
-                         <div onclick="setMode('scramble')" id="mode-scramble" class="mode-card bg-white p-4 rounded-2xl shadow-sm flex flex-col items-center text-center gap-2 hover-lift"><div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg"><i class="fas fa-sort-amount-down"></i></div><div><h3 class="font-bold text-gray-700 text-sm">Xếp Câu</h3><p class="text-[10px] text-gray-400 font-bold">Unscramble</p></div></div>
-                         <div onclick="setMode('listening')" id="mode-listening" class="mode-card bg-white p-4 rounded-2xl shadow-sm flex flex-col items-center text-center gap-2 hover-lift"><div class="w-10 h-10 rounded-xl bg-pink-50 text-pink-600 flex items-center justify-center text-lg"><i class="fas fa-headphones"></i></div><div><h3 class="font-bold text-gray-700 text-sm">Nghe Chép</h3><p class="text-[10px] text-gray-400 font-bold">Dictation</p></div></div>
-                         <div onclick="setMode('grammar')" id="mode-grammar" class="mode-card bg-white p-4 rounded-2xl shadow-sm flex flex-col items-center text-center gap-2 hover-lift"><div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg"><i class="fas fa-pen-nib"></i></div><div><h3 class="font-bold text-gray-700 text-sm">Ngữ Pháp</h3><p class="text-[10px] text-gray-400 font-bold">Tenses</p></div></div>
-                         <div onclick="setMode('idioms')" id="mode-idioms" class="mode-card bg-white p-4 rounded-2xl shadow-sm flex flex-col items-center text-center gap-2 hover-lift"><div class="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center text-lg"><i class="fas fa-dragon"></i></div><div><h3 class="font-bold text-gray-700 text-sm">Thành Ngữ</h3><p class="text-[10px] text-gray-400 font-bold">Idioms</p></div></div>
+                        </div>
+                        <div onclick="setMode('reading')" id="mode-reading" class="mode-card bg-white p-4 rounded-2xl shadow-sm flex flex-col items-center text-center gap-2 hover-lift">
+                            <div class="w-10 h-10 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center text-lg"><i class="fas fa-book-reader"></i></div>
+                            <div><h3 class="font-bold text-gray-700 text-sm">Luyện Đọc</h3><p class="text-[10px] text-gray-400 font-bold">Reading Exam</p></div>
+                        </div>
+                        <div onclick="setMode('vocab')" id="mode-vocab" class="mode-card bg-white p-4 rounded-2xl shadow-sm flex flex-col items-center text-center gap-2 hover-lift"><div class="w-10 h-10 rounded-xl bg-yellow-50 text-yellow-600 flex items-center justify-center text-lg"><i class="fas fa-font"></i></div><div><h3 class="font-bold text-gray-700 text-sm">Từ Vựng</h3><p class="text-[10px] text-gray-400 font-bold">Word Matching</p></div></div>
+                        <div onclick="setMode('scramble')" id="mode-scramble" class="mode-card bg-white p-4 rounded-2xl shadow-sm flex flex-col items-center text-center gap-2 hover-lift"><div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg"><i class="fas fa-sort-amount-down"></i></div><div><h3 class="font-bold text-gray-700 text-sm">Xếp Câu</h3><p class="text-[10px] text-gray-400 font-bold">Unscramble</p></div></div>
+                        <div onclick="setMode('listening')" id="mode-listening" class="mode-card bg-white p-4 rounded-2xl shadow-sm flex flex-col items-center text-center gap-2 hover-lift"><div class="w-10 h-10 rounded-xl bg-pink-50 text-pink-600 flex items-center justify-center text-lg"><i class="fas fa-headphones"></i></div><div><h3 class="font-bold text-gray-700 text-sm">Nghe Chép</h3><p class="text-[10px] text-gray-400 font-bold">Dictation</p></div></div>
+                        <div onclick="setMode('grammar')" id="mode-grammar" class="mode-card bg-white p-4 rounded-2xl shadow-sm flex flex-col items-center text-center gap-2 hover-lift"><div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg"><i class="fas fa-pen-nib"></i></div><div><h3 class="font-bold text-gray-700 text-sm">Ngữ Pháp</h3><p class="text-[10px] text-gray-400 font-bold">Tenses</p></div></div>
+                        <div onclick="setMode('forms')" id="mode-forms" class="mode-card bg-white p-4 rounded-2xl shadow-sm flex flex-col items-center text-center gap-2 hover-lift"><div class="w-10 h-10 rounded-xl bg-green-50 text-green-600 flex items-center justify-center text-lg"><i class="fas fa-magic"></i></div><div><h3 class="font-bold text-gray-700 text-sm">Biến Thể</h3><p class="text-[10px] text-gray-400 font-bold">Word Forms</p></div></div>
+                        <div onclick="setMode('idioms')" id="mode-idioms" class="mode-card bg-white p-4 rounded-2xl shadow-sm flex flex-col items-center text-center gap-2 hover-lift"><div class="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center text-lg"><i class="fas fa-dragon"></i></div><div><h3 class="font-bold text-gray-700 text-sm">Thành Ngữ</h3><p class="text-[10px] text-gray-400 font-bold">Idioms</p></div></div>
                     </div>
 
                     <!-- Start Input Area -->
                     <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm sticky bottom-0 z-20 safe-area-bottom-padding">
-                         <div id="inputAreaWrapper" class="space-y-3 mb-4">
-                             <div id="sharedInputArea" class="w-full">
-                                 <input type="text" id="vocabTopicInput" placeholder="VD: Marketing, Football..." class="mobile-compact-input w-full bg-gray-50 border border-gray-200 rounded-xl font-bold text-gray-800 focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-50 transition-all outline-none shadow-inner" onkeypress="if(event.key==='Enter') startGeneration()">
-                             </div>
-                             <div id="viewReading" class="hidden"><div class="relative"><select id="readingTopicSelect" class="mobile-compact-input w-full bg-gray-50 border border-gray-200 rounded-xl font-bold appearance-none outline-none focus:border-indigo-400"></select><i class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-xs"></i></div></div>
-                             <div id="viewGrammar" class="hidden"><div class="relative"><select id="grammarTenseSelect" class="mobile-compact-input w-full bg-gray-50 border border-gray-200 rounded-xl font-bold appearance-none outline-none focus:border-indigo-400"></select><i class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-xs"></i></div></div>
-                             <div id="viewForms" class="hidden"><div class="relative"><select id="formsTypeSelect" class="mobile-compact-input w-full bg-gray-50 border border-gray-200 rounded-xl font-bold appearance-none outline-none focus:border-indigo-400"></select><i class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-xs"></i></div></div>
-                         </div>
-                         <button onclick="startGeneration()" id="startBtn" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold text-base py-4 rounded-xl shadow-lg shadow-slate-200 active:scale-95 transition-all flex items-center justify-center gap-3"><span>BẮT ĐẦU</span> <i class="fas fa-arrow-right"></i></button>
+                        <div id="inputAreaWrapper" class="space-y-3 mb-4">
+                            <div id="sharedInputArea" class="w-full">
+                                <input type="text" id="vocabTopicInput" placeholder="VD: Marketing, Football..." class="mobile-compact-input w-full bg-gray-50 border border-gray-200 rounded-xl font-bold text-gray-800 focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-50 transition-all outline-none shadow-inner" onkeypress="if(event.key==='Enter') startGeneration()">
+                            </div>
+                            <div id="viewReading" class="hidden"><div class="relative"><select id="readingTopicSelect" class="mobile-compact-input w-full bg-gray-50 border border-gray-200 rounded-xl font-bold appearance-none outline-none focus:border-indigo-400"></select><i class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-xs"></i></div></div>
+                            <div id="viewGrammar" class="hidden"><div class="relative"><select id="grammarTenseSelect" class="mobile-compact-input w-full bg-gray-50 border border-gray-200 rounded-xl font-bold appearance-none outline-none focus:border-indigo-400"></select><i class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-xs"></i></div></div>
+                            <div id="viewForms" class="hidden"><div class="relative"><select id="formsTypeSelect" class="mobile-compact-input w-full bg-gray-50 border border-gray-200 rounded-xl font-bold appearance-none outline-none focus:border-indigo-400"></select><i class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-xs"></i></div></div>
+                        </div>
+                        <button onclick="startGeneration()" id="startBtn" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold text-base py-4 rounded-xl shadow-lg shadow-slate-200 active:scale-95 transition-all flex items-center justify-center gap-3"><span>BẮT ĐẦU</span> <i class="fas fa-arrow-right"></i></button>
                     </div>
                 </div>
             </div>
@@ -410,7 +417,7 @@
                         </div>
                     </div>
                     <div class="flex-1 mx-4 max-w-md hidden sm:block" id="progressBarContainer">
-                         <div class="h-2 bg-gray-100 rounded-full overflow-hidden border border-gray-100"><div id="progressBar" class="h-full bg-yellow-400 rounded-full transition-all duration-500 shadow-[0_0_10px_rgba(250,204,21,0.5)]" style="width: 0%"></div></div>
+                        <div class="h-2 bg-gray-100 rounded-full overflow-hidden border border-gray-100"><div id="progressBar" class="h-full bg-yellow-400 rounded-full transition-all duration-500 shadow-[0_0_10px_rgba(250,204,21,0.5)]" style="width: 0%"></div></div>
                     </div>
                     <div class="flex items-center gap-2">
                         <div id="comboBadge" class="hidden bg-gradient-to-r from-orange-500 to-red-500 text-white px-2 py-0.5 rounded-full text-[10px] font-black shadow-lg animate-popIn"><i class="fas fa-fire mr-0.5"></i> <span id="comboCountText">x2</span></div>
@@ -428,13 +435,13 @@
 
                             <!-- Roleplay Container (Flex Col for correct sizing) -->
                             <div id="roleplayContainer" class="hidden w-full flex-1 min-h-[40vh] flex flex-col">
-                                 <div id="chatHistory" class="flex-1 overflow-y-auto p-3 space-y-3 bg-white rounded-2xl border border-gray-200 shadow-inner custom-scroll flex flex-col scroll-smooth">
-                                 </div>
+                                <div id="chatHistory" class="flex-1 overflow-y-auto p-3 space-y-3 bg-white rounded-2xl border border-gray-200 shadow-inner custom-scroll flex flex-col scroll-smooth">
+                                </div>
 
                             </div>
                             <div id="scrambleContainer" class="hidden w-full">
-                                 <div id="scrambleResult" class="min-h-[80px] bg-white border-2 border-dashed border-indigo-200 rounded-2xl flex flex-wrap items-center justify-center p-3 gap-2 mb-4 transition-colors hover:border-indigo-300"></div>
-                                 <div id="scrambleBank" class="flex flex-wrap justify-center gap-2"></div>
+                                <div id="scrambleResult" class="min-h-[80px] bg-white border-2 border-dashed border-indigo-200 rounded-2xl flex flex-wrap items-center justify-center p-3 gap-2 mb-4 transition-colors hover:border-indigo-300"></div>
+                                <div id="scrambleBank" class="flex flex-wrap justify-center gap-2"></div>
                             </div>
                             <div id="listeningDisplay" class="hidden mb-6 flex flex-col items-center">
                                 <button onclick="playTTS()" class="w-20 h-20 bg-pink-500 hover:bg-pink-600 text-white rounded-full flex items-center justify-center shadow-lg shadow-pink-200 active:scale-95 transition-all mb-3 group"><i class="fas fa-volume-up text-3xl group-hover:scale-110 transition-transform"></i></button>
@@ -444,7 +451,7 @@
                             <div id="quickOptions" class="hidden grid grid-cols-1 md:grid-cols-2 gap-3 w-full mt-6"></div>
                             <div class="h-4 w-full shrink-0"></div>
                         </div>
-                         <div id="chat-anchor" style="height: 1px;"></div>
+                        <div id="chat-anchor" style="height: 1px;"></div>
 
                     </div>
                 </div>
@@ -544,7 +551,9 @@
                     </div>
                     <div class="px-4 pb-4 md:pt-4 flex md:flex-col gap-2 overflow-x-auto md:overflow-visible no-scrollbar">
                         <button onclick="switchTheoryTab('grammar')" id="btnTheoryGrammar" class="flex-1 md:w-full text-center md:text-left px-3 py-2 rounded-xl font-bold text-xs bg-white border border-gray-200 text-indigo-600 shadow-sm whitespace-nowrap transition-all">Ngữ Pháp</button>
-                        <button onclick="switchTheoryTab('forms')" id="btnTheoryForms" class="flex-1 md:w-full text-center md:text-left px-3 py-2 rounded-xl font-bold text-xs text-gray-500 hover:bg-white hover:shadow-sm border border-transparent hover:border-gray-200 whitespace-nowrap transition-all">Biến Thể Từ</button>
+                        <button onclick="switchTheoryTab('forms')" id="btnTheoryForms" class="flex-1 md:w-full text-center md:text-left px-3 py-2 rounded-xl font-bold text-xs text-gray-500 hover:bg-white hover:shadow-sm border border-transparent hover:border-gray-200 whitespace-nowrap transition-all">Biến Thể</button>
+                        <!-- ADDED: Button for Idioms Tab -->
+                        <button onclick="switchTheoryTab('idioms')" id="btnTheoryIdioms" class="flex-1 md:w-full text-center md:text-left px-3 py-2 rounded-xl font-bold text-xs text-gray-500 hover:bg-white hover:shadow-sm border border-transparent hover:border-gray-200 whitespace-nowrap transition-all">Thành Ngữ</button>
                     </div>
                 </div>
                 <!-- Content -->
@@ -556,12 +565,14 @@
                     </div>
 
                     <div class="modal-body-scroll p-4 md:p-8" id="theoryContent">
-                         <div id="theoryListGrammar" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
-                         <div id="theoryListForms" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
-                         <div id="theoryDetail" class="hidden h-full flex flex-col">
+                        <div id="theoryListGrammar" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+                        <div id="theoryListForms" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+                        <!-- ADDED: List container for Idioms (Now using full scrollable list) -->
+                        <div id="theoryListIdioms" class="hidden flex flex-col gap-3"></div>
+                        <div id="theoryDetail" class="hidden h-full flex flex-col">
                             <button onclick="backToTheoryList()" class="mb-4 text-gray-400 hover:text-indigo-600 font-bold text-xs uppercase tracking-widest flex items-center gap-2 w-fit group"><i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i> Quay lại</button>
                             <div id="theoryDetailContent" class="bg-white p-6 rounded-[24px] border border-gray-100 shadow-sm text-gray-700 leading-relaxed text-sm md:text-base"></div>
-                         </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -608,7 +619,7 @@
             const height = window.visualViewport.height;
             document.documentElement.style.setProperty('--app-height', `${height}px`);
             if (window.scrollY !== 0 || document.documentElement.scrollTop !== 0) {
-                 window.scrollTo(0, 0);
+                window.scrollTo(0, 0);
             }
         };
 
@@ -630,7 +641,20 @@
             feedback: { overlay: document.getElementById('feedbackOverlay'), title: document.getElementById('feedbackTitle'), correctText: document.getElementById('correctAnswerText'), explanation: document.getElementById('grammarExplanation'), synonym: document.getElementById('synonymText'), border: document.getElementById('feedbackBorder') },
             settings: { panel: document.getElementById('settingsPanel'), content: document.getElementById('settingsContent'), backdrop: document.getElementById('settingsBackdrop'), keyStatus: document.getElementById('keyStatus') },
             dict: { modal: document.getElementById('dictModal'), content: document.getElementById('dictContent'), result: document.getElementById('dictResultArea'), input: document.getElementById('dictInput') },
-            theory: { modal: document.getElementById('theoryModal'), content: document.getElementById('theoryContentPanel'), listGrammar: document.getElementById('theoryListGrammar'), listForms: document.getElementById('theoryListForms'), detail: document.getElementById('theoryDetail'), contentText: document.getElementById('theoryDetailContent'), tabs: { grammar: document.getElementById('btnTheoryGrammar'), forms: document.getElementById('btnTheoryForms') } },
+            theory: {
+                modal: document.getElementById('theoryModal'),
+                content: document.getElementById('theoryContentPanel'),
+                listGrammar: document.getElementById('theoryListGrammar'),
+                listForms: document.getElementById('theoryListForms'),
+                listIdioms: document.getElementById('theoryListIdioms'), // NEW
+                detail: document.getElementById('theoryDetail'),
+                contentText: document.getElementById('theoryDetailContent'),
+                tabs: {
+                    grammar: document.getElementById('btnTheoryGrammar'),
+                    forms: document.getElementById('btnTheoryForms'),
+                    idioms: document.getElementById('btnTheoryIdioms') // NEW
+                }
+            },
             topic: { modal: document.getElementById('topicModal'), content: document.getElementById('topicContentPanel'), list: document.getElementById('topicListContent'), banner: document.getElementById('activeTopicBanner'), bannerName: document.getElementById('activeTopicName') },
             wrappers: { inputWrapper: document.getElementById('inputWrapper') },
             config: { level: document.getElementById('levelSelect'), qtyInput: document.getElementById('quantityRange'), qtyDisplay: document.getElementById('qtyDisplay') },
@@ -641,6 +665,7 @@
         };
 
         // --- HELPER FUNCTIONS ---
+        // (Existing helper functions remain unchanged)
         function toggleModal(modal, content, backdrop, show) {
             if (show) {
                 modal.classList.remove('hidden');
@@ -663,13 +688,13 @@
         }
 
         function setMode(mode) {
-             Object.values(els.modeCards).forEach(c => c && c.classList.remove('active'));
-             if(els.modeCards[mode]) els.modeCards[mode].classList.add('active');
-             Object.values(els.views).forEach(v => v.classList.add('hidden'));
-             if(mode === 'reading') els.views.reading.classList.remove('hidden');
-             else if(mode === 'grammar') els.views.grammar.classList.remove('hidden');
-             else if(mode === 'forms') els.views.forms.classList.remove('hidden');
-             else els.views.sharedInput.classList.remove('hidden');
+            Object.values(els.modeCards).forEach(c => c && c.classList.remove('active'));
+            if(els.modeCards[mode]) els.modeCards[mode].classList.add('active');
+            Object.values(els.views).forEach(v => v.classList.add('hidden'));
+            if(mode === 'reading') els.views.sharedInput.classList.remove('hidden');
+            else if(mode === 'grammar') els.views.grammar.classList.remove('hidden');
+            else if(mode === 'forms') els.views.forms.classList.remove('hidden');
+            else els.views.sharedInput.classList.remove('hidden');
         }
 
         function switchScreen(n) {
@@ -684,13 +709,9 @@
             gameState.currentIdx = 0;
         }
 
-        // --- NEW: FORCE SCROLL TO BOTTOM (MULTI-STAGE) ---
-        // This function ensures the chat scrolls to the very bottom
-        // regardless of keyboard state, animations, or DOM reflow.
         function scrollToBottom() {
             const anchor = document.getElementById('chat-anchor');
             if (anchor) {
-                // Sử dụng requestAnimationFrame để đảm bảo trình duyệt đã vẽ xong tin nhắn mới
                 requestAnimationFrame(() => {
                     anchor.scrollIntoView({
                         behavior: 'smooth',
@@ -701,13 +722,14 @@
         }
 
         function checkExamAnswer() {
-            if (gameState.mode === 'roleplay') return;
+             // (Existing checkExamAnswer logic...)
+             if (gameState.mode === 'roleplay') return;
             let user = els.inputs.answer.value.trim();
             if (gameState.mode === 'scramble') {
-                 const normalize = s => s.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"").toLowerCase().replace(/\s{2,}/g," ");
-                 user = normalize(user);
-                 const correctNorm = normalize(gameState.currentCorrect);
-                 if (user === correctNorm) user = gameState.currentCorrect.toLowerCase();
+                const normalize = s => s.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"").toLowerCase().replace(/\s{2,}/g," ");
+                user = normalize(user);
+                const correctNorm = normalize(gameState.currentCorrect);
+                if (user === correctNorm) user = gameState.currentCorrect.toLowerCase();
             } else { user = user.toLowerCase(); }
 
             if(!user && gameState.mode !== 'scramble') { els.checkBtn.classList.add('animate-pulse'); setTimeout(()=>els.checkBtn.classList.remove('animate-pulse'), 200); return; }
@@ -716,7 +738,7 @@
             const mainCorrect = gameState.currentCorrect.toLowerCase();
             const isCorrect = user === mainCorrect || gameState.currentOthers.includes(user);
 
-            gameState.history.push({ q: gameState.mode === 'listening' ? `🔊 ${item.en}` : (gameState.mode === 'reading' ? `📖 ${item.question}` : els.game.display.textContent), a: gameState.currentCorrect, u: els.inputs.answer.value, ok: isCorrect });
+            gameState.history.push({ q: gameState.mode === 'listening' ? `🔊 ${item.en}` : (gameState.mode === 'reading' ? `📖 Question ${gameState.currentIdx + 1}` : els.game.display.textContent), a: gameState.currentCorrect, u: els.inputs.answer.value, ok: isCorrect });
 
             if(isCorrect) {
                 gameState.score++; comboCount++; triggerComboVisuals(comboCount);
@@ -732,6 +754,14 @@
             els.feedback.title.className = isCorrect ? "text-2xl md:text-3xl font-black mb-2 text-green-600" : "text-2xl md:text-3xl font-black mb-2 text-red-500";
             els.feedback.border.className = isCorrect ? "absolute left-0 top-0 bottom-0 w-1.5 bg-green-500" : "absolute left-0 top-0 bottom-0 w-1.5 bg-red-500";
             document.getElementById('feedbackIcon').textContent = isCorrect ? "🎉" : "😅"; els.feedback.correctText.textContent = gameState.currentCorrect;
+
+            if (gameState.mode === 'reading' && item.options) {
+                 const correctIdx = item.options.findIndex(o => o.toLowerCase() === gameState.currentCorrect.toLowerCase());
+                 if (correctIdx !== -1) {
+                     const label = String.fromCharCode(65 + correctIdx);
+                     els.feedback.correctText.textContent = `${label}. ${gameState.currentCorrect}`;
+                 }
+            }
 
             let modeToCheck = gameState.isReviewMode ? item.savedMode : gameState.mode;
             if ((['vocab','listening','phrases','idioms','grammar'].includes(modeToCheck)) && item.others) { els.feedback.synonym.textContent = `Chấp nhận thêm: ${item.others}`; els.feedback.synonym.classList.remove('hidden'); } else { els.feedback.synonym.classList.add('hidden'); }
@@ -770,7 +800,6 @@
                 this.save();
             },
             applyConfig() {
-                // Now safe because updateLevel is hoisted/defined above
                 updateLevel(this.data.config.level, document.querySelector(`.level-chip[onclick*="${this.data.config.level}"]`));
                 document.getElementById('quantityRange').value = this.data.config.quantity;
                 document.getElementById('qtyDisplay').textContent = this.data.config.quantity;
@@ -814,6 +843,7 @@
             }
         };
 
+        // (Existing nopdTopics remain unchanged)
         const nopdTopics = {
             "Everyday Language": [{en: "Meeting & Greeting", vi: "Chào hỏi & Làm quen"}, {en: "Time & Date", vi: "Thời gian & Ngày tháng"}, {en: "Numbers", vi: "Số đếm"}, {en: "Colors", vi: "Màu sắc"}, {en: "Weather", vi: "Thời tiết"}, {en: "Money", vi: "Tiền tệ"}],
             "People": [{en: "Family Members", vi: "Thành viên gia đình"}, {en: "The Human Body", vi: "Cơ thể người"}, {en: "Face & Hair", vi: "Gương mặt & Tóc"}, {en: "Emotions", vi: "Cảm xúc"}, {en: "Clothes", vi: "Quần áo"}, {en: "Daily Routine", vi: "Thói quen hàng ngày"}],
@@ -843,12 +873,21 @@
                 {vi: "Tìm kiếm", en: "look for", others: "search, seek"},
                 {vi: "Tham gia", en: "take part in", others: "participate, join"}
             ] },
-            idioms: { "General": [
-                {vi: "Một mũi tên trúng hai đích", en: "kill two birds with one stone", others: ""},
-                {vi: "Mưa như trút nước", en: "raining cats and dogs", others: ""},
-                {vi: "Dễ như ăn kẹo", en: "piece of cake", others: "easy, simple"},
-                {vi: "Tốn kém", en: "cost an arm and a leg", others: "expensive, pricey"}
-            ] },
+            idioms: {
+                "General": [
+                    {vi: "Một mũi tên trúng hai đích", en: "kill two birds with one stone", others: ""},
+                    {vi: "Mưa như trút nước", en: "raining cats and dogs", others: ""},
+                    {vi: "Dễ như ăn kẹo", en: "piece of cake", others: "easy, simple"}
+                ],
+                "Money": [
+                    {vi: "Tốn kém, đắt đỏ", en: "cost an arm and a leg", others: "expensive"},
+                    {vi: "Sinh ra trong nhung lụa", en: "born with a silver spoon in one's mouth", others: "wealthy"}
+                ],
+                "Time": [
+                    {vi: "Một lần hiếm hoi (rất hiếm khi)", en: "once in a blue moon", others: "rarely"},
+                    {vi: "Thời gian trôi nhanh", en: "time flies", others: ""}
+                ]
+            },
             grammar: {
                 "Present Simple": [
                     {question: "She usually ___ (walk) to work.", verb: "walk", answer: "walks", explanation: "Thói quen ở hiện tại (She -> V+s)."},
@@ -871,39 +910,271 @@
             },
             forms: {
                 "irregular": [
-                    {question: "go (V2)", answer: "went", explanation: "go - went - gone"},
-                    {question: "buy (V2)", answer: "bought", explanation: "buy - bought - bought"}
+                    {question: "I ___ to Paris last year. (go)", answer: "went", explanation: "Quá khứ đơn (V2) của 'go' là 'went'."},
+                    {question: "She has ___ a new car. (buy)", answer: "bought", explanation: "Hiện tại hoàn thành: has + V3 (bought)."}
                 ],
                 "irregular_v3": [
-                    {question: "go (V3)", answer: "gone", explanation: "go - went - gone"},
-                    {question: "write (V3)", answer: "written", explanation: "write - wrote - written"}
+                    {question: "The letter was ___ by him. (write)", answer: "written", explanation: "Câu bị động: be + V3 (written)."},
+                    {question: "He has ___ to school. (go)", answer: "gone", explanation: "Hiện tại hoàn thành: has + V3 (gone)."}
                 ],
-                "noun_suffix": [{question: "inform (Noun -tion)", answer: "information", explanation: "Thêm -ation."}, {question: "develop (Noun -ment)", answer: "development", explanation: "Thêm -ment."}],
-                "adj_suffix": [{question: "beauty (Adj -ful)", answer: "beautiful", explanation: "y -> i + ful."}, {question: "care (Adj -less)", answer: "careless", explanation: "Thêm -less."}],
-                "prefixes": [{question: "happy (Prefix: not)", answer: "unhappy", explanation: "Thêm un-."}, {question: "agree (Prefix: not)", answer: "disagree", explanation: "Thêm dis-."}],
-                "verb_noun": [{question: "decide (Noun)", answer: "decision", explanation: "de -> sion."}, {question: "arrive (Noun)", answer: "arrival", explanation: "e -> al."}],
-                "noun_adj": [{question: "danger (Adj)", answer: "dangerous", explanation: "+ ous."}, {question: "fame (Adj)", answer: "famous", explanation: "e -> ous."}],
-                "adj_adv": [{question: "quick (Adv)", answer: "quickly", explanation: "+ ly."}, {question: "happy (Adv)", "answer": "happily", explanation: "y -> i + ly."}],
-                "ing": [{question: "run", answer: "running", explanation: "Gấp đôi phụ âm."}, {question: "swim", answer: "swimming", explanation: "Gấp đôi phụ âm."}],
-                "ed": [{question: "stop", answer: "stopped", explanation: "Gấp đôi phụ âm."}, {question: "plan", answer: "planned", explanation: "Gấp đôi phụ âm."}],
-                "classify": [{question: "She runs [fast]. (Type?)", answer: "adverb", explanation: "Bổ nghĩa cho động từ runs."}, {question: "It is a [fast] car. (Type?)", "answer": "adjective", explanation: "Bổ nghĩa cho danh từ car."}]
+                "noun_suffix": [
+                    {question: "Thank you for your ___. (inform)", answer: "information", explanation: "Sau tính từ sở hữu 'your' cần danh từ."},
+                    {question: "The ___ of the city was rapid. (develop)", answer: "development", explanation: "Sau mạo từ 'The' cần danh từ."},
+                    {question: "Money can't buy ___. (happy)", answer: "happiness", explanation: "Làm tân ngữ cho động từ 'buy' cần danh từ."}
+                ],
+                "adj_suffix": [
+                    {question: "She is a very ___ girl. (beauty)", answer: "beautiful", explanation: "Bổ nghĩa cho danh từ 'girl' cần tính từ."},
+                    {question: "Be ___ when you cross the street. (care)", answer: "careful", explanation: "Sau động từ 'be' cần tính từ."},
+                    {question: "This problem is ___. (danger)", answer: "dangerous", explanation: "Sau động từ 'is' cần tính từ."}
+                ],
+                "prefixes": [
+                    {question: "I ___ with your opinion. (agree)", answer: "disagree", explanation: "Tiền tố 'dis-' mang nghĩa phủ định (không đồng ý)."},
+                    {question: "He was ___ because he lost. (happy)", answer: "unhappy", explanation: "Tiền tố 'un-' mang nghĩa phủ định (không vui)."}
+                ],
+                "verb_noun": [
+                    {question: "It was a difficult ___. (decide)", answer: "decision", explanation: "Sau tính từ 'difficult' cần danh từ."},
+                    {question: "His ___ was unexpected. (arrive)", answer: "arrival", explanation: "Sau tính từ sở hữu 'His' cần danh từ."}
+                ],
+                "noun_adj": [
+                    {question: "He is a ___ singer. (fame)", answer: "famous", explanation: "Bổ nghĩa cho danh từ 'singer' cần tính từ."},
+                    {question: "It was a ___ day. (rain)", answer: "rainy", explanation: "Bổ nghĩa cho danh từ 'day' cần tính từ."}
+                ],
+                "adj_adv": [
+                    {question: "She runs very ___. (quick)", answer: "quickly", explanation: "Bổ nghĩa cho động từ 'runs' cần trạng từ."},
+                    {question: "He spoke ___. (loud)", answer: "loudly", explanation: "Bổ nghĩa cho động từ 'spoke' cần trạng từ."}
+                ],
+                "ing": [
+                    {question: "They are ___ football. (play)", answer: "playing", explanation: "Hiện tại tiếp diễn: be + V-ing."},
+                    {question: "I enjoy ___. (swim)", answer: "swimming", explanation: "Sau 'enjoy' dùng V-ing."}
+                ],
+                "ed": [
+                    {question: "He ___ the door. (open)", answer: "opened", explanation: "Quá khứ đơn (có quy tắc): V-ed."},
+                    {question: "She has ___ the project. (finish)", answer: "finished", explanation: "Hiện tại hoàn thành: has + V3/ed."}
+                ],
+                "classify": [
+                    {question: "She runs [fast]. (Type?)", answer: "adverb", explanation: "Từ 'fast' bổ nghĩa cho động từ 'runs'."},
+                    {question: "It is a [fast] car. (Type?)", answer: "adjective", explanation: "Từ 'fast' bổ nghĩa cho danh từ 'car'."}
+                ]
             },
             scramble: { "General": [{vi: "Tôi đi học bằng xe buýt.", en: "I go to school by bus"}, {vi: "Cô ấy đang nấu ăn trong bếp.", en: "She is cooking in the kitchen"}, {vi: "Anh ấy chơi bóng đá giỏi.", en: "He plays football well"}] },
-            reading: { "Daily Life": [{passage: "My name is John...", question: "What time does John wake up?", answer: "6 AM", options: ["6 AM", "7 AM"], type: "mc", explanation: "Text says: 'I wake up at 6 AM'."}] },
+            reading: {
+                "Technology": [
+                    { passage: "Technology has changed the way we communicate. In the past, people wrote letters which took days to arrive. Today, we send emails and text messages that arrive in seconds. However, some people worry that we are losing the art of conversation.", question: "How did people communicate in the past?", answer: "By writing letters", options: ["By email", "By text messages", "By writing letters", "By phone"], explanation: "The text says 'people wrote letters'." },
+                    { passage: "Technology has changed the way we communicate. In the past, people wrote letters which took days to arrive. Today, we send emails and text messages that arrive in seconds. However, some people worry that we are losing the art of conversation.", question: "What is a concern mentioned in the text?", answer: "Losing the art of conversation", options: ["Technology is too expensive", "Losing the art of conversation", "Emails are slow", "Letters are better"], explanation: "The text mentions 'worry that we are losing the art of conversation'." }
+                ],
+                "Daily Routine": [
+                    { passage: "Sarah wakes up at 6 AM every day. She goes for a run before having breakfast. She usually eats oatmeal and drinks coffee. After that, she drives to work. She works as a teacher at a local high school.", question: "What time does Sarah wake up?", answer: "6 AM", options: ["7 AM", "6 AM", "8 AM", "5 AM"], explanation: "The text states 'Sarah wakes up at 6 AM'." },
+                    { passage: "Sarah wakes up at 6 AM every day. She goes for a run before having breakfast. She usually eats oatmeal and drinks coffee. After that, she drives to work. She works as a teacher at a local high school.", question: "What does she do before breakfast?", answer: "Goes for a run", options: ["Drives to work", "Reads a book", "Goes for a run", "Sleeps"], explanation: "The text says she 'goes for a run before having breakfast'." }
+                ]
+            },
             theory: {
-                // FALLBACK ONLY - will try to use AI first
-                "Present Simple": { title: "Thì Hiện Tại Đơn", content: "Đang tải dữ liệu chi tiết..." }
+                "Present Simple": { title: "Thì Hiện Tại Đơn", content: "Đang tải dữ liệu chi tiết..." },
+                "noun_suffix": {
+                    title: "Danh Từ (Noun Suffixes)",
+                    overview: "Cách thành lập danh từ bằng cách thêm hậu tố vào động từ hoặc tính từ.",
+                    formula: [
+                        {type: "positive", label: "Verb + tion/ation", struct: "inform -> information"},
+                        {type: "positive", label: "Verb + ment", struct: "develop -> development"},
+                        {type: "positive", label: "Adj + ness", struct: "happy -> happiness"},
+                        {type: "positive", label: "Verb + er/or", struct: "teach -> teacher (chỉ người)"}
+                    ],
+                    usage: ["Dùng làm chủ ngữ trong câu.", "Dùng làm tân ngữ sau động từ.", "Đứng sau tính từ hoặc mạo từ (a, an, the)."],
+                    signs: ["a/an/the...", "my/your/his...", "prepositions (in/on/of...)"],
+                    examples: [
+                        {en: "The information is useful.", vi: "Thông tin này rất hữu ích."},
+                        {en: "Happiness is important.", vi: "Hạnh phúc rất quan trọng."}
+                    ]
+                },
+                "adj_suffix": {
+                    title: "Tính Từ (Adjective Suffixes)",
+                    overview: "Cách thành lập tính từ từ danh từ hoặc động từ.",
+                    formula: [
+                        {type: "positive", label: "Noun + ful", struct: "beauty -> beautiful"},
+                        {type: "positive", label: "Noun + less", struct: "care -> careless (nghĩa phủ định)"},
+                        {type: "positive", label: "Noun + ous", struct: "danger -> dangerous"},
+                        {type: "positive", label: "Noun + y", struct: "rain -> rainy"}
+                    ],
+                    usage: ["Đứng trước danh từ để bổ nghĩa.", "Đứng sau động từ to be và các linking verbs (look, feel, seem)."],
+                    signs: ["very...", "quite...", "seem...", "look..."],
+                    examples: [
+                        {en: "It is a beautiful day.", vi: "Đó là một ngày đẹp trời."},
+                        {en: "He looks tired.", vi: "Anh ấy trông có vẻ mệt."}
+                    ]
+                },
+                "adj_adv": {
+                    title: "Trạng Từ (Adverbs)",
+                    overview: "Cách thành lập trạng từ từ tính từ.",
+                    formula: [
+                        {type: "positive", label: "Adj + ly", struct: "quick -> quickly"},
+                        {type: "positive", label: "Adj (y -> i) + ly", struct: "happy -> happily"},
+                        {type: "question", label: "Ngoại lệ", struct: "good -> well, fast -> fast, hard -> hard"}
+                    ],
+                    usage: ["Bổ nghĩa cho động từ thường.", "Bổ nghĩa cho tính từ khác.", "Bổ nghĩa cho cả câu."],
+                    signs: ["Đứng cuối câu", "Đứng trước tính từ"],
+                    examples: [
+                        {en: "She sings beautifully.", vi: "Cô ấy hát rất hay."},
+                        {en: "He works hard.", vi: "Anh ấy làm việc chăm chỉ."}
+                    ]
+                },
+                "prefixes": {
+                    title: "Tiền Tố (Prefixes)",
+                    overview: "Thêm vào trước từ gốc để thay đổi nghĩa (thường là đảo ngược nghĩa).",
+                    formula: [
+                        {type: "negative", label: "un + Adj/V", struct: "happy -> unhappy"},
+                        {type: "negative", label: "dis + V", struct: "like -> dislike"},
+                        {type: "negative", label: "im + Adj (b,m,p)", struct: "possible -> impossible"},
+                        {type: "positive", label: "re + V", struct: "write -> rewrite (làm lại)"}
+                    ],
+                    usage: ["Dùng để tạo từ trái nghĩa hoặc mang nghĩa lặp lại."],
+                    signs: ["not...", "again..."],
+                    examples: [
+                        {en: "I disagree with you.", vi: "Tôi không đồng ý với bạn."},
+                        {en: "Please rewrite this sentence.", vi: "Vui lòng viết lại câu này."}
+                    ]
+                },
+                "irregular": {
+                    title: "Động Từ Bất Quy Tắc (Irregular)",
+                    overview: "Các động từ không theo quy tắc thêm -ed ở quá khứ.",
+                    common_tenses: ["Quá khứ đơn (Past Simple)"], // ADDED
+                    formula: [
+                        {type: "positive", label: "V1 -> V2 (Past)", struct: "go -> went"},
+                        {type: "positive", label: "V1 -> V3 (P.P)", struct: "go -> gone"},
+                        {type: "positive", label: "Giữ nguyên", struct: "cut -> cut -> cut"}
+                    ],
+                    usage: ["V2 dùng trong Quá khứ đơn.", "V3 dùng trong các thì Hoàn thành và câu Bị động."],
+                    signs: ["yesterday", "ago", "last...", "just", "already", "since", "for"],
+                    examples: [
+                        {en: "I saw him yesterday.", vi: "Tôi đã gặp anh ấy hôm qua."},
+                        {en: "I have seen that movie.", vi: "Tôi đã xem phim đó rồi."}
+                    ]
+                },
+                // --- ADDED NEW OFFLINE THEORY DATA FOR VERB FORMS ---
+                "ing": {
+                    title: "Đuôi V-ING (Present Participle)",
+                    overview: "Dạng động từ thêm đuôi -ing, dùng trong các thì tiếp diễn hoặc làm danh động từ.",
+                    common_tenses: ["Hiện tại tiếp diễn", "Quá khứ tiếp diễn", "Tương lai tiếp diễn"], // ADDED
+                    formula: [
+                        {type: "positive", label: "Thông thường", struct: "walk -> walking"},
+                        {type: "positive", label: "Kết thúc 'e'", struct: "write -> writing (bỏ e)"},
+                        {type: "positive", label: "1 âm tiết, tận cùng phụ âm", struct: "run -> running (gấp đôi)"}
+                    ],
+                    usage: ["Diễn tả hành động đang xảy ra.", "Làm chủ ngữ (Swimming is fun).", "Sau giới từ (interested in learning)."],
+                    signs: ["now", "at the moment", "Look!", "Listen!"],
+                    examples: [
+                        {en: "She is running now.", vi: "Cô ấy đang chạy ngay bây giờ."},
+                        {en: "I like reading.", vi: "Tôi thích đọc sách."}
+                    ]
+                },
+                "ed": {
+                    title: "Đuôi V-ED (Past Participle)",
+                    overview: "Dạng quá khứ của động từ có quy tắc, dùng trong thì quá khứ hoặc hoàn thành.",
+                    common_tenses: ["Quá khứ đơn", "Hiện tại hoàn thành", "Quá khứ hoàn thành"], // ADDED
+                    formula: [
+                        {type: "positive", label: "Thông thường", struct: "walk -> walked"},
+                        {type: "positive", label: "Kết thúc 'e'", struct: "live -> lived (thêm d)"},
+                        {type: "positive", label: "Kết thúc 'y'", struct: "study -> studied (y->i + ed)"}
+                    ],
+                    usage: ["Diễn tả hành động đã xảy ra và kết thúc.", "Dùng trong câu bị động."],
+                    signs: ["yesterday", "ago", "last...", "since", "for"],
+                    examples: [
+                        {en: "I watched TV yesterday.", vi: "Tôi đã xem TV hôm qua."},
+                        {en: "She has lived here for 2 years.", vi: "Cô ấy đã sống ở đây 2 năm."}
+                    ]
+                },
+                "irregular_v3": {
+                    title: "Quá Khứ Phân Từ (Past Participle - V3)",
+                    overview: "Cột thứ 3 trong bảng động từ bất quy tắc.",
+                    common_tenses: ["Hiện tại hoàn thành", "Quá khứ hoàn thành", "Câu bị động"], // ADDED
+                    formula: [
+                        {type: "positive", label: "Have/Has + V3", struct: "I have eaten."},
+                        {type: "positive", label: "Be + V3 (Passive)", struct: "The cake was eaten."}
+                    ],
+                    usage: ["Dùng trong các thì hoàn thành.", "Dùng trong thể bị động (Passive Voice)."],
+                    signs: ["just", "already", "since", "for", "by (trong câu bị động)"],
+                    examples: [
+                        {en: "I have written a letter.", vi: "Tôi vừa viết một lá thư."},
+                        {en: "The letter was written by me.", vi: "Lá thư được viết bởi tôi."}
+                    ]
+                },
+                // --- EXISTING IDIOMS THEORY ---
+                "idioms_General": {
+                    title: "Thành Ngữ Thông Dụng (General)",
+                    overview: "Các thành ngữ tiếng Anh phổ biến dùng trong giao tiếp hàng ngày.",
+                    formula: [
+                        {type: "positive", label: "Piece of cake", struct: "Dễ như ăn kẹo (Rất dễ)"},
+                        {type: "positive", label: "Break a leg", struct: "Chúc may mắn (dùng trước khi biểu diễn)"},
+                        {type: "positive", label: "Under the weather", struct: "Cảm thấy mệt mỏi, không khỏe"},
+                        {type: "positive", label: "Spill the beans", struct: "Tiết lộ bí mật"}
+                    ],
+                    usage: ["Dùng để làm câu nói tự nhiên hơn.", "Tránh dịch word-by-word."],
+                    signs: ["Trong phim ảnh", "Giao tiếp hàng ngày"],
+                    examples: [
+                        {en: "The test was a piece of cake.", vi: "Bài kiểm tra rất dễ."},
+                        {en: "I'm feeling a bit under the weather.", vi: "Tôi thấy hơi mệt trong người."}
+                    ]
+                },
+                 "idioms_Money": {
+                    title: "Thành Ngữ Về Tiền Bạc (Money)",
+                    overview: "Các cụm từ diễn tả sự giàu có, nghèo khó hoặc chi tiêu.",
+                    formula: [
+                        {type: "positive", label: "Cost an arm and a leg", struct: "Rất đắt đỏ"},
+                        {type: "positive", label: "Born with a silver spoon", struct: "Sinh ra trong gia đình giàu có"},
+                        {type: "positive", label: "Save for a rainy day", struct: "Tiết kiệm phòng khi khó khăn"},
+                        {type: "positive", label: "Make ends meet", struct: "Kiếm đủ sống"}
+                    ],
+                    usage: ["Dùng khi nói về tài chính, mua sắm."],
+                    signs: ["expnsive", "rich", "poor"],
+                    examples: [
+                        {en: "That car costs an arm and a leg.", vi: "Chiếc xe đó đắt cắt cổ."},
+                        {en: "It's hard to make ends meet these days.", vi: "Thời buổi này kiếm đủ sống thật khó."}
+                    ]
+                },
+                "idioms_Time": {
+                    title: "Thành Ngữ Về Thời Gian (Time)",
+                    overview: "Diễn tả tần suất, sự trôi qua của thời gian.",
+                    formula: [
+                        {type: "positive", label: "Once in a blue moon", struct: "Rất hiếm khi xảy ra"},
+                        {type: "positive", label: "Time flies", struct: "Thời gian trôi nhanh"},
+                        {type: "positive", label: "Better late than never", struct: "Muộn còn hơn không"},
+                        {type: "positive", label: "Around the clock", struct: "Suốt ngày đêm (24/7)"}
+                    ],
+                    usage: ["Dùng để nhấn mạnh thời gian."],
+                    signs: ["rarely", "fast", "late"],
+                    examples: [
+                        {en: "I go there once in a blue moon.", vi: "Tôi hiếm khi đến đó lắm."},
+                        {en: "Time flies when you have fun.", vi: "Vui vẻ thì thời gian trôi nhanh lắm."}
+                    ]
+                },
+                 "idioms_Rhyming_Playful": {
+                    "title": "Thành Ngữ Có Vần & Vui Nhộn (Rhyming & Playful)",
+                    "overview": "Các cụm từ có vần điệu, vui nhộn thường dùng để tạo không khí thoải mái, trêu đùa hoặc nói chuyện với trẻ em.",
+                    "formula": [
+                    { "type": "positive", "label": "Easy peasy lemon squeezy", "struct": "Dễ ợt, cực kỳ đơn giản" },
+                    { "type": "positive", "label": "See you later, alligator", "struct": "Hẹn gặp lại nhé (cách nói đùa)" },
+                    { "type": "positive", "label": "In a while, crocodile", "struct": "Hẹn lát gặp lại (đáp lại câu alligator)" },
+                    { "type": "positive", "label": "Okey-dokey", "struct": "Ok luôn, đồng ý" },
+                    { "type": "positive", "label": "Holy moly", "struct": "Trời đất ơi (ngạc nhiên)" },
+                    { "type": "positive", "label": "Chill pill", "struct": "Bình tĩnh lại (uống viên thuốc bình tĩnh)" },
+                    { "type": "positive", "label": "Winner winner chicken dinner", "struct": "Thắng rồi! (ăn mừng chiến thắng)" }
+                    ],
+                    "usage": ["Dùng trong giao tiếp thân mật.", "Tránh dùng trong văn bản trang trọng."],
+                    "signs": ["fun", "rhyme", "casual"],
+                    "examples": [
+                    { "en": "Fixing this computer is easy peasy lemon squeezy.", "vi": "Sửa cái máy tính này dễ ợt ấy mà." },
+                    { "en": "I'm leaving now! - See you later, alligator!", "vi": "Tớ đi đây! - Hẹn gặp lại nhé!" }
+                    ]
+                }
             }
         };
 
         const tenseTranslations = { "Present Simple": "Hiện tại đơn", "Present Continuous": "Hiện tại tiếp diễn", "Present Perfect": "Hiện tại hoàn thành", "Present Perfect Continuous": "HT hoàn thành tiếp diễn", "Past Simple": "Quá khứ đơn", "Past Continuous": "Quá khứ tiếp diễn", "Past Perfect": "Quá khứ hoàn thành", "Past Perfect Continuous": "QK hoàn thành tiếp diễn", "Future Simple": "Tương lai đơn", "Future Continuous": "Tương lai tiếp diễn", "Future Perfect": "Tương lai hoàn thành", "Future Perfect Continuous": "TL hoàn thành tiếp diễn" };
         const formReadableNames = { "irregular": "Irregular Verbs (Bất quy tắc)", "irregular_v3": "Past Participle (Quá khứ phân từ)", "noun_suffix": "Noun Suffixes (Hậu tố Danh từ)", "adj_suffix": "Adjective Suffixes (Hậu tố Tính từ)", "prefixes": "Prefixes (Tiền tố)", "verb_noun": "Verb to Noun (Động từ → Danh từ)", "noun_adj": "Noun to Adjective (Danh từ → Tính từ)", "adj_adv": "Adjective to Adverb (Tính từ → Trạng từ)", "ing": "-ING Ending (Đuôi -ING)", "ed": "-ED Ending (Đuôi -ED)", "classify": "Word Class (Phân loại từ)" };
 
+        // ... (Remaining code from v3.1.4: gameState, functions checkKeyStatus, toggleSettings, openDictModal, etc.)
         let gameState = { mode: 'vocab', data: [], currentIdx: 0, score: 0, history: [], currentCorrect: "", currentOthers: [], isReviewMode: false, roleplayContext: null };
         let currentGlobalTopic = null;
         let currentGlobalTopicVi = null;
         let comboCount = 0;
-
 
         const checkKeyStatus = () => { if(els.aiStatus.dot) els.aiStatus.dot.className = "w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]"; };
         const toggleSettings = () => { const isHidden = els.settings.panel.classList.contains('hidden'); toggleModal(els.settings.panel, els.settings.content, null, isHidden); };
@@ -913,6 +1184,8 @@
         const closeTheoryModal = () => toggleModal(els.theory.modal, els.theory.content, null, false);
         const openTopicModal = () => { renderTopicList(); toggleModal(els.topic.modal, els.topic.content, null, true); };
         const closeTopicModal = () => toggleModal(els.topic.modal, els.topic.content, null, false);
+
+        // ... (Other functions: renderTopicList, selectTopic, clearTopic, confetti, robustFetch, callServerAI, updateUI, applyVocabulary, addChatBubble, submitChat, renderScrambleGame, finishGame, nextQuestion, getRandomSubTopic, generateContent, startGame, startGeneration, startReview, startDailyReview, playTTS, isVietnamese, lookupDictionary)
 
         const renderTopicList = () => {
             let html = '';
@@ -998,7 +1271,13 @@
                         let cleanText = data.result.replace(/```json/g, '').replace(/```/g, '').trim();
                         const parsed = JSON.parse(cleanText);
                         if (Array.isArray(parsed)) { if (parsed.length === 0) throw new Error("Empty Array Returned"); return parsed; }
-                        if (typeof parsed === 'object' && parsed !== null) { if (parsed.title || parsed.definition || parsed.reply) return parsed; const values = Object.values(parsed); const foundArray = values.find(v => Array.isArray(v)); if (foundArray && foundArray.length > 0) return foundArray; if (Object.keys(parsed).length > 0) return parsed; }
+                        if (typeof parsed === 'object' && parsed !== null) {
+                            if (parsed.title || parsed.definition || parsed.reply || parsed.passage) return parsed;
+                            const values = Object.values(parsed);
+                            const foundArray = values.find(v => Array.isArray(v));
+                            if (foundArray && foundArray.length > 0) return foundArray;
+                            if (Object.keys(parsed).length > 0) return parsed;
+                        }
                         throw new Error("AI returned unrecognized data structure.");
                     } else { return data.result; }
                 } catch (e) {
@@ -1010,38 +1289,40 @@
         }
 
         const updateUI = () => {
+             // (Identical to v3.1.4)
              const isRoleplay = gameState.mode === 'roleplay';
-             const headerStats = document.getElementById('gameHeaderStats');
-             const progressBar = document.getElementById('progressBarContainer');
-             const endChatBtn = document.getElementById('endChatBtn');
+            const headerStats = document.getElementById('gameHeaderStats');
+            const progressBar = document.getElementById('progressBarContainer');
+            const endChatBtn = document.getElementById('endChatBtn');
 
-             if (isRoleplay) {
-                 headerStats.classList.add('hidden');
-                 progressBar.classList.add('hidden');
-                 endChatBtn.classList.remove('hidden');
+            els.game.display.className = "text-3xl md:text-5xl font-black text-slate-800 text-center mb-3 leading-tight break-words max-w-full tracking-tight px-2 transition-all";
+
+            if (isRoleplay) {
+                headerStats.classList.add('hidden');
+                progressBar.classList.add('hidden');
+                endChatBtn.classList.remove('hidden');
                 els.checkBtn.onclick = submitChat;
                 els.inputs.answer.onkeypress = (e) => { if(e.key === 'Enter') submitChat(); };
                 els.checkBtn.innerHTML = '<i class="fas fa-paper-plane"></i>';
                 els.inputs.answer.placeholder = "Nhập tin nhắn trả lời...";
-             } else {
-                 headerStats.classList.remove('hidden');
-                 progressBar.classList.remove('hidden');
-                 endChatBtn.classList.add('hidden');
+            } else {
+                headerStats.classList.remove('hidden');
+                progressBar.classList.remove('hidden');
+                endChatBtn.classList.add('hidden');
                 els.checkBtn.onclick = checkExamAnswer;
                 els.inputs.answer.onkeypress = (e) => { if(e.key === 'Enter') checkExamAnswer(); };
                 els.checkBtn.innerHTML = '<i class="fas fa-check"></i>';
                 els.inputs.answer.placeholder = "Nhập đáp án...";
-             }
+            }
 
-             if (!isRoleplay && (!gameState.data || !gameState.data[gameState.currentIdx])) return;
+            if (!isRoleplay && (!gameState.data || !gameState.data[gameState.currentIdx])) return;
 
-             const item = gameState.data[gameState.currentIdx];
-             if (!isRoleplay) {
+            const item = gameState.data[gameState.currentIdx];
+            if (!isRoleplay) {
                 els.game.qNum.textContent = gameState.currentIdx + 1;
                 els.game.progress.style.width = `${((gameState.currentIdx + 1) / (gameState.data.length || 10)) * 100}%`;
-             }
+            }
 
-            // Clear inputs and states
             els.inputs.answer.value = "";
             els.game.quickOptions.classList.add('hidden'); els.game.quickOptions.innerHTML = '';
             els.game.display.classList.remove('hidden'); els.game.listeningDisplay.classList.add('hidden'); els.game.subDisplay.classList.add('hidden'); els.game.passageDisplay.classList.add('hidden'); els.game.scrambleContainer.classList.add('hidden'); els.game.roleplayContainer.classList.add('hidden');
@@ -1054,12 +1335,41 @@
             else if (modeToRender === 'idioms') { els.game.display.textContent = item.vi; els.game.instruction.textContent = "DỊCH THÀNH NGỮ"; gameState.currentCorrect = item.en; gameState.currentOthers = item.others ? item.others.split(',').map(s => s.trim().toLowerCase()) : []; }
             else if (modeToRender === 'listening') { els.game.display.classList.add('hidden'); els.game.listeningDisplay.classList.remove('hidden'); els.game.instruction.textContent = "NGHE VÀ VIẾT LẠI"; els.game.subDisplay.textContent = `(Nghĩa: ${item.vi})`; els.game.subDisplay.classList.remove('hidden'); gameState.currentCorrect = item.en; gameState.currentOthers = item.others ? item.others.split(',').map(s => s.trim().toLowerCase()) : []; setTimeout(() => playTTS(), 500); }
             else if (modeToRender === 'reading') {
+                els.game.display.classList.remove('text-3xl', 'md:text-5xl');
+                els.game.display.classList.add('text-lg', 'md:text-2xl');
                 els.game.passageDisplay.textContent = item.passage; els.game.passageDisplay.classList.remove('hidden');
-                els.game.display.textContent = item.question; els.game.display.classList.remove('text-2xl', 'md:text-6xl'); els.game.display.classList.add('text-base', 'md:text-2xl'); // Adjusted text size
+                els.game.display.textContent = item.question;
                 els.game.instruction.textContent = item.type === 'tf' ? "TRUE OR FALSE?" : (item.type === 'cloze' ? "ĐIỀN VÀO CHỖ TRỐNG" : "TRẮC NGHIỆM");
-                gameState.currentCorrect = item.answer; gameState.currentOthers = [];
+                gameState.currentCorrect = item.answer;
+                if (item.options && item.options.length > 0) {
+                     const exactMatch = item.options.find(o => o.trim().toLowerCase() === item.answer.trim().toLowerCase());
+                     if (exactMatch) {
+                         gameState.currentCorrect = exactMatch;
+                     } else {
+                         const cleanAns = item.answer.trim().toUpperCase();
+                         if (/^[A-D]$/.test(cleanAns)) {
+                             const idx = cleanAns.charCodeAt(0) - 65;
+                             if (item.options[idx]) gameState.currentCorrect = item.options[idx];
+                         }
+                         else if (/^[0-3]$/.test(cleanAns)) {
+                             const idx = parseInt(cleanAns);
+                             if (item.options[idx]) gameState.currentCorrect = item.options[idx];
+                         }
+                     }
+                }
+                gameState.currentOthers = [];
                 if (item.type !== 'cloze') { els.wrappers.inputWrapper.classList.add('hidden'); }
-                if (item.options && item.options.length > 0 && item.type !== 'cloze') { els.game.quickOptions.classList.remove('hidden'); item.options.forEach(opt => { const btn = document.createElement('button'); btn.className = "bg-white border-2 border-gray-100 hover:border-indigo-400 px-3 py-3 rounded-xl text-sm md:text-lg font-bold text-gray-700 shadow-sm transition-all hover:bg-indigo-50 active:scale-95"; btn.textContent = opt; btn.onclick = () => { els.inputs.answer.value = opt; checkExamAnswer(); }; els.game.quickOptions.appendChild(btn); }); }
+                if (item.options && item.options.length > 0 && item.type !== 'cloze') {
+                    els.game.quickOptions.classList.remove('hidden');
+                    item.options.forEach((opt, idx) => {
+                        const label = String.fromCharCode(65 + idx);
+                        const btn = document.createElement('button');
+                        btn.className = "w-full text-left bg-white border-2 border-gray-100 hover:border-indigo-400 px-4 py-3 rounded-xl text-sm md:text-lg font-bold text-gray-700 shadow-sm transition-all hover:bg-indigo-50 active:scale-95 flex items-start gap-3 group";
+                        btn.innerHTML = `<span class="shrink-0 bg-indigo-50 text-indigo-600 w-8 h-8 rounded-lg flex items-center justify-center text-xs border border-indigo-100 group-hover:bg-indigo-600 group-hover:text-white transition-colors">${label}</span><span class="pt-0.5">${opt}</span>`;
+                        btn.onclick = () => { els.inputs.answer.value = opt; checkExamAnswer(); };
+                        els.game.quickOptions.appendChild(btn);
+                    });
+                }
             }
             else if (modeToRender === 'grammar') { els.game.display.textContent = item.question; els.game.instruction.textContent = "CHIA ĐỘNG TỪ"; els.game.subDisplay.textContent = item.verb ? `Verb: (${item.verb})` : ""; els.game.subDisplay.classList.remove('hidden'); gameState.currentCorrect = item.answer; gameState.currentOthers = item.others ? item.others.split(',').map(s => s.trim().toLowerCase()) : []; }
             else if (modeToRender === 'forms') { els.game.display.textContent = item.question; els.game.instruction.textContent = "BIẾN ĐỔI TỪ LOẠI"; els.game.subDisplay.classList.add('hidden'); gameState.currentCorrect = item.answer; gameState.currentOthers = []; }
@@ -1069,7 +1379,6 @@
                 gameState.currentCorrect = item.en;
                 els.wrappers.inputWrapper.classList.add('hidden');
                 els.game.scrambleContainer.classList.remove('hidden');
-                // CLEAN UP & RENDER
                 renderScrambleGame(item.en);
             }
             else if (modeToRender === 'roleplay') {
@@ -1077,7 +1386,7 @@
                 els.game.roleplayContainer.classList.remove('hidden');
                 els.game.instruction.textContent = "HỘI THOẠI AI";
                 if(gameState.currentIdx === 0 && els.game.chatHistory.children.length === 0) {
-                     addChatBubble('ai', gameState.roleplayContext.aiFirstMessage);
+                    addChatBubble('ai', gameState.roleplayContext.aiFirstMessage);
                 }
             }
         };
@@ -1108,7 +1417,6 @@
             addChatBubble('user', userText);
             els.inputs.answer.value = '';
 
-            // Create typing indicator
             const typingDiv = document.createElement('div');
             typingDiv.className = 'chat-bubble ai italic text-gray-400 text-sm';
             typingDiv.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i> AI đang trả lời...';
@@ -1130,7 +1438,7 @@
                     const uClean = userText.trim().replace(/[.,!?;]/g, '').toLowerCase();
                     const cClean = response.analysis.correction.trim().replace(/[.,!?;]/g, '').toLowerCase();
                     if (uClean !== cClean) {
-                         feedbackHtml = `<div class="bg-red-50 p-2 md:p-3 rounded-xl border border-red-100 mb-3 text-xs"><div class="font-bold text-red-500 mb-1 flex items-center gap-1"><i class="fas fa-wrench"></i> ${response.analysis.errorType || "Gợi ý sửa lỗi"}</div><div class="mb-2"><span class="line-through text-gray-400 mr-2">${userText}</span><span class="text-green-600 font-bold bg-green-50 px-2 py-0.5 rounded border border-green-100">${response.analysis.correction}</span></div><div class="text-[10px] md:text-[11px] text-gray-600 bg-white p-2 rounded-lg border border-gray-100">💡 ${response.analysis.explanation || ''}</div></div>`;
+                        feedbackHtml = `<div class="bg-red-50 p-2 md:p-3 rounded-xl border border-red-100 mb-3 text-xs"><div class="font-bold text-red-500 mb-1 flex items-center gap-1"><i class="fas fa-wrench"></i> ${response.analysis.errorType || "Gợi ý sửa lỗi"}</div><div class="mb-2"><span class="line-through text-gray-400 mr-2">${userText}</span><span class="text-green-600 font-bold bg-green-50 px-2 py-0.5 rounded border border-green-100">${response.analysis.correction}</span></div><div class="text-[10px] md:text-[11px] text-gray-600 bg-white p-2 rounded-lg border border-gray-100">💡 ${response.analysis.explanation || ''}</div></div>`;
                     }
                 }
                 const richReply = applyVocabulary(response.reply, response.vocabulary);
@@ -1148,18 +1456,13 @@
             }
         }
 
-        // --- SCRAMBLE LOGIC FIXED ---
         function renderScrambleGame(sentence) {
             const words = sentence.split(' ');
             const shuffled = [...words].sort(() => Math.random() - 0.5);
 
-            // CLEAR EVERYTHING inside container except the structure divs if they exist,
-            // but actually we append button to container, so we must clear old buttons.
-            // Safe way: clear banks, remove any BUTTONs from container.
             els.game.scrambleBank.innerHTML = '';
             els.game.scrambleResult.innerHTML = '';
 
-            // Remove any existing "Check" buttons to prevent stacking
             const existingBtn = els.game.scrambleContainer.querySelector('#checkScrambleBtn');
             if(existingBtn) existingBtn.remove();
 
@@ -1171,12 +1474,12 @@
                 els.game.scrambleBank.appendChild(chip);
             });
 
-             const checkScrambleBtn = document.createElement('button');
-             checkScrambleBtn.id = 'checkScrambleBtn'; // Assign ID for easy removal
-             checkScrambleBtn.className = "w-full mt-4 md:mt-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-colors text-sm shadow-md active:scale-95";
-             checkScrambleBtn.innerHTML = "KIỂM TRA KẾT QUẢ";
-             checkScrambleBtn.onclick = checkExamAnswer;
-             els.game.scrambleContainer.appendChild(checkScrambleBtn);
+            const checkScrambleBtn = document.createElement('button');
+            checkScrambleBtn.id = 'checkScrambleBtn';
+            checkScrambleBtn.className = "w-full mt-4 md:mt-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-colors text-sm shadow-md active:scale-95";
+            checkScrambleBtn.innerHTML = "KIỂM TRA KẾT QUẢ";
+            checkScrambleBtn.onclick = checkExamAnswer;
+            els.game.scrambleContainer.appendChild(checkScrambleBtn);
         }
 
         function moveScrambleWord(chip) {
@@ -1189,61 +1492,63 @@
 
 
         const finishGame = () => {
+             // (Identical to v3.1.4)
              UserSystem.recordActivity();
-             const isRoleplay = gameState.mode === 'roleplay';
-             const resultTitle = document.getElementById('resultTitle');
-             const scoreBadge = document.getElementById('scoreBadge');
-             const roleplayMsg = document.getElementById('roleplayEndMsg');
+            const isRoleplay = gameState.mode === 'roleplay';
+            const resultTitle = document.getElementById('resultTitle');
+            const scoreBadge = document.getElementById('scoreBadge');
+            const roleplayMsg = document.getElementById('roleplayEndMsg');
 
-             if (isRoleplay) {
-                 resultTitle.textContent = "Kết thúc Roleplay";
-                 scoreBadge.classList.add('hidden');
-                 roleplayMsg.classList.remove('hidden');
-                 document.getElementById('resultList').innerHTML = `<div class="p-4 text-center text-gray-500 italic bg-gray-50 rounded-xl text-xs md:text-sm">Toàn bộ đoạn chat đã được lưu vào bộ nhớ tạm để phân tích sau.</div>`;
-             } else {
-                 resultTitle.textContent = "Hoàn thành!";
-                 scoreBadge.classList.remove('hidden');
-                 roleplayMsg.classList.add('hidden');
-                 const wrongCount = gameState.history.filter(h => !h.ok).length;
-                 const reviewBtn = document.getElementById('reviewBtn');
-                 if (wrongCount > 0 && !gameState.isReviewMode) { reviewBtn.classList.remove('hidden'); reviewBtn.innerHTML = `<i class="fas fa-recycle mr-2"></i> Học lại ngay (${wrongCount})`; } else { reviewBtn.classList.add('hidden'); }
-                 document.getElementById('finalScore').textContent = gameState.score;
-                 document.getElementById('totalScoreQ').textContent = gameState.data.length || 10;
-                 document.getElementById('resultList').innerHTML = gameState.history.map(h => `<div class="p-3 border-b border-gray-100 flex gap-3 items-center last:border-0 bg-white mb-2 rounded-lg shadow-sm"><div class="w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center shrink-0 ${h.ok ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-500'} font-bold text-xs md:text-sm border border-gray-100">${h.ok?'<i class="fas fa-check"></i>':'<i class="fas fa-times"></i>'}</div><div class="flex-1 min-w-0"><div class="text-[9px] md:text-[10px] font-bold text-gray-400 mb-0.5 truncate uppercase tracking-wider">${h.q}</div><div class="font-black text-slate-800 text-sm">${h.a}</div>${!h.ok ? `<div class="text-xs font-medium text-red-400 line-through mt-0.5">${h.u}</div>` : ''}</div></div>`).join('');
-             }
-             switchScreen('result');
+            if (isRoleplay) {
+                resultTitle.textContent = "Kết thúc Roleplay";
+                scoreBadge.classList.add('hidden');
+                roleplayMsg.classList.remove('hidden');
+                document.getElementById('resultList').innerHTML = `<div class="p-4 text-center text-gray-500 italic bg-gray-50 rounded-xl text-xs md:text-sm">Toàn bộ đoạn chat đã được lưu vào bộ nhớ tạm để phân tích sau.</div>`;
+            } else {
+                resultTitle.textContent = "Hoàn thành!";
+                scoreBadge.classList.remove('hidden');
+                roleplayMsg.classList.add('hidden');
+                const wrongCount = gameState.history.filter(h => !h.ok).length;
+                const reviewBtn = document.getElementById('reviewBtn');
+                if (wrongCount > 0 && !gameState.isReviewMode) { reviewBtn.classList.remove('hidden'); reviewBtn.innerHTML = `<i class="fas fa-recycle mr-2"></i> Học lại ngay (${wrongCount})`; } else { reviewBtn.classList.add('hidden'); }
+                document.getElementById('finalScore').textContent = gameState.score;
+                document.getElementById('totalScoreQ').textContent = gameState.data.length || 10;
+                document.getElementById('resultList').innerHTML = gameState.history.map(h => `<div class="p-3 border-b border-gray-100 flex gap-3 items-center last:border-0 bg-white mb-2 rounded-lg shadow-sm"><div class="w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center shrink-0 ${h.ok ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-500'} font-bold text-xs md:text-sm border border-gray-100">${h.ok?'<i class="fas fa-check"></i>':'<i class="fas fa-times"></i>'}</div><div class="flex-1 min-w-0"><div class="text-[9px] md:text-[10px] font-bold text-gray-400 mb-0.5 truncate uppercase tracking-wider">${h.q}</div><div class="font-black text-slate-800 text-sm">${h.a}</div>${!h.ok ? `<div class="text-xs font-medium text-red-400 line-through mt-0.5">${h.u}</div>` : ''}</div></div>`).join('');
+            }
+            switchScreen('result');
         };
 
         const nextQuestion = () => {
-             toggleModal(els.feedback.overlay, els.feedback.overlay.firstElementChild, null, false);
-             gameState.currentIdx++;
-             if(gameState.currentIdx >= gameState.data.length) finishGame();
-             else { updateUI(); if (gameState.mode !== 'scramble' && gameState.mode !== 'reading' && gameState.mode !== 'roleplay') { setTimeout(() => els.inputs.answer.focus(), 100); } }
+             // (Identical to v3.1.4)
+            toggleModal(els.feedback.overlay, els.feedback.overlay.firstElementChild, null, false);
+            gameState.currentIdx++;
+            if(gameState.currentIdx >= gameState.data.length) finishGame();
+            else { updateUI(); if (gameState.mode !== 'scramble' && gameState.mode !== 'reading' && gameState.mode !== 'roleplay') { setTimeout(() => els.inputs.answer.focus(), 100); } }
         };
 
         const getRandomSubTopic = () => { const c = Object.keys(nopdTopics); const rc = c[Math.floor(Math.random() * c.length)]; const t = nopdTopics[rc]; return t[Math.floor(Math.random() * t.length)].en; };
 
         const generateContent = async (type) => {
-            const qty = parseInt(els.config.qtyInput.value); const rawLevel = els.config.level.value;
+             // (Identical to v3.1.4 logic)
+             const qty = parseInt(els.config.qtyInput.value); const rawLevel = els.config.level.value;
             els.loading.overlay.classList.remove('hidden'); els.loading.text.textContent = "ĐANG TẠO BÀI HỌC...";
             gameState.mode = type; gameState.isReviewMode = false;
 
             let context = "", displayTitle = "";
             if (currentGlobalTopic) { context = currentGlobalTopic; displayTitle = currentGlobalTopic; }
             else {
-                 let rawInput = (els.inputs.vocabTopic.value || "").trim();
-                 if (type === 'vocab' || type === 'phrases' || type === 'idioms' || type === 'listening' || type === 'scramble' || type === 'roleplay') {
+                let rawInput = (els.inputs.vocabTopic.value || "").trim();
+                if (type === 'vocab' || type === 'phrases' || type === 'idioms' || type === 'listening' || type === 'scramble' || type === 'roleplay' || type === 'reading') {
                     if(!rawInput) { context = "Mixed Topics"; displayTitle = "Tổng hợp"; } else { context = rawInput; displayTitle = context; }
-                 }
-                 else if (type === 'reading') { context = els.inputs.readingSelect.value || getRandomSubTopic(); displayTitle = context; }
-                 else if (type === 'grammar') {
-                     let t = els.inputs.grammarTense.value;
-                     if(t === 'random') { context = "Mixed Tenses"; displayTitle = "Tổng hợp 12 thì"; } else { context = t; displayTitle = t; }
-                 }
-                 else if (type === 'forms') {
-                     let t = els.inputs.formsType.value;
-                     if(t === 'random') { context = "Mixed Word Forms"; displayTitle = "Biến thể tổng hợp"; } else { context = t; displayTitle = formReadableNames[t] || t; }
-                 }
+                }
+                else if (type === 'grammar') {
+                    let t = els.inputs.grammarTense.value;
+                    if(t === 'random') { context = "Mixed Tenses"; displayTitle = "Tổng hợp 12 thì"; } else { context = t; displayTitle = t; }
+                }
+                else if (type === 'forms') {
+                    let t = els.inputs.formsType.value;
+                    if(t === 'random') { context = "Mixed Word Forms"; displayTitle = "Biến thể tổng hợp"; } else { context = t; displayTitle = formReadableNames[t] || t; }
+                }
             }
 
             let prompt = "";
@@ -1263,7 +1568,7 @@
                 Format: [{"vi":"<DIRECT_TRANSLATION>","en":"<word>","others":"<synonyms>"}]
                 RULES:
                 1. 'vi' MUST be direct meaning. NO definitions.
-                   (Good: "apple"->"quả táo", "run"->"chạy". Bad: "fruit"->"một loại quả")
+                (Good: "apple"->"quả táo", "run"->"chạy". Bad: "fruit"->"một loại quả")
                 2. Random order. Seed: ${randomSeed}.`;
             }
             else if (type === 'phrases') {
@@ -1272,7 +1577,7 @@
                 Format: [{"vi":"<DIRECT_MEANING>","en":"<phrase>","others":"<synonyms>"}]
                 RULES:
                 1. 'vi' MUST be exact meaning. NO descriptions.
-                   (Good: "give up"->"từ bỏ". Bad: "give up"->"hành động ngừng cố gắng")
+                (Good: "give up"->"từ bỏ". Bad: "give up"->"hành động ngừng cố gắng")
                 2. Random order. Seed: ${randomSeed}.`;
             }
             else if (type === 'idioms') {
@@ -1296,9 +1601,16 @@
                 Seed: ${randomSeed}.`;
             }
             else if (type === 'reading') {
-                prompt = `Create ${qty} short reading MCQs (Level ${levelPrompt}) about '${context}'.
-                Response: JSON Array ONLY.
-                Format: [{"passage":"<text>","question":"<text>","answer":"<correct_opt>","options":["<opt1>","<opt2>","..."],"type":"mc","explanation":"<VN_reason>"}]
+                prompt = `Create a reading comprehension exam (Level ${levelPrompt}). Topic: '${context}'.
+                1. Write a passage (150-200 words).
+                2. Create ${qty < 5 ? 5 : qty} multiple choice questions based on it.
+                Response: JSON Object ONLY.
+                Format: {
+                "passage": "<English Passage Text>",
+                "questions": [
+                    { "question": "<Question Text>", "options": ["A", "B", "C", "D"], "answer": "<Correct Option Text>", "explanation": "<Vietnamese Explanation>" }
+                ]
+                }
                 Seed: ${randomSeed}.`;
             }
             else if (type === 'grammar') {
@@ -1322,6 +1634,7 @@
 
             try {
                 const aiResult = await callServerAI(prompt);
+
                 if (type === 'roleplay') {
                     gameState.roleplayContext = aiResult;
                     gameState.data = [];
@@ -1332,22 +1645,65 @@
                     els.loading.overlay.classList.add('hidden');
                     return;
                 }
-                if (type !== 'reading') aiResult.sort(() => Math.random() - 0.5);
+
+                if (type === 'reading') {
+                    let examData = [];
+                    const rawData = Array.isArray(aiResult) ? aiResult : [aiResult];
+
+                    rawData.forEach(item => {
+                        if (item.passage && item.questions && Array.isArray(item.questions)) {
+                            item.questions.forEach(q => {
+                                examData.push({
+                                    ...q,
+                                    passage: item.passage,
+                                    type: 'mc',
+                                    savedMode: 'reading'
+                                });
+                            });
+                        }
+                    });
+
+                    gameState.data = examData;
+                    if (currentGlobalTopic) displayTitle = `${currentGlobalTopic} (Sticky)`;
+                    els.game.title.textContent = `READING EXAM: ${displayTitle}`;
+                    startGame();
+                    els.loading.overlay.classList.add('hidden');
+                    return;
+                }
+
+                aiResult.sort(() => Math.random() - 0.5);
                 gameState.data = aiResult;
                 if (currentGlobalTopic) displayTitle = `${currentGlobalTopic} (Sticky)`;
                 els.game.title.textContent = `${type.toUpperCase()}: ${displayTitle}`;
                 startGame(); els.loading.overlay.classList.add('hidden');
+
             } catch(e) {
                 console.error(e);
                 if (type === 'roleplay') { alert("Không thể khởi tạo Roleplay do lỗi Server."); els.loading.overlay.classList.add('hidden'); return; }
+
                 let source = [];
                 if (type === 'grammar' && context === 'Mixed Tenses') Object.values(offlineData.grammar).forEach(arr => source = source.concat(arr));
                 else if (type === 'forms' && context === 'Mixed Word Forms') Object.values(offlineData.forms).forEach(arr => source = source.concat(arr));
                 else if (offlineData[type] && offlineData[type][context]) source = offlineData[type][context];
                 else if (offlineData[type]) source = Object.values(offlineData[type]).flat();
+
+                if (type === 'reading') {
+                    if (!source || source.length === 0) {
+                        source = offlineData.reading["Technology"] || [];
+                    }
+                }
+
                 if(!source.length && type==='vocab') source = offlineData.vocab["Daily Life"];
-                let finalData = []; while(finalData.length < qty && source.length > 0) finalData = finalData.concat([...source].sort(()=>0.5-Math.random()));
-                gameState.data = finalData.slice(0, qty); els.game.title.textContent = `${displayTitle} (Offline)`;
+
+                let finalData = [];
+                if (type !== 'reading') {
+                    while(finalData.length < qty && source.length > 0) finalData = finalData.concat([...source].sort(()=>0.5-Math.random()));
+                    gameState.data = finalData.slice(0, qty);
+                } else {
+                    gameState.data = source.slice(0, qty);
+                }
+
+                els.game.title.textContent = `${displayTitle} (Offline)`;
                 startGame(); els.loading.overlay.classList.add('hidden');
             }
         };
@@ -1355,19 +1711,20 @@
         const startGame = () => { gameState.currentIdx = 0; gameState.score = 0; comboCount = 0; gameState.history = []; els.game.totalQ.textContent = gameState.data.length || 10; switchScreen('game'); updateUI(); };
         const startGeneration = () => { const activeCard = document.querySelector('.mode-card.active'); let mode = 'vocab'; if (activeCard) { mode = activeCard.id.replace('mode-', ''); } generateContent(mode); };
         const startReview = () => {
-             const wrongIndices = gameState.history.map((h, i) => h.ok ? -1 : i).filter(i => i !== -1);
-             if (wrongIndices.length === 0) return;
-             gameState.data = wrongIndices.map(i => gameState.data[i]); gameState.isReviewMode = false; els.game.title.textContent += " (Review)"; startGame();
+            const wrongIndices = gameState.history.map((h, i) => h.ok ? -1 : i).filter(i => i !== -1);
+            if (wrongIndices.length === 0) return;
+            gameState.data = wrongIndices.map(i => gameState.data[i]); gameState.isReviewMode = false; els.game.title.textContent += " (Review)"; startGame();
         };
         const startDailyReview = () => {
-             const data = UserSystem.data.wrongAnswers;
-             if (!data || data.length === 0) { alert("Kho sai lầm trống!"); return; }
-             gameState.data = data.slice(0, 15); gameState.isReviewMode = true; els.game.title.textContent = "Ôn Tập Sai Lầm"; startGame();
+            const data = UserSystem.data.wrongAnswers;
+            if (!data || data.length === 0) { alert("Kho sai lầm trống!"); return; }
+            gameState.data = data.slice(0, 15); gameState.isReviewMode = true; els.game.title.textContent = "Ôn Tập Sai Lầm"; startGame();
         };
         const playTTS = () => { if(gameState.currentCorrect) { const u = new SpeechSynthesisUtterance(gameState.currentCorrect); u.lang = 'en-US'; u.rate = 0.9; speechSynthesis.speak(u); } };
         function isVietnamese(str) { return /[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]/i.test(str); }
 
-        const lookupDictionary = async () => {
+        async function lookupDictionary() {
+             // (Identical to v3.1.4)
             const word = els.dict.input.value.trim(); if (!word) return;
             els.dict.result.innerHTML = '<div class="flex flex-col items-center justify-center h-48"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mb-2"></div><p class="text-xs text-gray-500 font-bold">Đang tra cứu...</p></div>';
             try {
@@ -1389,7 +1746,7 @@
                     html += `</div>`; els.dict.result.innerHTML = html;
                 }
             } catch (e) { els.dict.result.innerHTML = `<div class="text-center p-4 text-red-500 font-bold">Lỗi kết nối hoặc API quá tải.</div>`; }
-        };
+        }
 
         const renderTheoryAI = (data) => {
             let html = `<div class="animate-fadeIn pb-10">`;
@@ -1400,8 +1757,13 @@
 
             // 2. Formulas (Formatted nicely)
             if(data.formula && data.formula.length > 0) {
+                const isIdiom = data.title && data.title.toLowerCase().includes('thành ngữ');
+                const headerTitle = isIdiom ? "CÁC THÀNH NGỮ PHỔ BIẾN" : "CÔNG THỨC";
+                const icon = isIdiom ? "fa-star" : "fa-flask";
+                const iconColor = isIdiom ? "text-yellow-500" : "text-indigo-500";
+
                 html += `<div class="mb-8">
-                            <h3 class="text-sm font-black text-gray-400 uppercase tracking-widest mb-3 flex items-center gap-2"><i class="fas fa-flask text-indigo-500"></i> CÔNG THỨC</h3>
+                            <h3 class="text-sm font-black text-gray-400 uppercase tracking-widest mb-3 flex items-center gap-2"><i class="fas ${icon} ${iconColor}"></i> ${headerTitle}</h3>
                             <div class="grid gap-3">`;
                 data.formula.forEach(f => {
                     let colorClass = "bg-white border-gray-200 text-gray-700";
@@ -1411,8 +1773,11 @@
                     else if(f.type === 'question') { colorClass = "bg-indigo-50/50 border-indigo-200 text-indigo-900"; iconClass = "text-indigo-600"; }
 
                     html += `<div class="${colorClass} p-4 rounded-xl border flex items-center gap-4 shadow-sm transition-transform hover:scale-[1.01]">
-                                <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm font-black ${iconClass}">${f.label}</div>
-                                <div class="font-mono font-bold text-sm md:text-base tracking-wide">${f.struct}</div>
+                                <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm font-black ${iconClass}">${f.label.length < 3 ? f.label : '<i class="fas fa-quote-right text-xs"></i>'}</div>
+                                <div class="flex-1">
+                                     ${f.label.length >= 3 ? `<div class="font-bold text-indigo-700 text-sm md:text-base mb-1">${f.label}</div>` : ''}
+                                     <div class="font-mono ${f.label.length >= 3 ? 'text-gray-600 text-xs italic' : 'font-bold text-sm md:text-base tracking-wide'}">${f.struct}</div>
+                                </div>
                              </div>`;
                 });
                 html += `   </div>
@@ -1432,6 +1797,18 @@
                  });
                  html += `  </ul>
                           </div>`;
+            }
+
+            // --- 3.5. NEW: COMMON TENSES SECTION ---
+            if(data.common_tenses && data.common_tenses.length > 0) {
+                html += `<div class="mb-8">
+                            <h3 class="text-sm font-black text-gray-400 uppercase tracking-widest mb-3 flex items-center gap-2"><i class="fas fa-history text-cyan-500"></i> CÁC THÌ THƯỜNG DÙNG</h3>
+                            <div class="flex flex-wrap gap-2">`;
+                data.common_tenses.forEach(t => {
+                    html += `<span class="bg-cyan-50 text-cyan-700 px-3 py-1.5 rounded-lg border border-cyan-100 text-xs font-bold shadow-sm flex items-center gap-1"><i class="fas fa-clock text-[10px] opacity-50"></i> ${t}</span>`;
+                });
+                html += `   </div>
+                         </div>`;
             }
 
             // 4. Signs
@@ -1466,11 +1843,12 @@
         };
 
         const loadTheory = async (topic, type) => {
+             // (Identical logic to v3.1.4, just robust AI call)
              els.theory.listGrammar.classList.add('hidden');
              els.theory.listForms.classList.add('hidden');
+             els.theory.listIdioms.classList.add('hidden');
              els.theory.detail.classList.remove('hidden');
 
-             // 1. Show Loading State Immediately (Optimistic UI)
              els.theory.contentText.innerHTML = `
                 <div class="flex flex-col items-center justify-center h-64 animate-pulse">
                     <div class="w-16 h-16 bg-indigo-50 rounded-full flex items-center justify-center mb-4">
@@ -1483,10 +1861,10 @@
 
              const friendlyName = formReadableNames[topic] || topic;
 
-             // 2. FORCE AI CALL - NO EARLY RETURN for offline data
              try {
                  let prompt = "";
                  if (type === 'forms') {
+                     // Updated Prompt to include common_tenses
                      prompt = `Explain English Word Form topic: "${friendlyName}".
                      Target Audience: Vietnamese learners.
                      Response Format: JSON ONLY (No Markdown).
@@ -1495,12 +1873,15 @@
                        "title": "Vietnamese Title for ${friendlyName}",
                        "overview": "Short definition/introduction in Vietnamese",
                        "usage": ["Usage rule 1", "Usage rule 2"],
+                       "common_tenses": ["Tense 1", "Tense 2"],
                        "formula": [
                          {"type": "positive", "label": "Structure", "struct": "Formula or Rule"}
                        ],
                        "signs": ["Signal word 1", "Signal word 2"],
                        "examples": [{"en": "English example", "vi": "Vietnamese translation"}]
                      }`;
+                 } else if (type === 'idioms') {
+                    // No AI call for idioms list mode usually, but if individual lookup supported:
                  } else {
                      prompt = `Explain English Grammar topic: "${topic}".
                      Target Audience: Vietnamese learners.
@@ -1521,19 +1902,20 @@
                  }
 
                  const jsonData = await callServerAI(prompt);
-                 // 3. Render Beautiful AI Result
                  els.theory.contentText.innerHTML = renderTheoryAI(jsonData);
 
              } catch(e) {
                  console.error("AI Theory Error", e);
-                 // 4. Smart Fallback: Use offline data only if AI fails
-                 const offlineContent = offlineData.theory[topic];
+                 let offlineContent = null;
+                 if (type === 'idioms') offlineContent = offlineData.theory[`idioms_${topic}`];
+                 else offlineContent = offlineData.theory[topic];
+
                  if (offlineContent) {
                      els.theory.contentText.innerHTML = `
                         <div class="bg-yellow-50 p-3 rounded-lg border border-yellow-100 text-yellow-700 text-xs mb-4 flex items-center gap-2">
                             <i class="fas fa-exclamation-triangle"></i> Kết nối AI gián đoạn. Hiển thị dữ liệu offline.
                         </div>
-                        <div class="animate-fadeIn">${offlineContent.content || "Nội dung đang cập nhật."}</div>
+                        <div class="animate-fadeIn">${renderTheoryAI(offlineContent)}</div>
                      `;
                  } else {
                      els.theory.contentText.innerHTML = `
@@ -1548,22 +1930,108 @@
              }
         };
 
+        // ... (Remaining code: switchTheoryTab, backToTheoryList, event listeners, init)
         let theoryTab = 'grammar';
-        const switchTheoryTab = (tab) => {
+        const switchTheoryTab = async (tab) => {
             theoryTab = tab;
-            els.theory.tabs.grammar.className = tab==='grammar' ? 'flex-1 md:w-full text-center md:text-left px-3 py-2 rounded-lg font-bold text-xs md:text-sm bg-indigo-100 text-indigo-700 whitespace-nowrap' : 'flex-1 md:w-full text-center md:text-left px-3 py-2 rounded-lg font-bold text-xs md:text-sm text-gray-500 hover:bg-gray-100 whitespace-nowrap';
-            els.theory.tabs.forms.className = tab==='forms' ? 'flex-1 md:w-full text-center md:text-left px-3 py-2 rounded-lg font-bold text-xs md:text-sm bg-indigo-100 text-indigo-700 whitespace-nowrap' : 'flex-1 md:w-full text-center md:text-left px-3 py-2 rounded-lg font-bold text-xs md:text-sm text-gray-500 hover:bg-gray-100 whitespace-nowrap';
+            // Helper to set class
+            const setClass = (el, isActive) => {
+                el.className = isActive
+                    ? 'flex-1 md:w-full text-center md:text-left px-3 py-2 rounded-xl font-bold text-xs md:text-sm bg-indigo-100 text-indigo-700 whitespace-nowrap'
+                    : 'flex-1 md:w-full text-center md:text-left px-3 py-2 rounded-xl font-bold text-xs md:text-sm text-gray-500 hover:bg-gray-100 whitespace-nowrap';
+            };
+
+            setClass(els.theory.tabs.grammar, tab === 'grammar');
+            setClass(els.theory.tabs.forms, tab === 'forms');
+            setClass(els.theory.tabs.idioms, tab === 'idioms');
+
             els.theory.listGrammar.classList.toggle('hidden', tab !== 'grammar');
             els.theory.listForms.classList.toggle('hidden', tab !== 'forms');
+            els.theory.listIdioms.classList.toggle('hidden', tab !== 'idioms');
             els.theory.detail.classList.add('hidden');
-            const dataSrc = tab === 'grammar' ? offlineData.grammar : offlineData.forms;
-            const container = tab === 'grammar' ? els.theory.listGrammar : els.theory.listForms;
+
+            let dataSrc, container;
+            if (tab === 'grammar') { dataSrc = offlineData.grammar; container = els.theory.listGrammar; }
+            else if (tab === 'forms') { dataSrc = offlineData.forms; container = els.theory.listForms; }
+            else if (tab === 'idioms') {
+                container = els.theory.listIdioms;
+
+                // 1. Show Loading UI
+                container.innerHTML = `<div class="p-8 text-center animate-pulse"><div class="animate-spin rounded-full h-10 w-10 border-b-2 border-orange-500 mx-auto mb-3"></div><p class="text-gray-400 text-sm font-bold">Đang tải dữ liệu thành ngữ...</p></div>`;
+
+                let sourceData = {};
+                let usedOffline = false;
+
+                try {
+                    // 2. Try Fetching API
+                    const res = await fetch(`${SERVER_URL}/api/idioms`);
+                    if (!res.ok) throw new Error("API Failed");
+                    sourceData = await res.json();
+                } catch (e) {
+                    console.warn("API Failed, using offline data for Idioms");
+                    usedOffline = true;
+                    sourceData = offlineData.theory; // Fallback to offline data
+                }
+
+                // 3. Process Data
+                let allIdioms = [];
+                Object.keys(sourceData).forEach(key => {
+                    if (key.startsWith('idioms_')) {
+                        const group = sourceData[key];
+                        if (group && group.formula) {
+                            // Extract category name properly
+                            const catName = group.title ? group.title.replace('Thành Ngữ Về ', '').replace(/\(.*\)/, '').trim() : key.replace('idioms_', '');
+                            group.formula.forEach(f => {
+                                allIdioms.push({
+                                    idiom: f.label,
+                                    meaning: f.struct,
+                                    category: catName
+                                });
+                            });
+                        }
+                    }
+                });
+
+                // 4. Render as a Handbook List
+                let html = `<div class="bg-orange-50 p-4 rounded-xl border border-orange-100 mb-4 flex items-start gap-3 animate-fadeIn">
+                                <div class="text-orange-500 text-xl"><i class="fas fa-book-open"></i></div>
+                                <div>
+                                    <h4 class="font-bold text-orange-800 text-sm">Sổ Tay Thành Ngữ <span class="text-[9px] bg-white border border-orange-200 px-1.5 rounded ml-1 uppercase tracking-wider text-orange-400">${usedOffline ? 'Offline' : 'Online'}</span></h4>
+                                    <p class="text-xs text-orange-600 mt-1">Danh sách các thành ngữ thông dụng để tra cứu nhanh.</p>
+                                </div>
+                            </div>
+                            <div class="space-y-3 pb-4">`;
+
+                if (allIdioms.length > 0) {
+                    allIdioms.forEach((item, index) => {
+                        // Stagger animation for items
+                        html += `<div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:border-indigo-200 transition-colors group animate-fadeIn" style="animation-delay: ${Math.min(index * 50, 500)}ms">
+                                    <div class="flex justify-between items-start mb-1">
+                                        <h3 class="font-bold text-indigo-700 text-base md:text-lg">${item.idiom}</h3>
+                                        <span class="text-[9px] font-bold text-gray-400 uppercase tracking-wider bg-gray-50 px-1.5 py-0.5 rounded border border-gray-100 whitespace-nowrap ml-2">${item.category}</span>
+                                    </div>
+                                    <p class="text-gray-600 text-sm font-medium leading-relaxed">${item.meaning}</p>
+                                </div>`;
+                    });
+                } else {
+                    html += `<div class="text-center text-gray-400 py-10 flex flex-col items-center gap-2"><i class="fas fa-search text-3xl opacity-20"></i><span>Không tìm thấy dữ liệu.</span></div>`;
+                }
+
+                html += `</div>`;
+                container.innerHTML = html;
+                return; // Stop here, don't run generic renderer
+            }
+
             const keys = Object.keys(dataSrc);
             container.innerHTML = keys.map(t => `<div onclick="loadTheory('${t}', '${tab}')" class="p-3 bg-white rounded-xl shadow-sm border border-gray-100 cursor-pointer hover:bg-gray-50 hover:border-indigo-200 transition-all flex justify-between items-center group active:scale-95"><span class="font-bold text-gray-700 text-sm group-hover:text-indigo-600 transition-colors">${tab === 'forms' ? (formReadableNames[t] || t) : `${t} <span class="text-[10px] font-normal text-gray-500 ml-1 block sm:inline">(${tenseTranslations[t] || ''})</span>`}</span><i class="fas fa-chevron-right text-gray-300 text-xs"></i></div>`).join('');
         };
-        const backToTheoryList = () => { els.theory.detail.classList.add('hidden'); if(theoryTab === 'grammar') els.theory.listGrammar.classList.remove('hidden'); else els.theory.listForms.classList.remove('hidden'); };
+        const backToTheoryList = () => {
+            els.theory.detail.classList.add('hidden');
+            if(theoryTab === 'grammar') els.theory.listGrammar.classList.remove('hidden');
+            else if (theoryTab === 'forms') els.theory.listForms.classList.remove('hidden');
+            else els.theory.listIdioms.classList.remove('hidden');
+        };
 
-        // [SECTION: EVENT LISTENERS & INIT]
         Object.assign(window, {
             openTopicModal, closeTopicModal, selectTopic, clearTopic,
             openDictModal, closeDictModal, lookupDictionary,
@@ -1572,7 +2040,14 @@
             checkExamAnswer, submitChat, nextQuestion, startGeneration, playTTS, startReview, startDailyReview, finishGame
         });
         document.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !els.feedback.overlay.classList.contains('hidden')) { e.preventDefault(); nextQuestion(); } });
-        els.dict.input.addEventListener('keydown', (e) => { if(e.key === 'Enter') { lookupDictionary(); } });
+
+        els.dict.input.addEventListener('keydown', (e) => {
+            if(e.key === 'Enter') {
+                if (typeof lookupDictionary === 'function') lookupDictionary();
+                else if (typeof window.lookupDictionary === 'function') window.lookupDictionary();
+            }
+        });
+
         els.game.scrambleContainer.addEventListener('keydown', (e) => { if(e.key === 'Enter') checkExamAnswer(); });
 
         const keyInputs = [els.inputs.answer, els.inputs.vocabTopic];
