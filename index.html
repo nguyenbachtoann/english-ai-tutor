@@ -12,7 +12,7 @@
     <link rel="apple-touch-icon" href="icon-180.png">
     <meta name="theme-color" content="#f8fafc">
 
-    <title>AI Tutor: Ultimate Full Version (v3.1.5)</title>
+    <title>AI Tutor: Ultimate Full Version (v3.2.2)</title>
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -251,6 +251,10 @@
         .modal-body-scroll {
             flex: 1; overflow-y: auto; overscroll-behavior: contain;
         }
+
+        /* NEW: FLIP CARD EFFECT FOR STUDY MODE */
+        .study-card { transition: transform 0.3s; transform-style: preserve-3d; }
+        .study-card:hover { transform: translateY(-2px); }
     </style>
 </head>
 <body>
@@ -273,7 +277,7 @@
                             <!-- COPYRIGHT HEADER -->
                             <span class="text-[9px] text-gray-400 font-semibold tracking-wider mt-0.5 hover:text-indigo-500 transition-colors select-none">© nguyenbachtoan</span>
                         </div>
-                        <span class="bg-indigo-100 text-indigo-700 text-[9px] px-1.5 py-0.5 rounded-md font-bold ml-1 self-start">v3.1.5</span>
+                        <span class="bg-indigo-100 text-indigo-700 text-[9px] px-1.5 py-0.5 rounded-md font-bold ml-1 self-start">v3.2.2</span>
                     </h1>
                 </div>
             </div>
@@ -373,10 +377,28 @@
 
                     <!-- Modes Grid -->
                     <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6" id="modeGrid">
-                        <div onclick="setMode('roleplay')" id="mode-roleplay" class="mode-card col-span-2 sm:col-span-3 bg-white p-5 rounded-2xl shadow-sm hover:shadow-md active h-auto">
-                            <div class="absolute right-0 top-0 px-2 py-0.5 bg-purple-600 text-white text-[9px] font-bold rounded-bl-lg z-10">HOT</div>
+
+                        <!-- NEW STUDY MODE CARD -->
+                        <div onclick="setMode('study')" id="mode-study" class="mode-card col-span-2 sm:col-span-3 bg-white p-5 rounded-2xl shadow-sm hover:shadow-md active h-auto border-emerald-200">
+                            <div class="absolute right-0 top-0 px-2 py-0.5 bg-emerald-600 text-white text-[9px] font-bold rounded-bl-lg z-10">MỚI</div>
                             <div class="flex items-center gap-4 relative z-10">
-                                <div class="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center text-xl border border-purple-100"><i class="fas fa-comments"></i></div>
+                                <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl border border-emerald-100"><i class="fas fa-clipboard-check"></i></div>
+                                <div class="flex-1"><h3 class="text-base font-black text-gray-800">Học & Dò Bài</h3><p class="text-xs text-gray-500 font-medium mt-0.5">Học thuộc từ vựng rồi kiểm tra.</p></div>
+                            </div>
+                        </div>
+
+                        <!-- NEW REWRITE MODE -->
+                        <div onclick="setMode('rewrite')" id="mode-rewrite" class="mode-card col-span-2 sm:col-span-3 bg-white p-5 rounded-2xl shadow-sm hover:shadow-md active h-auto border-purple-200">
+                            <div class="flex items-center gap-4 relative z-10">
+                                <div class="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center text-xl border border-purple-100"><i class="fas fa-pencil-alt"></i></div>
+                                <div class="flex-1"><h3 class="text-base font-black text-gray-800">Dịch Câu</h3><p class="text-xs text-gray-500 font-medium mt-0.5">Viết lại câu hoàn chỉnh.</p></div>
+                            </div>
+                        </div>
+
+                        <div onclick="setMode('roleplay')" id="mode-roleplay" class="mode-card col-span-2 sm:col-span-3 bg-white p-5 rounded-2xl shadow-sm hover:shadow-md active h-auto">
+                            <div class="absolute right-0 top-0 px-2 py-0.5 bg-indigo-600 text-white text-[9px] font-bold rounded-bl-lg z-10">HOT</div>
+                            <div class="flex items-center gap-4 relative z-10">
+                                <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl border border-indigo-100"><i class="fas fa-comments"></i></div>
                                 <div class="flex-1"><h3 class="text-base font-black text-gray-800">Thực Chiến AI</h3><p class="text-xs text-gray-500 font-medium mt-0.5">Chat hội thoại nhập vai với AI.</p></div>
                             </div>
                         </div>
@@ -384,11 +406,20 @@
                             <div class="w-10 h-10 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center text-lg"><i class="fas fa-book-reader"></i></div>
                             <div><h3 class="font-bold text-gray-700 text-sm">Luyện Đọc</h3><p class="text-[10px] text-gray-400 font-bold">Reading Exam</p></div>
                         </div>
-                        <div onclick="setMode('vocab')" id="mode-vocab" class="mode-card bg-white p-4 rounded-2xl shadow-sm flex flex-col items-center text-center gap-2 hover-lift"><div class="w-10 h-10 rounded-xl bg-yellow-50 text-yellow-600 flex items-center justify-center text-lg"><i class="fas fa-font"></i></div><div><h3 class="font-bold text-gray-700 text-sm">Từ Vựng</h3><p class="text-[10px] text-gray-400 font-bold">Word Matching</p></div></div>
+                        <div onclick="setMode('vocab')" id="mode-vocab" class="mode-card bg-white p-4 rounded-2xl shadow-sm flex flex-col items-center text-center gap-2 hover-lift"><div class="w-10 h-10 rounded-xl bg-yellow-50 text-yellow-600 flex items-center justify-center text-lg"><i class="fas fa-font"></i></div><div><h3 class="font-bold text-gray-700 text-sm">Từ Vựng</h3><p class="text-[10px] text-gray-400 font-bold">Game Mode</p></div></div>
                         <div onclick="setMode('scramble')" id="mode-scramble" class="mode-card bg-white p-4 rounded-2xl shadow-sm flex flex-col items-center text-center gap-2 hover-lift"><div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg"><i class="fas fa-sort-amount-down"></i></div><div><h3 class="font-bold text-gray-700 text-sm">Xếp Câu</h3><p class="text-[10px] text-gray-400 font-bold">Unscramble</p></div></div>
                         <div onclick="setMode('listening')" id="mode-listening" class="mode-card bg-white p-4 rounded-2xl shadow-sm flex flex-col items-center text-center gap-2 hover-lift"><div class="w-10 h-10 rounded-xl bg-pink-50 text-pink-600 flex items-center justify-center text-lg"><i class="fas fa-headphones"></i></div><div><h3 class="font-bold text-gray-700 text-sm">Nghe Chép</h3><p class="text-[10px] text-gray-400 font-bold">Dictation</p></div></div>
                         <div onclick="setMode('grammar')" id="mode-grammar" class="mode-card bg-white p-4 rounded-2xl shadow-sm flex flex-col items-center text-center gap-2 hover-lift"><div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg"><i class="fas fa-pen-nib"></i></div><div><h3 class="font-bold text-gray-700 text-sm">Ngữ Pháp</h3><p class="text-[10px] text-gray-400 font-bold">Tenses</p></div></div>
-                        <div onclick="setMode('forms')" id="mode-forms" class="mode-card bg-white p-4 rounded-2xl shadow-sm flex flex-col items-center text-center gap-2 hover-lift"><div class="w-10 h-10 rounded-xl bg-green-50 text-green-600 flex items-center justify-center text-lg"><i class="fas fa-magic"></i></div><div><h3 class="font-bold text-gray-700 text-sm">Biến Thể</h3><p class="text-[10px] text-gray-400 font-bold">Word Forms</p></div></div>
+                        <!-- Updated Mode Cards -->
+                        <div onclick="setMode('forms')" id="mode-forms" class="mode-card bg-white p-4 rounded-2xl shadow-sm flex flex-col items-center text-center gap-2 hover-lift">
+                            <div class="w-10 h-10 rounded-xl bg-green-50 text-green-600 flex items-center justify-center text-lg"><i class="fas fa-code-branch"></i></div>
+                            <div><h3 class="font-bold text-gray-700 text-sm">Động Từ</h3><p class="text-[10px] text-gray-400 font-bold">Verb Forms</p></div>
+                        </div>
+                         <!-- New Word Form Card -->
+                        <div onclick="setMode('wordform')" id="mode-wordform" class="mode-card bg-white p-4 rounded-2xl shadow-sm flex flex-col items-center text-center gap-2 hover-lift">
+                            <div class="w-10 h-10 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center text-lg"><i class="fas fa-cubes"></i></div>
+                            <div><h3 class="font-bold text-gray-700 text-sm">Cấu Tạo Từ</h3><p class="text-[10px] text-gray-400 font-bold">Word Formation</p></div>
+                        </div>
                         <div onclick="setMode('idioms')" id="mode-idioms" class="mode-card bg-white p-4 rounded-2xl shadow-sm flex flex-col items-center text-center gap-2 hover-lift"><div class="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center text-lg"><i class="fas fa-dragon"></i></div><div><h3 class="font-bold text-gray-700 text-sm">Thành Ngữ</h3><p class="text-[10px] text-gray-400 font-bold">Idioms</p></div></div>
                     </div>
 
@@ -401,6 +432,8 @@
                             <div id="viewReading" class="hidden"><div class="relative"><select id="readingTopicSelect" class="mobile-compact-input w-full bg-gray-50 border border-gray-200 rounded-xl font-bold appearance-none outline-none focus:border-indigo-400"></select><i class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-xs"></i></div></div>
                             <div id="viewGrammar" class="hidden"><div class="relative"><select id="grammarTenseSelect" class="mobile-compact-input w-full bg-gray-50 border border-gray-200 rounded-xl font-bold appearance-none outline-none focus:border-indigo-400"></select><i class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-xs"></i></div></div>
                             <div id="viewForms" class="hidden"><div class="relative"><select id="formsTypeSelect" class="mobile-compact-input w-full bg-gray-50 border border-gray-200 rounded-xl font-bold appearance-none outline-none focus:border-indigo-400"></select><i class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-xs"></i></div></div>
+                            <!-- NEW View for Word Formation -->
+                            <div id="viewWordFormation" class="hidden"><div class="relative"><select id="wordFormationSelect" class="mobile-compact-input w-full bg-gray-50 border border-gray-200 rounded-xl font-bold appearance-none outline-none focus:border-indigo-400"></select><i class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-xs"></i></div></div>
                         </div>
                         <button onclick="startGeneration()" id="startBtn" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold text-base py-4 rounded-xl shadow-lg shadow-slate-200 active:scale-95 transition-all flex items-center justify-center gap-3"><span>BẮT ĐẦU</span> <i class="fas fa-arrow-right"></i></button>
                     </div>
@@ -463,6 +496,33 @@
                         </div>
                         <button id="checkBtn" class="w-14 h-14 bg-slate-900 hover:bg-slate-800 text-white rounded-xl shadow-lg flex items-center justify-center text-xl active:scale-95 transition-all shrink-0"><i class="fas fa-check"></i></button>
                     </div>
+                </div>
+            </div>
+
+            <!-- 2.5 STUDY MODE OVERLAY (NEW) -->
+            <div id="studyScreen" class="hidden absolute inset-0 z-40 bg-slate-50 flex flex-col">
+                <div class="px-4 py-4 bg-white border-b border-gray-100 flex items-center justify-between shrink-0 shadow-sm">
+                    <h2 class="text-lg font-black text-slate-800 flex items-center gap-2"><i class="fas fa-book-open text-indigo-500"></i> Sổ Tay Ôn Tập</h2>
+                    <button onclick="resetGame()" class="text-gray-400 hover:text-red-500 font-bold text-xs uppercase tracking-wider">Thoát</button>
+                </div>
+                <div class="flex-1 overflow-y-auto p-4 md:p-6 custom-scroll">
+                    <div class="max-w-2xl mx-auto">
+                        <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-4 mb-6 flex items-start gap-3">
+                            <i class="fas fa-info-circle text-indigo-500 mt-1"></i>
+                            <div class="text-sm text-indigo-800">
+                                <p class="font-bold mb-1">Hướng dẫn:</p>
+                                <p>Hệ thống đã tạo danh sách từ vựng/câu hỏi cho bạn. Hãy dành thời gian <strong>học thuộc</strong> danh sách bên dưới trước. Khi đã sẵn sàng, hãy bấm nút "Kiểm tra" để bắt đầu bài test.</p>
+                            </div>
+                        </div>
+                        <div id="studyList" class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-20">
+                            <!-- Items will be injected here -->
+                        </div>
+                    </div>
+                </div>
+                <div class="p-4 bg-white border-t border-gray-100 shadow-[0_-5px_20px_rgba(0,0,0,0.05)] shrink-0 pb-safe">
+                    <button onclick="startQuizFromStudy()" class="max-w-md mx-auto w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-indigo-200 transition-all active:scale-95 flex items-center justify-center gap-2">
+                        <i class="fas fa-check-circle"></i> Tôi đã thuộc bài - Kiểm tra ngay
+                    </button>
                 </div>
             </div>
 
@@ -634,10 +694,11 @@
         viewportHandler();
 
         const els = {
-            screens: { start: document.getElementById('startScreen'), game: document.getElementById('gameScreen'), result: document.getElementById('resultScreen') },
-            views: { sharedInput: document.getElementById('sharedInputArea'), reading: document.getElementById('viewReading'), grammar: document.getElementById('viewGrammar'), forms: document.getElementById('viewForms') },
-            inputs: { vocabTopic: document.getElementById('vocabTopicInput'), vocabSelect: document.getElementById('vocabTopicSelect'), readingTopic: document.getElementById('readingTopicInput'), readingSelect: document.getElementById('readingTopicSelect'), grammarTense: document.getElementById('grammarTenseSelect'), formsType: document.getElementById('formsTypeSelect'), answer: document.getElementById('answerInput'), dict: document.getElementById('dictInput') },
+            screens: { start: document.getElementById('startScreen'), game: document.getElementById('gameScreen'), result: document.getElementById('resultScreen'), study: document.getElementById('studyScreen') },
+            views: { sharedInput: document.getElementById('sharedInputArea'), reading: document.getElementById('viewReading'), grammar: document.getElementById('viewGrammar'), forms: document.getElementById('viewForms'), wordform: document.getElementById('viewWordFormation') },
+            inputs: { vocabTopic: document.getElementById('vocabTopicInput'), vocabSelect: document.getElementById('vocabTopicSelect'), readingTopic: document.getElementById('readingTopicInput'), readingSelect: document.getElementById('readingTopicSelect'), grammarTense: document.getElementById('grammarTenseSelect'), formsType: document.getElementById('formsTypeSelect'), wordFormationType: document.getElementById('wordFormationSelect'), answer: document.getElementById('answerInput'), dict: document.getElementById('dictInput') },
             game: { title: document.getElementById('gameTitle'), qNum: document.getElementById('currentQ'), totalQ: document.getElementById('totalQ'), progress: document.getElementById('progressBar'), display: document.getElementById('mainDisplay'), passageDisplay: document.getElementById('readingPassageDisplay'), listeningDisplay: document.getElementById('listeningDisplay'), subDisplay: document.getElementById('subDisplay'), instruction: document.getElementById('instructionText'), quickOptions: document.getElementById('quickOptions'), comboBadge: document.getElementById('comboBadge'), comboText: document.getElementById('comboCountText'), floatingCombo: document.getElementById('floatingComboContainer'), scrambleContainer: document.getElementById('scrambleContainer'), scrambleBank: document.getElementById('scrambleBank'), scrambleResult: document.getElementById('scrambleResult'), roleplayContainer: document.getElementById('roleplayContainer'), chatHistory: document.getElementById('chatHistory') },
+            study: { list: document.getElementById('studyList') },
             feedback: { overlay: document.getElementById('feedbackOverlay'), title: document.getElementById('feedbackTitle'), correctText: document.getElementById('correctAnswerText'), explanation: document.getElementById('grammarExplanation'), synonym: document.getElementById('synonymText'), border: document.getElementById('feedbackBorder') },
             settings: { panel: document.getElementById('settingsPanel'), content: document.getElementById('settingsContent'), backdrop: document.getElementById('settingsBackdrop'), keyStatus: document.getElementById('keyStatus') },
             dict: { modal: document.getElementById('dictModal'), content: document.getElementById('dictContent'), result: document.getElementById('dictResultArea'), input: document.getElementById('dictInput') },
@@ -661,7 +722,7 @@
             loading: { overlay: document.getElementById('loadingOverlay'), text: document.getElementById('loadingText') },
             aiStatus: { dot: document.getElementById('aiStatusDot') },
             checkBtn: document.getElementById('checkBtn'),
-            modeCards: { vocab: document.getElementById('mode-vocab'), phrases: document.getElementById('mode-phrases'), idioms: document.getElementById('mode-idioms'), listening: document.getElementById('mode-listening'), reading: document.getElementById('mode-reading'), grammar: document.getElementById('mode-grammar'), forms: document.getElementById('mode-forms'), scramble: document.getElementById('mode-scramble'), roleplay: document.getElementById('mode-roleplay') }
+            modeCards: { vocab: document.getElementById('mode-vocab'), study: document.getElementById('mode-study'), phrases: document.getElementById('mode-phrases'), idioms: document.getElementById('mode-idioms'), listening: document.getElementById('mode-listening'), reading: document.getElementById('mode-reading'), grammar: document.getElementById('mode-grammar'), forms: document.getElementById('mode-forms'), wordform: document.getElementById('mode-wordform'), scramble: document.getElementById('mode-scramble'), roleplay: document.getElementById('mode-roleplay'), rewrite: document.getElementById('mode-rewrite') }
         };
 
         // --- HELPER FUNCTIONS ---
@@ -694,13 +755,12 @@
             if(mode === 'reading') els.views.sharedInput.classList.remove('hidden');
             else if(mode === 'grammar') els.views.grammar.classList.remove('hidden');
             else if(mode === 'forms') els.views.forms.classList.remove('hidden');
+            else if(mode === 'wordform') els.views.wordform.classList.remove('hidden');
             else els.views.sharedInput.classList.remove('hidden');
         }
 
         function switchScreen(n) {
-            els.screens.start.classList.add('hidden');
-            els.screens.game.classList.add('hidden');
-            els.screens.result.classList.add('hidden');
+            Object.values(els.screens).forEach(s => s.classList.add('hidden'));
             els.screens[n].classList.remove('hidden');
         }
 
@@ -725,7 +785,8 @@
              // (Existing checkExamAnswer logic...)
              if (gameState.mode === 'roleplay') return;
             let user = els.inputs.answer.value.trim();
-            if (gameState.mode === 'scramble') {
+            // Normalization
+            if (gameState.mode === 'scramble' || gameState.mode === 'rewrite') {
                 const normalize = s => s.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"").toLowerCase().replace(/\s{2,}/g," ");
                 user = normalize(user);
                 const correctNorm = normalize(gameState.currentCorrect);
@@ -764,7 +825,9 @@
             }
 
             let modeToCheck = gameState.isReviewMode ? item.savedMode : gameState.mode;
-            if ((['vocab','listening','phrases','idioms','grammar'].includes(modeToCheck)) && item.others) { els.feedback.synonym.textContent = `Chấp nhận thêm: ${item.others}`; els.feedback.synonym.classList.remove('hidden'); } else { els.feedback.synonym.classList.add('hidden'); }
+            if (modeToCheck === 'study') modeToCheck = 'vocab'; // Map study back to vocab for synonym check
+
+            if ((['vocab','study','listening','phrases','idioms','grammar'].includes(modeToCheck)) && item.others) { els.feedback.synonym.textContent = `Chấp nhận thêm: ${item.others}`; els.feedback.synonym.classList.remove('hidden'); } else { els.feedback.synonym.classList.add('hidden'); }
             els.feedback.explanation.textContent = item.explanation ? "💡 " + item.explanation : ""; els.feedback.explanation.classList.toggle('hidden', !item.explanation);
             toggleModal(els.feedback.overlay, els.feedback.overlay.firstElementChild, null, true);
             const nextBtn = els.feedback.overlay.querySelector('button');
@@ -1329,11 +1392,20 @@
             els.wrappers.inputWrapper.classList.remove('hidden');
 
             let modeToRender = gameState.isReviewMode ? item.savedMode : gameState.mode;
+            if (modeToRender === 'study') modeToRender = 'vocab'; // Display study items like vocab
 
             if(modeToRender === 'vocab') { els.game.display.textContent = item.vi; els.game.instruction.textContent = "DỊCH TỪ SAU SANG TIẾNG ANH"; gameState.currentCorrect = item.en; gameState.currentOthers = item.others ? item.others.split(',').map(s => s.trim().toLowerCase()) : []; }
             else if (modeToRender === 'phrases') { els.game.display.textContent = item.vi; els.game.instruction.textContent = "DỊCH CỤM TỪ"; gameState.currentCorrect = item.en; gameState.currentOthers = item.others ? item.others.split(',').map(s => s.trim().toLowerCase()) : []; }
             else if (modeToRender === 'idioms') { els.game.display.textContent = item.vi; els.game.instruction.textContent = "DỊCH THÀNH NGỮ"; gameState.currentCorrect = item.en; gameState.currentOthers = item.others ? item.others.split(',').map(s => s.trim().toLowerCase()) : []; }
             else if (modeToRender === 'listening') { els.game.display.classList.add('hidden'); els.game.listeningDisplay.classList.remove('hidden'); els.game.instruction.textContent = "NGHE VÀ VIẾT LẠI"; els.game.subDisplay.textContent = `(Nghĩa: ${item.vi})`; els.game.subDisplay.classList.remove('hidden'); gameState.currentCorrect = item.en; gameState.currentOthers = item.others ? item.others.split(',').map(s => s.trim().toLowerCase()) : []; setTimeout(() => playTTS(), 500); }
+            else if (modeToRender === 'rewrite') { // NEW REWRITE MODE
+                els.game.display.classList.remove('text-3xl', 'md:text-5xl');
+                els.game.display.classList.add('text-lg', 'md:text-2xl');
+                els.game.display.textContent = item.vi;
+                els.game.instruction.textContent = "VIẾT LẠI CÂU TIẾNG ANH";
+                gameState.currentCorrect = item.en;
+                gameState.currentOthers = [];
+            }
             else if (modeToRender === 'reading') {
                 els.game.display.classList.remove('text-3xl', 'md:text-5xl');
                 els.game.display.classList.add('text-lg', 'md:text-2xl');
@@ -1372,7 +1444,8 @@
                 }
             }
             else if (modeToRender === 'grammar') { els.game.display.textContent = item.question; els.game.instruction.textContent = "CHIA ĐỘNG TỪ"; els.game.subDisplay.textContent = item.verb ? `Verb: (${item.verb})` : ""; els.game.subDisplay.classList.remove('hidden'); gameState.currentCorrect = item.answer; gameState.currentOthers = item.others ? item.others.split(',').map(s => s.trim().toLowerCase()) : []; }
-            else if (modeToRender === 'forms') { els.game.display.textContent = item.question; els.game.instruction.textContent = "BIẾN ĐỔI TỪ LOẠI"; els.game.subDisplay.classList.add('hidden'); gameState.currentCorrect = item.answer; gameState.currentOthers = []; }
+            else if (modeToRender === 'forms') { els.game.display.textContent = item.question; els.game.instruction.textContent = "CHIA DẠNG ĐỘNG TỪ"; els.game.subDisplay.classList.add('hidden'); gameState.currentCorrect = item.answer; gameState.currentOthers = []; }
+            else if (modeToRender === 'wordform') { els.game.display.textContent = item.question; els.game.instruction.textContent = "BIẾN ĐỔI TỪ LOẠI"; els.game.subDisplay.classList.add('hidden'); gameState.currentCorrect = item.answer; gameState.currentOthers = []; }
             else if (modeToRender === 'scramble') {
                 els.game.display.textContent = item.vi;
                 els.game.instruction.textContent = "SẮP XẾP THÀNH CÂU";
@@ -1538,16 +1611,21 @@
             if (currentGlobalTopic) { context = currentGlobalTopic; displayTitle = currentGlobalTopic; }
             else {
                 let rawInput = (els.inputs.vocabTopic.value || "").trim();
-                if (type === 'vocab' || type === 'phrases' || type === 'idioms' || type === 'listening' || type === 'scramble' || type === 'roleplay' || type === 'reading') {
+                // ADDED 'rewrite' to types
+                if (['vocab', 'study', 'phrases', 'idioms', 'listening', 'scramble', 'roleplay', 'reading', 'rewrite'].includes(type)) {
                     if(!rawInput) { context = "Mixed Topics"; displayTitle = "Tổng hợp"; } else { context = rawInput; displayTitle = context; }
                 }
                 else if (type === 'grammar') {
                     let t = els.inputs.grammarTense.value;
                     if(t === 'random') { context = "Mixed Tenses"; displayTitle = "Tổng hợp 12 thì"; } else { context = t; displayTitle = t; }
                 }
-                else if (type === 'forms') {
+                else if (type === 'forms') { // "Verb Forms" context
                     let t = els.inputs.formsType.value;
-                    if(t === 'random') { context = "Mixed Word Forms"; displayTitle = "Biến thể tổng hợp"; } else { context = t; displayTitle = formReadableNames[t] || t; }
+                    if(t === 'random') { context = "Mixed Verb Forms"; displayTitle = "Động từ tổng hợp"; } else { context = t; displayTitle = formReadableNames[t] || t; }
+                }
+                else if (type === 'wordform') { // "Word Formation" context
+                    let t = els.inputs.wordFormationType.value;
+                    if(t === 'random') { context = "Mixed Word Formation"; displayTitle = "Cấu tạo từ tổng hợp"; } else { context = t; displayTitle = formReadableNames[t] || t; }
                 }
             }
 
@@ -1562,23 +1640,52 @@
             const topicInjection = currentGlobalTopic ? `Topic: '${currentGlobalTopic}'.` : "";
             const randomSeed = Math.floor(Math.random() * 10000);
 
-            if (type === 'vocab') {
+            // --- PROMPT ENGINEERING FOR ACCURACY ---
+            if (type === 'vocab' || type === 'study') {
                 prompt = `List ${qty} English words (Level ${levelPrompt}) about '${context}'. ${topicInjection}
                 Response: JSON Array ONLY.
-                Format: [{"vi":"<DIRECT_TRANSLATION>","en":"<word>","others":"<synonyms>"}]
+                Format: [{"vi":"<VN_meaning>","en":"<word>","others":"<synonyms>"}]
                 RULES:
-                1. 'vi' MUST be direct meaning. NO definitions.
-                (Good: "apple"->"quả táo", "run"->"chạy". Bad: "fruit"->"một loại quả")
-                2. Random order. Seed: ${randomSeed}.`;
+                1. Reference Oxford Dictionary. 'vi' MUST be the exact academic/formal meaning.
+                (Bad: "Meeting"->"gặp gỡ". Good: "Meeting"->"cuộc họp/gặp gỡ").
+                2. Do NOT use loose conversational definitions.
+                Seed: ${randomSeed}.`;
             }
             else if (type === 'phrases') {
-                prompt = `List ${qty} English phrases/collocations (Level ${levelPrompt}) about '${context}'. ${topicInjection}
+                prompt = `List ${qty} English phrases (Level ${levelPrompt}) about '${context}'. ${topicInjection}
                 Response: JSON Array ONLY.
-                Format: [{"vi":"<DIRECT_MEANING>","en":"<phrase>","others":"<synonyms>"}]
+                Format: [{"vi":"<VN_meaning>","en":"<phrase>","others":"<synonyms>"}]
                 RULES:
-                1. 'vi' MUST be exact meaning. NO descriptions.
-                (Good: "give up"->"từ bỏ". Bad: "give up"->"hành động ngừng cố gắng")
-                2. Random order. Seed: ${randomSeed}.`;
+                1. Reference Oxford Dictionary. Exact meanings only.
+                Seed: ${randomSeed}.`;
+            }
+            // NEW REWRITE PROMPT
+            else if (type === 'rewrite') {
+                prompt = `Create ${qty} sentence rewriting exercises (Level ${levelPrompt}) about '${context}'.
+                Response: JSON Array ONLY.
+                Format: [{"vi":"<Vietnamese_Sentence>","en":"<English_Translation>"}]
+                RULES:
+                1. English sentences must be grammatically perfect (Oxford standard).
+                2. 'vi' sentence must be natural.
+                Seed: ${randomSeed}.`;
+            }
+            else if (type === 'forms') { // VERB FORMS ONLY
+                prompt = `Create ${qty} Verb Form questions (Level ${levelPrompt}) on topic: ${context}.
+                Response: JSON Array ONLY.
+                Format: [{"question":"<sentence_with_blank_verb>", "answer":"<correct_verb_form>", "explanation":"<VN_reason>"}]
+                RULES:
+                1. Focus on Irregular Verbs, V3, V-ing, V-ed, Conjugations.
+                2. Context: ${context}.
+                Seed: ${randomSeed}.`;
+            }
+            else if (type === 'wordform') { // WORD FORMATION ONLY
+                prompt = `Create ${qty} Word Formation questions (Level ${levelPrompt}) on topic: ${context}.
+                Response: JSON Array ONLY.
+                Format: [{"question":"<root_word> (Change to Noun/Adj/Adv/Negative)", "answer":"<derived_word>", "explanation":"<VN_reason>"}]
+                RULES:
+                1. Focus on Suffixes (-tion, -ment, -ness, -ly) and Prefixes (un-, dis-, im-).
+                2. Include derivation like 'happy' -> 'happiness', 'use' -> 'useless'.
+                Seed: ${randomSeed}.`;
             }
             else if (type === 'idioms') {
                 prompt = `List ${qty} English idioms (Level ${levelPrompt}) about '${context}'.
@@ -1618,12 +1725,6 @@
                 Response: JSON Array ONLY.
                 Format: [{"question":"She ___ (go) home.","verb":"go","answer":"goes","explanation":"<VN_reason>"}]
                 RULE: 'answer' is the conjugated verb only.
-                Seed: ${randomSeed}.`;
-            }
-            else if (type === 'forms') {
-                prompt = `Create ${qty} Word Form questions (Level ${levelPrompt}) on topic: ${context}.
-                Response: JSON Array ONLY.
-                Format: [{"question":"<word> (Noun/Adj/...)","answer":"<derived_word>","explanation":"<VN_reason>"}]
                 Seed: ${randomSeed}.`;
             }
             else if (type === 'roleplay') {
@@ -1675,15 +1776,34 @@
                 gameState.data = aiResult;
                 if (currentGlobalTopic) displayTitle = `${currentGlobalTopic} (Sticky)`;
                 els.game.title.textContent = `${type.toUpperCase()}: ${displayTitle}`;
-                startGame(); els.loading.overlay.classList.add('hidden');
+
+                // CHECK FOR STUDY MODE
+                // Only 'study' mode triggers the flashcard review.
+                // Others (vocab, rewrite, etc.) go straight to game.
+                if (type === 'study') {
+                    renderStudyList(aiResult, type);
+                    toggleModal(els.screens.study, els.screens.study.firstElementChild, null, true);
+                    els.screens.start.classList.add('hidden'); // Hide start screen behind modal
+                } else {
+                    startGame();
+                }
+                els.loading.overlay.classList.add('hidden');
 
             } catch(e) {
                 console.error(e);
                 if (type === 'roleplay') { alert("Không thể khởi tạo Roleplay do lỗi Server."); els.loading.overlay.classList.add('hidden'); return; }
 
                 let source = [];
+                // Offline fallback logic
                 if (type === 'grammar' && context === 'Mixed Tenses') Object.values(offlineData.grammar).forEach(arr => source = source.concat(arr));
-                else if (type === 'forms' && context === 'Mixed Word Forms') Object.values(offlineData.forms).forEach(arr => source = source.concat(arr));
+                else if (type === 'forms') {
+                    // Fallback for Verb Forms
+                    source = [...(offlineData.forms.irregular || []), ...(offlineData.forms.irregular_v3 || []), ...(offlineData.forms.ing || []), ...(offlineData.forms.ed || [])];
+                }
+                else if (type === 'wordform') {
+                    // Fallback for Word Forms
+                     source = [...(offlineData.forms.noun_suffix || []), ...(offlineData.forms.adj_suffix || []), ...(offlineData.forms.prefixes || [])];
+                }
                 else if (offlineData[type] && offlineData[type][context]) source = offlineData[type][context];
                 else if (offlineData[type]) source = Object.values(offlineData[type]).flat();
 
@@ -1693,7 +1813,7 @@
                     }
                 }
 
-                if(!source.length && type==='vocab') source = offlineData.vocab["Daily Life"];
+                if(!source.length && (type==='vocab' || type==='study')) source = offlineData.vocab["Daily Life"];
 
                 let finalData = [];
                 if (type !== 'reading') {
@@ -1706,6 +1826,32 @@
                 els.game.title.textContent = `${displayTitle} (Offline)`;
                 startGame(); els.loading.overlay.classList.add('hidden');
             }
+        };
+
+        // NEW: RENDER STUDY LIST (Flashcard-ish)
+        const renderStudyList = (data, type) => {
+            let html = '';
+            data.forEach(item => {
+                let term = item.en || item.answer;
+                let def = item.vi || item.question;
+                if (type === 'forms' || type === 'wordform') { term = item.answer; def = `${item.question}`; }
+                if (type === 'rewrite') { term = item.en; def = item.vi; }
+
+                html += `
+                <div class="study-card bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex flex-col items-center text-center relative overflow-hidden group">
+                    <div class="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
+                    <h3 class="font-black text-slate-800 text-lg md:text-xl mb-2 text-indigo-700">${term}</h3>
+                    <div class="w-full h-px bg-gray-100 mb-2"></div>
+                    <p class="text-gray-600 font-medium text-sm">${def}</p>
+                    ${item.others ? `<p class="text-xs text-gray-400 mt-1 italic">(${item.others})</p>` : ''}
+                </div>`;
+            });
+            els.study.list.innerHTML = html;
+        };
+
+        const startQuizFromStudy = () => {
+            toggleModal(els.screens.study, els.screens.study.firstElementChild, null, false);
+            startGame();
         };
 
         const startGame = () => { gameState.currentIdx = 0; gameState.score = 0; comboCount = 0; gameState.history = []; els.game.totalQ.textContent = gameState.data.length || 10; switchScreen('game'); updateUI(); };
@@ -2037,7 +2183,7 @@
             openDictModal, closeDictModal, lookupDictionary,
             switchTheoryTab, openTheoryModal, closeTheoryModal, backToTheoryList, loadTheory,
             toggleSettings, updateLevel, setMode, switchScreen, resetGame,
-            checkExamAnswer, submitChat, nextQuestion, startGeneration, playTTS, startReview, startDailyReview, finishGame
+            checkExamAnswer, submitChat, nextQuestion, startGeneration, playTTS, startReview, startDailyReview, finishGame, startQuizFromStudy
         });
         document.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !els.feedback.overlay.classList.contains('hidden')) { e.preventDefault(); nextQuestion(); } });
 
@@ -2068,6 +2214,10 @@
             }
         });
 
+        // SPLIT DATA LOGIC FOR SELECT OPTIONS
+        const verbFormKeys = ['irregular', 'irregular_v3', 'ing', 'ed'];
+        const wordFormKeys = ['noun_suffix', 'adj_suffix', 'prefixes', 'verb_noun', 'noun_adj', 'adj_adv', 'classify'];
+
         try {
             checkKeyStatus();
             UserSystem.load();
@@ -2076,11 +2226,19 @@
                 html += Object.keys(offlineData.grammar).map(t => `<option value="${t}">${t} (${tenseTranslations[t] || ''})</option>`).join('');
                 els.inputs.grammarTense.innerHTML = html;
             }
+            // Populate Verb Forms Select
             if (els.inputs.formsType) {
-                let html = '<option value="random">🎲 Tổng hợp (Mixed Forms)</option>';
-                html += Object.keys(offlineData.forms).map(t => `<option value="${t}">${formReadableNames[t] || t}</option>`).join('');
+                let html = '<option value="random">🎲 Tổng hợp (Mixed Verbs)</option>';
+                html += verbFormKeys.map(t => `<option value="${t}">${formReadableNames[t] || t}</option>`).join('');
                 els.inputs.formsType.innerHTML = html;
             }
+            // Populate Word Formation Select
+            if (els.inputs.wordFormationType) {
+                let html = '<option value="random">🎲 Tổng hợp (Mixed Formation)</option>';
+                html += wordFormKeys.map(t => `<option value="${t}">${formReadableNames[t] || t}</option>`).join('');
+                els.inputs.wordFormationType.innerHTML = html;
+            }
+
             setMode('vocab');
             els.config.qtyInput.addEventListener('input', (e) => {
                 els.config.qtyDisplay.textContent = `${e.target.value}`;
