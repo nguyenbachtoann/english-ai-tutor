@@ -406,7 +406,7 @@
                     <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6" id="modeGrid">
 
                         <!-- NEW STUDY MODE CARD -->
-                        <div onclick="setMode('study')" id="mode-study" class="mode-card col-span-2 sm:col-span-3 bg-white p-5 rounded-2xl shadow-sm hover:shadow-md active h-auto border-emerald-200">
+                        <div onclick="setMode('study')" id="mode-study" class="mode-card col-span-2 sm:col-span-3 bg-white p-5 rounded-2xl shadow-sm hover:shadow-md h-auto border-emerald-200">
                             <div class="absolute right-0 top-0 px-2 py-0.5 bg-emerald-600 text-white text-[9px] font-bold rounded-bl-lg z-10">MỚI</div>
                             <div class="flex items-center gap-4 relative z-10">
                                 <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl border border-emerald-100"><i class="fas fa-clipboard-check"></i></div>
@@ -415,7 +415,7 @@
                         </div>
 
                         <!-- REVIEW MISTAKES CARD -->
-                        <div onclick="startDailyReview()" class="mode-card col-span-2 sm:col-span-3 bg-red-50 p-5 rounded-2xl shadow-sm hover:shadow-md active h-auto border-red-200 cursor-pointer hover:bg-red-100 transition-colors">
+                        <div onclick="startDailyReview()" class="mode-card col-span-2 sm:col-span-3 bg-red-50 p-5 rounded-2xl shadow-sm hover:shadow-md h-auto border-red-200 cursor-pointer hover:bg-red-100 transition-colors">
                             <div class="flex items-center gap-4 relative z-10">
                                 <div class="w-12 h-12 rounded-2xl bg-white text-red-500 flex items-center justify-center text-xl border border-red-100 shadow-sm"><i class="fas fa-bomb"></i></div>
                                 <div class="flex-1"><h3 class="text-base font-black text-gray-800">Khắc Phục Sai Lầm</h3><p class="text-xs text-gray-600 font-bold mt-0.5">Ôn lại TẤT CẢ các câu đã sai.</p></div>
@@ -423,14 +423,14 @@
                         </div>
 
                         <!-- NEW REWRITE MODE -->
-                        <div onclick="setMode('rewrite')" id="mode-rewrite" class="mode-card col-span-2 sm:col-span-3 bg-white p-5 rounded-2xl shadow-sm hover:shadow-md active h-auto border-purple-200">
+                        <div onclick="setMode('rewrite')" id="mode-rewrite" class="mode-card col-span-2 sm:col-span-3 bg-white p-5 rounded-2xl shadow-sm hover:shadow-md h-auto border-purple-200">
                             <div class="flex items-center gap-4 relative z-10">
                                 <div class="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center text-xl border border-purple-100"><i class="fas fa-pencil-alt"></i></div>
                                 <div class="flex-1"><h3 class="text-base font-black text-gray-800">Dịch Câu</h3><p class="text-xs text-gray-500 font-medium mt-0.5">Viết lại câu hoàn chỉnh.</p></div>
                             </div>
                         </div>
 
-                        <div onclick="setMode('roleplay')" id="mode-roleplay" class="mode-card col-span-2 sm:col-span-3 bg-white p-5 rounded-2xl shadow-sm hover:shadow-md active h-auto">
+                        <div onclick="setMode('roleplay')" id="mode-roleplay" class="mode-card col-span-2 sm:col-span-3 bg-white p-5 rounded-2xl shadow-sm hover:shadow-md h-auto">
                             <div class="absolute right-0 top-0 px-2 py-0.5 bg-indigo-600 text-white text-[9px] font-bold rounded-bl-lg z-10">HOT</div>
                             <div class="flex items-center gap-4 relative z-10">
                                 <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl border border-indigo-100"><i class="fas fa-comments"></i></div>
@@ -849,7 +849,21 @@
             if (gameState.currentIdx >= gameState.data.length) return;
             const item = gameState.data[gameState.currentIdx];
             const mainCorrect = gameState.currentCorrect.toLowerCase();
-            const isCorrect = !isTimeout && (user === mainCorrect || gameState.currentOthers.includes(user));
+            let isCorrect = false;
+
+            // SMART MULTI-ANSWER CHECK (Comma/Slash separation)
+            if (mainCorrect.includes(',') || mainCorrect.includes('/')) {
+                const splitRegex = /[,/]+/;
+                const correctParts = mainCorrect.split(splitRegex).map(s => s.trim());
+                const userParts = user.split(splitRegex).map(s => s.trim());
+                if (correctParts.length === userParts.length) {
+                    isCorrect = correctParts.every((part, idx) => part === userParts[idx]);
+                }
+                // Fallback: Check if user input matches exact string if they didn't split well but typed exact chars
+                if (!isCorrect) isCorrect = (user === mainCorrect);
+            } else {
+                isCorrect = !isTimeout && (user === mainCorrect || gameState.currentOthers.includes(user));
+            }
 
             gameState.history.push({ q: gameState.mode === 'listening' ? `🔊 ${item.en}` : (gameState.mode === 'reading' ? `📖 Question ${gameState.currentIdx + 1}` : els.game.display.textContent), a: gameState.currentCorrect, u: isTimeout ? "HẾT GIỜ" : els.inputs.answer.value, ok: isCorrect });
 
@@ -1430,7 +1444,12 @@
                 els.checkBtn.onclick = checkExamAnswer;
                 els.inputs.answer.onkeypress = (e) => { if(e.key === 'Enter') checkExamAnswer(); };
                 els.checkBtn.innerHTML = '<i class="fas fa-check"></i>';
-                els.inputs.answer.placeholder = "Nhập đáp án...";
+                els.checkBtn.innerHTML = '<i class="fas fa-check"></i>';
+                if (['grammar', 'forms', 'wordform'].includes(gameState.mode)) {
+                     els.inputs.answer.placeholder = "Nhập đáp án (dùng dấu phẩy nếu nhiều chỗ trống)...";
+                } else {
+                     els.inputs.answer.placeholder = "Nhập đáp án...";
+                }
             }
 
             if (!isRoleplay && (!gameState.data || !gameState.data[gameState.currentIdx])) return;
@@ -1673,25 +1692,28 @@
             gameState.mode = type; gameState.isReviewMode = false;
 
             let context = "", displayTitle = "";
-            if (currentGlobalTopic) { context = currentGlobalTopic; displayTitle = currentGlobalTopic; }
+
+            // PRIORITY 1: Technical Modes (Grammar/Forms) MUST use their specific dropdowns
+            if (type === 'grammar') {
+                let t = els.inputs.grammarTense.value;
+                if(t === 'random') { context = "Mixed Tenses"; displayTitle = "Tổng hợp 12 thì"; } else { context = t; displayTitle = t; }
+            }
+            else if (type === 'forms') {
+                let t = els.inputs.formsType.value;
+                if(t === 'random') { context = "Mixed Verb Forms"; displayTitle = "Động từ tổng hợp"; } else { context = t; displayTitle = formReadableNames[t] || t; }
+            }
+            else if (type === 'wordform') {
+                let t = els.inputs.wordFormationType.value;
+                if(t === 'random') { context = "Mixed Word Formation"; displayTitle = "Cấu tạo từ tổng hợp"; } else { context = t; displayTitle = formReadableNames[t] || t; }
+            }
+            // PRIORITY 2: Global Pinned Topic (for Content Modes: Vocab, Reading, etc.)
+            else if (currentGlobalTopic) {
+                context = currentGlobalTopic; displayTitle = currentGlobalTopic;
+            }
+            // PRIORITY 3: Manual Input (Fallback)
             else {
                 let rawInput = (els.inputs.vocabTopic.value || "").trim();
-                // ADDED 'rewrite' to types
-                if (['vocab', 'study', 'phrases', 'idioms', 'listening', 'scramble', 'roleplay', 'reading', 'rewrite'].includes(type)) {
-                    if(!rawInput) { context = "Mixed Topics"; displayTitle = "Tổng hợp"; } else { context = rawInput; displayTitle = context; }
-                }
-                else if (type === 'grammar') {
-                    let t = els.inputs.grammarTense.value;
-                    if(t === 'random') { context = "Mixed Tenses"; displayTitle = "Tổng hợp 12 thì"; } else { context = t; displayTitle = t; }
-                }
-                else if (type === 'forms') { // "Verb Forms" context
-                    let t = els.inputs.formsType.value;
-                    if(t === 'random') { context = "Mixed Verb Forms"; displayTitle = "Động từ tổng hợp"; } else { context = t; displayTitle = formReadableNames[t] || t; }
-                }
-                else if (type === 'wordform') { // "Word Formation" context
-                    let t = els.inputs.wordFormationType.value;
-                    if(t === 'random') { context = "Mixed Word Formation"; displayTitle = "Cấu tạo từ tổng hợp"; } else { context = t; displayTitle = formReadableNames[t] || t; }
-                }
+                if(!rawInput) { context = "Mixed Topics"; displayTitle = "Tổng hợp"; } else { context = rawInput; displayTitle = context; }
             }
 
             let prompt = "";
@@ -1735,21 +1757,24 @@
                 Seed: ${randomSeed}.`;
             }
             else if (type === 'forms') { // VERB FORMS ONLY
-                prompt = `Create ${qty} Verb Form questions (Level ${levelPrompt}) on topic: ${context}.
+                prompt = `Create ${qty} Verb Form questions (Level ${levelPrompt}) on topic: ${context}. ${topicInjection}
                 Response: JSON Array ONLY.
-                Format: [{"question":"<sentence_with_blank_verb>", "answer":"<correct_verb_form>", "explanation":"<VN_reason>"}]
+                Format: [{"question":"<sentence_with_blank_verb>", "answer":"<correct_verb_form>", "explanation":"<VN_detailed_explanation>"}]
                 RULES:
                 1. Focus on Irregular Verbs, V3, V-ing, V-ed, Conjugations.
                 2. Context: ${context}.
+                3. If multiple blanks, separate answers with comma (e.g. "went, gone").
+                4. Explanation MUST explain WHY this form is used (e.g., "Dùng V3 vì là câu bị động").
                 Seed: ${randomSeed}.`;
             }
             else if (type === 'wordform') { // WORD FORMATION ONLY
-                prompt = `Create ${qty} Word Formation questions (Level ${levelPrompt}) on topic: ${context}.
+                prompt = `Create ${qty} Word Formation questions (Level ${levelPrompt}) on topic: ${context}. ${topicInjection}
                 Response: JSON Array ONLY.
-                Format: [{"question":"<root_word> (Change to Noun/Adj/Adv/Negative)", "answer":"<derived_word>", "explanation":"<VN_reason>"}]
+                Format: [{"question":"<root_word> (Change to Noun/Adj/Adv/Negative)", "answer":"<derived_word>", "explanation":"<VN_detailed_explanation>"}]
                 RULES:
                 1. Focus on Suffixes (-tion, -ment, -ness, -ly) and Prefixes (un-, dis-, im-).
                 2. Include derivation like 'happy' -> 'happiness', 'use' -> 'useless'.
+                3. Explanation MUST explain the part of speech needed and why (e.g., "Cần danh từ vì đứng sau tính từ sở hữu").
                 Seed: ${randomSeed}.`;
             }
             else if (type === 'idioms') {
@@ -1780,22 +1805,42 @@
                 Format: {
                 "passage": "<English Passage Text>",
                 "questions": [
-                    { "question": "<Question Text>", "options": ["A", "B", "C", "D"], "answer": "<Correct Option Text>", "explanation": "<Vietnamese Explanation>" }
+                    { "question": "<Question Text>", "options": ["Option text 1", "Option text 2", "Option text 3", "Option text 4"], "answer": "<Exact text of correct option>", "explanation": "<Vietnamese Explanation>" }
                 ]
                 }
+                RULES:
+                1. 'options' MUST be an array of simple strings. DO NOT include "A.", "B)", "C." prefixes in the strings.
+                2. 'answer' MUST be the exact string content of the correct option (CASE SENSITIVE Match).
                 Seed: ${randomSeed}.`;
             }
             else if (type === 'grammar') {
-                prompt = `Create ${qty} grammar fill-in-blank questions (Level ${levelPrompt}) on topic: ${context}.
+                prompt = `Create ${qty} grammar fill-in-blank questions (Level ${levelPrompt}) on topic: ${context}. ${topicInjection}
                 Response: JSON Array ONLY.
-                Format: [{"question":"She ___ (go) home.","verb":"go","answer":"goes","explanation":"<VN_reason>"}]
-                RULE: 'answer' is the conjugated verb only.
+                Format: [{"question":"She ___ (go) home.","verb":"go","answer":"goes","explanation":"<VN_detailed_explanation>"}]
+                RULES:
+                1. 'answer' is the conjugated verb only. If multiple blanks, use comma (e.g. "goes, is").
+                2. EXPLANATION IN VIETNAMESE MUST BE DETAILED (Step-by-Step Analysis):
+                   - Explain the Signal Word (Dấu hiệu nhận biết).
+                   - Explain Subject-Verb agreement (Tại sao dùng 'have' hay 'has', 'was' hay 'were'...).
+                   - Explain the Verb Form (Tại sao dùng V3, V-ing...).
+                   (Example: "Dùng thì Hiện Tại Hoàn Thành vì có 'since'. Chủ ngữ 'She' số ít nên chọn trợ từ 'has'. Động từ 'go' ở cột 3 là 'gone' => has gone").
+                3. CRITICAL: STRICTLY GENERATE QUESTIONS ONLY FOR THE TOPIC: '${context}'.
+                   - ABSOLUTELY NO mixing with other tenses.
+                   - If topic is 'Present Perfect', ONLY use 'have/has + V3'. NEVER use 'had' (Past Perfect) or single V2.
+                   - If topic is 'Past Simple', ONLY use V2/ed. NEVER use have/has/had.
                 Seed: ${randomSeed}.`;
             }
             else if (type === 'roleplay') {
                 let pc = context === "Mixed Topics" ? "ordering coffee" : `${context}`;
                 prompt = `Create Roleplay Scenario: ${pc}. Level ${levelPrompt}.
                 JSON Output: { "scenario": "Short description", "aiRole": "AI's role", "userRole": "User's role", "aiFirstMessage": "Opening line" }`;
+            }
+
+            // --- SAFETY CHECK FOR PROMPT ---
+            if (!prompt || prompt.trim() === "") {
+                console.warn(`[generateContent] Empty prompt for type: '${type}'. Context: '${context}'. Force switching to Offline Mode.`);
+                // Throw error to jump to catch block immediately (skip server call that would fail 400)
+                throw new Error("Prompt generation failed/empty - Skipping Server Call");
             }
 
             try {
@@ -1864,14 +1909,29 @@
 
                 let source = [];
                 // Offline fallback logic
-                if (type === 'grammar' && context === 'Mixed Tenses') Object.values(offlineData.grammar).forEach(arr => source = source.concat(arr));
+                // Offline fallback logic
+                if (type === 'grammar') {
+                   if (context === 'Mixed Tenses' || context === 'Mixed Topics') {
+                       Object.values(offlineData.grammar).forEach(arr => source = source.concat(arr));
+                   } else if (offlineData.grammar[context]) {
+                       source = offlineData.grammar[context];
+                   }
+                }
                 else if (type === 'forms') {
-                    // Fallback for Verb Forms
-                    source = [...(offlineData.forms.irregular || []), ...(offlineData.forms.irregular_v3 || []), ...(offlineData.forms.ing || []), ...(offlineData.forms.ed || [])];
+                    // Fix: Respect specific context if not Mixed
+                    if (context === 'Mixed Verb Forms' || context === 'Mixed Topics' || context === 'random') {
+                        source = [...(offlineData.forms.irregular || []), ...(offlineData.forms.irregular_v3 || []), ...(offlineData.forms.ing || []), ...(offlineData.forms.ed || [])];
+                    } else if (offlineData.forms[context]) {
+                        source = offlineData.forms[context];
+                    }
                 }
                 else if (type === 'wordform') {
-                    // Fallback for Word Forms
-                     source = [...(offlineData.forms.noun_suffix || []), ...(offlineData.forms.adj_suffix || []), ...(offlineData.forms.prefixes || [])];
+                    // Fix: Respect specific context if not Mixed
+                     if (context === 'Mixed Word Formation' || context === 'Mixed Topics' || context === 'random') {
+                        source = [...(offlineData.forms.noun_suffix || []), ...(offlineData.forms.adj_suffix || []), ...(offlineData.forms.prefixes || []), ...(offlineData.forms.verb_noun || []), ...(offlineData.forms.noun_adj || []), ...(offlineData.forms.adj_adv || [])];
+                     } else if (offlineData.forms[context]) {
+                        source = offlineData.forms[context];
+                     }
                 }
                 else if (offlineData[type] && offlineData[type][context]) source = offlineData[type][context];
                 else if (offlineData[type]) source = Object.values(offlineData[type]).flat();
@@ -1882,18 +1942,43 @@
                     }
                 }
 
-                if(!source.length && (type==='vocab' || type==='study')) source = offlineData.vocab["Daily Life"];
+                // IMPROVED FALLBACK FOR MISSING MODES
+                if(!source.length) {
+                    if (type === 'vocab' || type === 'study' || type === 'listening' || type === 'rewrite' || type === 'scramble' || type === 'phrases') {
+                        // Fallback to Daily Life Vocab for these text-based modes if native offline data missing
+                        source = offlineData.vocab["Daily Life"] || [];
+                        // Check if we have phrases data
+                        if (type === 'phrases' && offlineData.phrases) source = Object.values(offlineData.phrases).flat();
+                    }
+                }
 
                 let finalData = [];
                 if (type !== 'reading') {
-                    while(finalData.length < qty && source.length > 0) finalData = finalData.concat([...source].sort(()=>0.5-Math.random()));
-                    gameState.data = finalData.slice(0, qty);
+                    if (source.length > 0) {
+                        while(finalData.length < qty) finalData = finalData.concat([...source].sort(()=>0.5-Math.random()));
+                        gameState.data = finalData.slice(0, qty);
+                    }
                 } else {
                     gameState.data = source.slice(0, qty);
                 }
 
+                if (!gameState.data || gameState.data.length === 0) {
+                    alert("Hiện tại không thể tải dữ liệu (Server quá tải & không có dữ liệu Offline cho mục này). Vui lòng thử lại sau hoặc chọn chủ đề khác!");
+                    els.loading.overlay.classList.add('hidden');
+                    return;
+                }
+
                 els.game.title.textContent = `${displayTitle} (Offline)`;
-                startGame(); els.loading.overlay.classList.add('hidden');
+
+                // For 'study' mode offline
+                if (type === 'study') {
+                     renderStudyList(gameState.data, type);
+                     toggleModal(els.screens.study, els.screens.study.firstElementChild, null, true);
+                     els.screens.start.classList.add('hidden');
+                } else {
+                    startGame();
+                }
+                els.loading.overlay.classList.add('hidden');
             }
         };
 
@@ -2008,7 +2093,10 @@
         const startGeneration = () => {
             const activeCard = document.querySelector('.mode-card.active');
             let mode = 'vocab';
-            if (activeCard) { mode = activeCard.id.replace('mode-', ''); }
+            if (activeCard && activeCard.id) {
+                mode = activeCard.id.replace('mode-', '').trim();
+            }
+            console.log("Starting Generation for Mode:", mode);
             // CAPTURE TIMER STATE ON START
             gameState.timerEnabled = document.getElementById('timerToggle').checked;
             generateContent(mode);
@@ -2408,6 +2496,17 @@
                 UserSystem.save();
             });
         } catch (e) { console.error("Initialization Error:", e); }
+
+        // --- KEEP SERVER ALIVE (Render Free Tier) ---
+        // Pings the server every 5 minutes to prevent sleep
+        setInterval(() => {
+            if (typeof SERVER_URL !== 'undefined') {
+                console.log("Health Check: Pinging Server...");
+                fetch(`${SERVER_URL}/`)
+                    .then(res => console.log("Health Check: Server Active", res.status))
+                    .catch(e => console.warn("Health Check: Server Sleeping or Error", e));
+            }
+        }, 300000); // 5 minutes
     </script>
 </body>
 </html>
