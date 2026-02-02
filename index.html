@@ -1325,21 +1325,47 @@
 
             if (gameState.currentIdx >= gameState.data.length) return;
             const item = gameState.data[gameState.currentIdx];
-            const mainCorrect = gameState.currentCorrect.toLowerCase();
+            const flexibleCompare = (u, c) => {
+                let un = u.toLowerCase().trim().replace(/['’‘]/g, "'");
+                let cn = c.toLowerCase().trim().replace(/['’‘]/g, "'");
+                if (un === cn) return true;
+
+                const contractions = {
+                    "don't": "do not", "doesn't": "does not", "didn't": "did not",
+                    "haven't": "have not", "hasn't": "has not", "hadn't": "had not",
+                    "isn't": "is not", "aren't": "are not", "wasn't": "was not", "weren't": "were not",
+                    "won't": "will not", "can't": "can not", "cannot": "can not",
+                    "shouldn't": "should not", "couldn't": "could not", "wouldn't": "would not",
+                    "i'm": "i am", "you're": "you are", "he's": "he is", "she's": "she is", "it's": "it is", "we're": "we are", "they're": "they are",
+                    "i've": "i have", "you've": "you have", "we've": "we have", "they've": "they have",
+                    "i'll": "i will", "you'll": "you will", "he'll": "he will", "she'll": "he will", "it'll": "it will", "we'll": "we will", "they'll": "they will"
+                };
+
+                for (const [key, val] of Object.entries(contractions)) {
+                    un = un.replace(new RegExp(`\\b${key}\\b`, 'g'), val);
+                    cn = cn.replace(new RegExp(`\\b${key}\\b`, 'g'), val);
+                }
+                return un === cn;
+            };
+
+            const mainCorrect = gameState.currentCorrect;
             let isCorrect = false;
 
             // SMART MULTI-ANSWER CHECK (Comma/Slash separation)
-            if (mainCorrect.includes(',') || mainCorrect.includes('/')) {
-                const splitRegex = /[,/]+/;
-                const correctParts = mainCorrect.split(splitRegex).map(s => s.trim());
-                const userParts = user.split(splitRegex).map(s => s.trim());
-                if (correctParts.length === userParts.length) {
-                    isCorrect = correctParts.every((part, idx) => part === userParts[idx]);
+            if (mainCorrect.includes(',') || mainCorrect.includes('/') || mainCorrect.includes(';')) {
+                const splitRegex = /[,/;]+/;
+                const correctParts = mainCorrect.split(splitRegex).map(s => s.trim()).filter(s => s);
+                const userParts = user.split(splitRegex).map(s => s.trim()).filter(s => s);
+
+                if (correctParts.length > 0 && correctParts.length === userParts.length) {
+                    isCorrect = correctParts.every((part, idx) => flexibleCompare(userParts[idx], part));
+                } else if (correctParts.length === 1) {
+                    isCorrect = flexibleCompare(user, mainCorrect);
                 }
-                // Fallback: Check if user input matches exact string if they didn't split well but typed exact chars
-                if (!isCorrect) isCorrect = (user === mainCorrect);
+
+                if (!isCorrect) isCorrect = flexibleCompare(user, mainCorrect);
             } else {
-                isCorrect = !isTimeout && (user === mainCorrect || gameState.currentOthers.includes(user));
+                isCorrect = !isTimeout && (flexibleCompare(user, mainCorrect) || gameState.currentOthers.some(o => flexibleCompare(user, o)));
             }
 
             gameState.history.push({ q: gameState.mode === 'listening' ? `🔊 ${item.en}` : (gameState.mode === 'reading' ? `📖 Question ${gameState.currentIdx + 1}` : els.game.display.textContent), a: gameState.currentCorrect, u: isTimeout ? "HẾT GIỜ" : els.inputs.answer.value, ok: isCorrect });
@@ -1453,17 +1479,25 @@
 
         // (Existing nopdTopics remain unchanged)
         const nopdTopics = {
-            "Everyday Language": [{ en: "Meeting & Greeting", vi: "Chào hỏi & Làm quen" }, { en: "Time & Date", vi: "Thời gian & Ngày tháng" }, { en: "Numbers", vi: "Số đếm" }, { en: "Colors", vi: "Màu sắc" }, { en: "Weather", vi: "Thời tiết" }, { en: "Money", vi: "Tiền tệ" }],
-            "People": [{ en: "Family Members", vi: "Thành viên gia đình" }, { en: "The Human Body", vi: "Cơ thể người" }, { en: "Face & Hair", vi: "Gương mặt & Tóc" }, { en: "Emotions", vi: "Cảm xúc" }, { en: "Clothes", vi: "Quần áo" }, { en: "Daily Routine", vi: "Thói quen hàng ngày" }],
-            "Housing": [{ en: "House Exterior", vi: "Ngoại thất ngôi nhà" }, { en: "Living Room", vi: "Phòng khách" }, { en: "Kitchen", vi: "Nhà bếp" }, { en: "Bedroom", vi: "Phòng ngủ" }, { en: "Bathroom", vi: "Phòng tắm" }, { en: "Household Chores", vi: "Việc nhà" }],
-            "Food": [{ en: "Fruit", vi: "Trái cây" }, { en: "Vegetables", vi: "Rau củ" }, { en: "Meat & Poultry", vi: "Thịt & Gia cầm" }, { en: "Seafood", vi: "Hải sản" }, { en: "Drinks", vi: "Đồ uống" }, { en: "Supermarket", vi: "Siêu thị" }, { en: "Restaurant", vi: "Nhà hàng" }],
-            "Health": [{ en: "Medical Care", vi: "Chăm sóc y tế" }, { en: "Ailments & Injuries", vi: "Bệnh & Chấn thương" }, { en: "The Hospital", vi: "Bệnh viện" }, { en: "Dental Care", vi: "Chăm sóc nha khoa" }],
-            "Community": [{ en: "The City", vi: "Thành phố" }, { en: "Downtown", vi: "Trung tâm thành phố" }, { en: "Shopping Mall", vi: "Trung tâm thương mại" }, { en: "Bank", vi: "Ngân hàng" }, { en: "Post Office", vi: "Bưu điện" }, { en: "Library", vi: "Thư viện" }],
-            "Transport": [{ en: "Car Parts", vi: "Phụ tùng xe hơi" }, { en: "Bicycle", vi: "Xe đạp" }, { en: "Public Transportation", vi: "Giao thông công cộng" }, { en: "Airport", vi: "Sân bay" }, { en: "Traffic Signs", vi: "Biển báo giao thông" }],
-            "Work": [{ en: "Office", vi: "Văn phòng" }, { en: "Construction Site", vi: "Công trường xây dựng" }, { en: "Farming", vi: "Nông trại" }, { en: "Jobs & Occupations", vi: "Nghề nghiệp" }, { en: "Tools", vi: "Dụng cụ" }],
-            "Nature": [{ en: "Animals", vi: "Động vật" }, { en: "Birds & Insects", vi: "Chim & Côn trùng" }, { en: "Plants & Trees", vi: "Cây cối" }, { en: "The Universe", vi: "Vũ trụ" }, { en: "Environment", vi: "Môi trường" }],
-            "School": [{ en: "Classroom", vi: "Lớp học" }, { en: "School Subjects", vi: "Môn học" }, { en: "Stationery", vi: "Văn phòng phẩm" }, { en: "Study Activities", vi: "Hoạt động học tập" }],
-            "Recreation": [{ en: "Sports", vi: "Thể thao" }, { en: "Hobbies", vi: "Sở thích" }, { en: "Music", vi: "Âm nhạc" }, { en: "Beach", vi: "Bãi biển" }, { en: "Camping", vi: "Cắm trại" }]
+            "Everyday Language": [{ en: "Meeting & Greeting", vi: "Chào hỏi & Làm quen" }, { en: "Time & Date", vi: "Thời gian & Ngày tháng" }, { en: "Numbers", vi: "Số đếm" }, { en: "Colors", vi: "Màu sắc" }, { en: "Weather", vi: "Thời tiết" }, { en: "Money", vi: "Tiền tệ" }, { en: "Common Adjectives", vi: "Tính từ thông dụng" }],
+            "People": [{ en: "Family Members", vi: "Thành viên gia đình" }, { en: "The Human Body", vi: "Cơ thể người" }, { en: "Face & Hair", vi: "Gương mặt & Tóc" }, { en: "Emotions", vi: "Cảm xúc" }, { en: "Clothes", vi: "Quần áo" }, { en: "Daily Routine", vi: "Thói quen hàng ngày" }, { en: "Personality Traits", vi: "Tính cách" }, { en: "Gestures & Body Language", vi: "Cử chỉ & Ngôn ngữ cơ thể" }],
+            "Housing": [{ en: "House Exterior", vi: "Ngoại thất ngôi nhà" }, { en: "Living Room", vi: "Phòng khách" }, { en: "Kitchen", vi: "Nhà bếp" }, { en: "Bedroom", vi: "Phòng ngủ" }, { en: "Bathroom", vi: "Phòng tắm" }, { en: "Household Chores", vi: "Việc nhà" }, { en: "Smart Home", vi: "Nhà thông minh" }, { en: "Real Estate", vi: "Bất động sản" }],
+            "Food": [{ en: "Fruit", vi: "Trái cây" }, { en: "Vegetables", vi: "Rau củ" }, { en: "Meat & Poultry", vi: "Thịt & Gia cầm" }, { en: "Seafood", vi: "Hải sản" }, { en: "Drinks", vi: "Đồ uống" }, { en: "Supermarket", vi: "Siêu thị" }, { en: "Restaurant", vi: "Nhà hàng" }, { en: "Cooking Methods", vi: "Phương pháp nấu ăn" }, { en: "Nutrition & Diet", vi: "Dinh dưỡng & Chế độ ăn" }],
+            "Health": [{ en: "Medical Care", vi: "Chăm sóc y tế" }, { en: "Ailments & Injuries", vi: "Bệnh & Chấn thương" }, { en: "The Hospital", vi: "Bệnh viện" }, { en: "Dental Care", vi: "Chăm sóc nha khoa" }, { en: "Mental Health", vi: "Sức khỏe tâm thần" }, { en: "Fitness & Exercise", vi: "Thể hình & Tập luyện" }, { en: "Pharmacy & Medicines", vi: "Nhà thuốc & Thuốc" }],
+            "Community": [{ en: "The City", vi: "Thành phố" }, { en: "Downtown", vi: "Trung tâm thành phố" }, { en: "Shopping Mall", vi: "Trung tâm thương mại" }, { en: "Bank", vi: "Ngân hàng" }, { en: "Post Office", vi: "Bưu điện" }, { en: "Library", vi: "Thư viện" }, { en: "Museum & Gallery", vi: "Bảo tàng & Phòng tranh" }, { en: "Religious Places", vi: "Địa điểm tôn giáo" }],
+            "Transport": [{ en: "Car Parts", vi: "Phụ tùng xe hơi" }, { en: "Bicycle", vi: "Xe đạp" }, { en: "Public Transportation", vi: "Giao thông công cộng" }, { en: "Airport", vi: "Sân bay" }, { en: "Traffic Signs", vi: "Biển báo giao thông" }, { en: "Logistics", vi: "Hậu cần & Vận tải" }, { en: "Space Travel", vi: "Du hành vũ trụ" }],
+            "Work": [{ en: "Office", vi: "Văn phòng" }, { en: "Construction Site", vi: "Công trường xây dựng" }, { en: "Farming", vi: "Nông trại" }, { en: "Jobs & Occupations", vi: "Nghề nghiệp" }, { en: "Tools", vi: "Dụng cụ" }, { en: "Remote Work", vi: "Làm việc từ xa" }, { en: "Entrepreneurship", vi: "Khởi nghiệp" }, { en: "Workplace Safety", vi: "An toàn lao động" }],
+            "Technology": [{ en: "Internet & Web", vi: "Internet & Mạng" }, { en: "Social Media", vi: "Mạng xã hội" }, { en: "Artificial Intelligence", vi: "Trí tuệ nhân tạo" }, { en: "Gadgets & Hardware", vi: "Thiết bị & Phần cứng" }, { en: "Cybersecurity", vi: "An ninh mạng" }, { en: "Programming", vi: "Lập trình" }, { en: "Blockchain & Crypto", vi: "Blockchain & Tiền ảo" }],
+            "Nature": [{ en: "Animals", vi: "Động vật" }, { en: "Birds & Insects", vi: "Chim & Côn trùng" }, { en: "Plants & Trees", vi: "Cây cối" }, { en: "The Universe", vi: "Vũ trụ" }, { en: "Environment", vi: "Môi trường" }, { en: "Climate Change", vi: "Biến đổi khí hậu" }, { en: "Natural Disasters", vi: "Thiên tai" }],
+            "School": [{ en: "Classroom", vi: "Lớp học" }, { en: "School Subjects", vi: "Môn học" }, { en: "Stationery", vi: "Văn phòng phẩm" }, { en: "Study Activities", vi: "Hoạt động học tập" }, { en: "Higher Education", vi: "Giáo dục đại học" }, { en: "Online Learning", vi: "Học trực tuyến" }],
+            "Recreation": [{ en: "Sports", vi: "Thể thao" }, { en: "Hobbies", vi: "Sở thích" }, { en: "Music", vi: "Âm nhạc" }, { en: "Beach", vi: "Bãi biển" }, { en: "Camping", vi: "Cắm trại" }, { en: "Cinema & Photography", vi: "Điện ảnh & Nhiếp ảnh" }, { en: "Gaming", vi: "Trò chơi điện tử" }, { en: "Nightlife", vi: "Đời sống về đêm" }],
+            "Business": [{ en: "Marketing & Sales", vi: "Tiếp thị & Bán hàng" }, { en: "Human Resources", vi: "Nhân sự" }, { en: "Finance & Investment", vi: "Tài chính & Đầu tư" }, { en: "Economy", vi: "Kinh tế" }, { en: "Customer Service", vi: "Dịch vụ khách hàng" }, { en: "E-commerce", vi: "Thương mại điện tử" }],
+            "Law & Justice": [{ en: "Legal System", vi: "Hệ thống pháp luật" }, { en: "Crimes", vi: "Tội phạm" }, { en: "Courtroom", vi: "Phòng xử án" }, { en: "Human Rights", vi: "Quyền con người" }, { en: "Police & Security", vi: "Cảnh sát & An ninh" }],
+            "Politics": [{ en: "Government", vi: "Chính phủ" }, { en: "Elections", vi: "Bầu cử" }, { en: "Diplomacy", vi: "Ngoại giao" }, { en: "Social Issues", vi: "Vấn đề xã hội" }, { en: "International Relations", vi: "Quan hệ quốc tế" }],
+            "Science": [{ en: "Biology", vi: "Sinh học" }, { en: "Chemistry", vi: "Hóa học" }, { en: "Physics", vi: "Vật lý" }, { en: "Mathematics", vi: "Toán học" }, { en: "Geology", vi: "Địa chất" }, { en: "Psychology", vi: "Tâm lý học" }],
+            "Media": [{ en: "Journalism", vi: "Báo chí" }, { en: "Broadcasting", vi: "Phát thanh truyền hình" }, { en: "Advertising", vi: "Quảng cáo" }, { en: "Public Relations", vi: "Quan hệ công chúng" }, { en: "Publishing", vi: "Xuất bản" }],
+            "History & Culture": [{ en: "World History", vi: "Lịch sử thế giới" }, { en: "Landmarks", vi: "Địa danh nổi tiếng" }, { en: "Literature", vi: "Văn học" }, { en: "Fine Arts", vi: "Mỹ thuật" }, { en: "Traditions & Holidays", vi: "Truyền thống & Lễ hội" }],
+            "Lifestyle": [{ en: "Travel & Tourism", vi: "Du lịch & Lữ hành" }, { en: "Fashion", vi: "Thời trang" }, { en: "Architecture", vi: "Kiến trúc" }, { en: "Interior Design", vi: "Thiết kế nội thất" }, { en: "Self-Improvement", vi: "Phát triển bản thân" }, { en: "Mindfulness & Yoga", vi: "Thiền & Yoga" }]
         };
 
         const offlineData = {
@@ -1958,8 +1992,15 @@
                 els.checkBtn.innerHTML = '<i class="fas fa-check"></i>';
                 els.checkBtn.innerHTML = '<i class="fas fa-check"></i>';
                 if (['grammar', 'forms', 'wordform'].includes(gameState.mode)) {
-                    els.inputs.answer.placeholder = "Nhập đáp án (dùng dấu phẩy nếu nhiều chỗ trống)...";
                     document.getElementById('hintBtn').classList.remove('hidden');
+                    // Multi-blank detection for specific modes
+                    const item = gameState.data[gameState.currentIdx];
+                    const blankCount = (item && item.question) ? (item.question.match(/________/g) || []).length : 0;
+                    if (blankCount > 1) {
+                        els.inputs.answer.placeholder = `Nhập đủ ${blankCount} đáp án (cách nhau bởi dấu phẩy)...`;
+                    } else {
+                        els.inputs.answer.placeholder = "Nhập đáp án (dùng dấu phẩy nếu nhiều chỗ trống)...";
+                    }
                 } else {
                     els.inputs.answer.placeholder = "Nhập đáp án...";
                     document.getElementById('hintBtn').classList.add('hidden');
@@ -2312,9 +2353,10 @@
                 RULES:
                 1. 'question' MUST contain '________' (blank) and the base verb IN PARENTHESES.
                 2. 'answer' MUST be the correct word to fill the blank.
-                3. NO duplicates. Ensure ${qty} distinct verbs.
-                4. ${isMixed ? "This is a MIXED mode exercise." : `CRITICAL: ONLY target '${context}'.`}
-                5. 'vocab_hints': Identify 2-3 challenging words and translate to STANDARD VIETNAMESE.
+                3. IF THERE ARE MULTIPLE BLANKS, 'answer' MUST contain all answers separated by a comma (e.g. "went, was").
+                4. ${isMixed ? "This is a MIXED mode exercise." : `CRITICAL: ONLY target '${context}'. ABSOLUTELY NO other verb forms. Every single sentence must strictly test '${context}'.`}
+                5. NO duplicates. Ensure ${qty} distinct verbs.
+                6. 'vocab_hints': Identify 2-3 challenging words and translate to STANDARD VIETNAMESE.
                 Seed: ${randomSeed}.`;
             }
             else if (type === 'wordform') { // WORD FORMATION ONLY
@@ -2325,9 +2367,10 @@
                 RULES:
                 1. 'question' MUST contain '________' (blank) and the root word in parentheses.
                 2. Focus on Suffixes (-tion, -ment, -ness, -ly) and Prefixes (un-, dis-, im-).
-                3. ${isMixed ? "This is a MIXED word formation exercise." : `CRITICAL: ONLY target the specific category: '${context}'. Do not mix with others.`}
-                4. NO duplicates. Ensure ${qty} distinct root words.
-                5. 'vocab_hints': Extract 2-3 sophisticated or professional words from the sentence and translate to Vietnamese.
+                3. IF THERE ARE MULTIPLE BLANKS, 'answer' MUST contain all answers separated by a comma (e.g. "beautiful, slowly").
+                4. ${isMixed ? "This is a MIXED word formation exercise." : `CRITICAL: ONLY target the specific category: '${context}'. Do not mix with others.`}
+                5. NO duplicates. Ensure ${qty} distinct root words.
+                6. 'vocab_hints': Extract 2-3 sophisticated or professional words from the sentence and translate to Vietnamese.
                 Seed: ${randomSeed}.`;
             }
             else if (type === 'idioms') {
@@ -2375,10 +2418,10 @@
                 Response: JSON Array ONLY.
                 Format: [{"question":"She ________ (go) home.", "answer":"goes", "explanation":"...", "vocab_hints": [{"word":"...", "vi":"..."}]}]
                 RULES:
-                1. 'question' MUST contain '________' (blank space) AND the base verb (V1) IN PARENTHESES like "________ (go)".
-                2. 'answer' is the conjugated verb only.
-                3. NO DUPLICATE sentences or verbs. Ensure all ${qty} questions are distinct.
-                4. ${isMixed ? "This is a MIXED Tenses exercise." : `CRITICAL: ONLY target '${context}'.`}
+                1. 'question' MUST contain '________' (blank space) AND the base verb (V1) IN PARENTHESES.
+                2. 'answer' is the conjugated verb. IF MULTIPLE BLANKS, 'answer' MUST contain all answers separated by a comma.
+                3. ${isMixed ? "This is a MIXED Tenses exercise." : `STRICT TOPIC ISOLATION: ONLY generate questions for '${context}'. DO NOT mix with any other tenses (e.g. if the topic is Present Perfect Continuous, DO NOT use Future Perfect). Each sentence must have clear context markers (like 'since', 'for', 'tomorrow') that justify the use of ONLY '${context}'.`}
+                4. NO DUPLICATE sentences or verbs. Ensure all ${qty} questions are distinct.
                 5. 'vocab_hints': Identify 2-3 challenging words and translate to STANDARD VIETNAMESE.
                 6. 'explanation' MUST be in STANDARD VIETNAMESE.
                 Seed: ${randomSeed}.`;
