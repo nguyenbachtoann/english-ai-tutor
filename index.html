@@ -2352,9 +2352,9 @@
                 Format: [{"question":"I ________ (go) to school.", "answer":"went", "explanation":"...", "vocab_hints": [{"word":"...", "vi":"..."}]}]
                 RULES:
                 1. 'question' MUST contain '________' (blank) and the base verb IN PARENTHESES.
-                2. 'answer' MUST be the correct word to fill the blank.
-                3. IF THERE ARE MULTIPLE BLANKS, 'answer' MUST contain all answers separated by a comma (e.g. "went, was").
-                4. ${isMixed ? "This is a MIXED mode exercise." : `CRITICAL: ONLY target '${context}'. ABSOLUTELY NO other verb forms. Every single sentence must strictly test '${context}'.`}
+                2. 'answer' MUST be the correct grammatical form.
+                3. STRICT TENSE RULE: Every 'answer' MUST match the specific structure of '${context}'.
+                4. ${isMixed ? "This is a MIXED mode exercise." : `CRITICAL: ONLY target '${context}'. ABSOLUTELY NO other verb forms. If a sentence naturally suggests a different tense (like a schedule), DISCARD it and create a new one.`}
                 5. NO duplicates. Ensure ${qty} distinct verbs.
                 6. 'vocab_hints': Identify 2-3 challenging words and translate to STANDARD VIETNAMESE.
                 Seed: ${randomSeed}.`;
@@ -2419,11 +2419,16 @@
                 Format: [{"question":"She ________ (go) home.", "answer":"goes", "explanation":"...", "vocab_hints": [{"word":"...", "vi":"..."}]}]
                 RULES:
                 1. 'question' MUST contain '________' (blank space) AND the base verb (V1) IN PARENTHESES.
-                2. 'answer' is the conjugated verb. IF MULTIPLE BLANKS, 'answer' MUST contain all answers separated by a comma.
-                3. ${isMixed ? "This is a MIXED Tenses exercise." : `STRICT TOPIC ISOLATION: ONLY generate questions for '${context}'. DO NOT mix with any other tenses (e.g. if the topic is Present Perfect Continuous, DO NOT use Future Perfect). Each sentence must have clear context markers (like 'since', 'for', 'tomorrow') that justify the use of ONLY '${context}'.`}
-                4. NO DUPLICATE sentences or verbs. Ensure all ${qty} questions are distinct.
-                5. 'vocab_hints': Identify 2-3 challenging words and translate to STANDARD VIETNAMESE.
-                6. 'explanation' MUST be in STANDARD VIETNAMESE.
+                2. 'answer' is the conjugated verb.
+                3. STRICT TENSE RULE: For '${context}', every answer MUST follow its specific structure.
+                   Examples:
+                   - If Present Continuous: answer MUST be "am/is/are + verb-ing".
+                   - If Present Perfect: answer MUST be "have/has + V3".
+                   NO EXCEPTIONS for schedules or other usage cases.
+                4. ${isMixed ? "This is a MIXED Tenses exercise." : `STRICT TOPIC ISOLATION: ONLY generate questions for '${context}'. DO NOT mix with any other tenses. Each sentence must have clear context markers that justify the use of ONLY '${context}'.`}
+                5. NO DUPLICATE sentences or verbs. Ensure all ${qty} questions are distinct.
+                6. 'vocab_hints': Identify 2-3 challenging words and translate to STANDARD VIETNAMESE.
+                7. 'explanation' MUST be in STANDARD VIETNAMESE.
                 Seed: ${randomSeed}.`;
             }
             else if (type === 'roleplay') {
